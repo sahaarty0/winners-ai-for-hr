@@ -34,7 +34,8 @@ function setupArena(){
 }
 function doGet(e){
  var p=e&&e.parameter||{}, embed=p.embed==='1',origin=ARENA_ORIGIN;
- var hostedUrl=ARENA_ORIGIN+'/winners-ai-for-hr/arena/?bridge=parent'+(p.session?'&session='+encodeURIComponent(String(p.session)):'');
+ var serviceUrl=ScriptApp.getService().getUrl()||'';
+ var hostedUrl=ARENA_ORIGIN+'/winners-ai-for-hr/arena/?bridge=parent&service='+encodeURIComponent(serviceUrl)+(p.session?'&session='+encodeURIComponent(String(p.session)):'')+(p.view?'&view='+encodeURIComponent(String(p.view)):'');
  var html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
  '<style>html,body{margin:0;width:100%;height:100%;background:#06152c;color:white;font:14px Arial}iframe{border:0;width:100%;height:100%}</style></head><body>'+
  (embed?'<p style="display:none">Winners Arena Bridge</p>':'<iframe id="app" src="'+hostedUrl+'" title="Winners Challenge Arena" allow="clipboard-write"></iframe>')+
