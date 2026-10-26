@@ -1,6 +1,6 @@
 # Winners AI Challenge Arena — FREE deployment
 
-**Status 26 Oct 2026:** GitHub UI and backend code are committed, and a real Google Sheet has been created; **the Apps Script web app is not deployed yet**. Gemini cannot grade live until you finish the one-time setup below. The interface opens in a local demo mode without the backend.
+**Status 26 Oct 2026:** The instructor published the [Apps Script Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec). The live Arena loaded successfully in a browser and displayed the Presenter/Team controls, with “Apps Script Connected”. **Admin login, Sheets submissions and Gemini scoring still require end-to-end classroom smoke tests.** The setup steps below are retained for future re-deployment.
 
 **Training database**: https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit
 
