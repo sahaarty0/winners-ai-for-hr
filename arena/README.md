@@ -36,6 +36,13 @@
 5. The submission is **saved to Sheets before Gemini is called**. If Gemini quota fails, the submission stays available for Manual Scoring. Instructor approves and reveals scores.
 6. Returning Leaders should use the **same device/browser** (their private team token is kept in local storage); otherwise ask the facilitator rather than creating duplicate groups.
 
+## V2 case fidelity — available now on GitHub
+The presenter and leader form now read the same [detailed Case Bank V2](./case-details.js) and display source evidence via [Case Evidence Renderer](./case-view.js). Stage 01 includes named positions, four candidate cards, 12 quoted comments, and 3 supplied leave-policy clauses. Stage 02 includes the Nova 18→24 staff allocation, Store D reporting structure, JD and CBI scoring anchors. Stage 03 uses the same Horizon evidence plus testable workflow and QA acceptance criteria.
+
+**Trainer notice:** The [latest Code.gs](./apps-script/Code.gs) has now been updated so Gemini uses the exact V2 facts and task-weighted rubrics. The Apps Script copy saved **before** this update is outdated. To activate it, replace the contents of the existing Apps Script `Code.gs` with the latest GitHub file, save, and use **Deploy → Manage deployments → Edit → New version → Deploy**. No new Web App URL is needed, and `case-details.js` must **never** be pasted into Apps Script because it uses `export`.
+
+**Current verification:** Offline JavaScript parse tests passed, the Stage 01 Leader Form was opened in a real demo browser and V2 evidence/required tasks displayed, and all three server rubric weights exactly match the V2 case data. **Actual Gemini live grading and Sheets persistence still require a smoke test after redeployment.**
+
 ## Stages
 
 | Stage | Source case | Assessment |
