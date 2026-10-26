@@ -126,7 +126,55 @@ $('advisorForm').addEventListener('submit',ev=>{ev.preventDefault();selectAdvice
 $('useRecommendation').addEventListener('click',()=>{selectAdvice();let r=window._recommendation;$('promptPlatform').value=r.platform;$('promptEffort').value=r.effort;loadCase(r.caseId);buildPrompt();navigate('builder');toast('Recommendation applied')});
 function recommendationText(){const r=window._recommendation;return `Winners AI for HR — Model Advisor\nCase: ${byCase(r.caseId).title}\nSuggested platform: ${r.platform}\nAlternative: ${r.alt}\nThinking depth: ${r.effort}\n\nReasoning:\n- ${r.why.join('\n- ')}\n\nImportant: Provider/model settings change, verify availability, anonymize confidential data, and require human sign-off for consequential decisions.`}
 $('copyRecommendation').addEventListener('click',()=>copyText(recommendationText()));
+const AR_CASES = {
+jd:['الوصف الوظيفي وربط الجدارات','إعداد وصف وظيفي قائم على الجدارات والمسؤوليات ومعايير النجاح القابلة للملاحظة.','شركة صناعية بها 300 موظف، الوظيفة: منسق موارد بشرية. اعتمد على بيانات المستخدم.','متطلبات الوظيفة والجدارات والملاءمة التنظيمية، ومنع اختلاق الرواتب.'],
+cbi:['المقابلة السلوكية ونموذج تقييم الجدارات','إعداد أسئلة مقابلة قائمة على الجدارات وأسئلة متابعة ونموذج تقييم موحد.','أخصائي توظيف متوسط الخبرة؛ يجب توحيد أسلوب المقابلة بين المرشحين.','صلة الأسئلة بالوظيفة والعدالة والمعايير الواضحة وتجنب البيانات الحساسة.'],
+screen:['فرز السير الذاتية والقائمة المختصرة','إنشاء إطار تقييم للسير الذاتية ومصفوفة مقارنة بالأدلة، دون رفض تلقائي.','استخدم بيانات مرشحين مجهولة الهوية ومتطلبات وظيفية موثقة دون معرفات شخصية.','معايير وظيفية وأدلة ناقصة وضوابط التحيز وموافقة بشرية.'],
+wfp:['تخطيط القوى العاملة','تحليل فجوة العرض والطلب على العمالة مع افتراضات وسيناريوهات وحلول توظيف.','مؤسسة متعددة المواقع. اعتمد على أعداد الموظفين والإنتاجية والطلب الموثق.','تتبع الافتراضات وسيناريوهات بديلة واعتماد الإدارة المالية.'],
+org:['مراجعة الهيكل التنظيمي','تحليل التبعية والصلاحيات وتداخل الأدوار ونطاق الإشراف واقتراح هيكل أولي.','شركة خدمات نامية فيها غموض المسؤوليات وتداخل الأدوار.','دقة التبعية ومتطلبات الحوكمة واعتماد الإدارة.'],
+audit:['تدقيق شؤون العاملين والامتثال','إعداد قائمة تدقيق شؤون العاملين وسجل مخاطر بالأدلة المطلوبة والمسؤولين.','مؤسسة في مصر؛ راجع النصوص القانونية الحالية والمستندات الفعلية.','القانون الساري والمصادر وسرية السجلات والمراجعة القانونية.'],
+payroll:['فحص استثناءات الرواتب','تصميم إجراءات لرصد استثناءات الرواتب وطلب الأدلة دون اتهام أحد بالاحتيال.','بيانات رواتب افتراضية تشمل التعديلات والإضافي والخصومات والتكرارات.','مراجعة بشرية ومدخلات الرواتب واللوائح والخصوصية.'],
+rewards:['مراجعة الأدلة السوقية للتعويضات','تصميم نموذج مقارنة رواتب وتحديد أدلة الوظائف والمستويات والمصادر السوقية.','وظائف مختلفة في القطاع نفسه مع اختلاف الموقع والخبرة؛ لا تخترع أرقام رواتب.','تكافؤ المستويات وحداثة المصادر وجودة العينات والسرية.'],
+pms:['أهداف الأداء ومؤشرات القياس','إعداد أهداف SMART وتعريف KPIs والمعادلات والأوزان والمسؤولين ودورية المراجعة.','استخدم أهداف الشركة الاستراتيجية والمسؤوليات الوظيفية الموثقة.','التوازن والعدالة وواقعية المستهدفات والمعايرة.'],
+tna:['تحليل الاحتياجات التدريبية','مقارنة الجدارات الحالية بالجدارات المطلوبة وترتيب أولويات فجوات التدريب.','إدارة موارد بشرية بمستويات متعددة في مصنع؛ لا توصي بتدريب قبل تحليل الفجوة.','إثبات الفجوة والأولويات وأثر الأعمال ومراجعة المديرين.'],
+idp:['خطة التطوير الفردية','إعداد خطة تطوير حسب فجوات القدرات وأنشطة 70-20-10 والمواعيد وأدلة النمو.','ملف موظف مجهول الهوية والدور الحالي والمستهدف ونتائج مناقشة التطوير.','موافقة الموظف وجدول واقعي ومتابعة التقدم.'],
+succession:['مصفوفة جاهزية التعاقب','إنشاء إطار لتقييم مخاطر المناصب وجاهزية البدلاء دون استنتاجات قاطعة بغير دليل.','مناصب قيادية حرجة؛ استخدم أدلة أداء وتقييم موثقة فقط.','العدالة وحداثة الأدلة ومنع التحيز والحوكمة.'],
+attrition:['الأسباب الجذرية لدوران العمالة','تشخيص دوران الموظفين بالتقسيم والفرضيات والأدلة وFishbone و5 Whys.','زيادة ترك العمل بشركة خدمات؛ استخدم المجاميع مع حماية المجموعات الصغيرة.','التمييز بين الارتباط والسببية وتحيز العينة والخصوصية.'],
+engagement:['تحليل صوت الموظف والاستبيانات','إعداد إطار لتصنيف تعليقات الموظفين وربطها بالأدلة وترتيب الإجراءات.','استبيان مجهول الهوية؛ احجب بيانات المجموعات الصغيرة.','حماية الهوية وتمثيل العينة والاقتباسات الدقيقة دون استنتاج أشخاص.'],
+dashboard:['لوحة مؤشرات HR وفق بطاقة الأداء المتوازن','إعداد لوحة BSC بالمهام والأهداف والنتائج المستهدفة وKPIs والأوزان.','خطة HR استراتيجية مرتبطة بالأداء المؤسسي والتقارير التشغيلية.','المعادلات والمسؤوليات والمصادر ومجموع الأوزان والمستهدفات.']
+};
+const AR_FORMAT={'Structured table with actions':'جدول منظم بالإجراءات','Step-by-step implementation plan':'خطة تنفيذ خطوة بخطوة','Executive summary + recommendations':'ملخص تنفيذي وتوصيات','Checklist / audit template':'نموذج تدقيق وقائمة تحقق','CSV-ready table':'جدول قابل للتصدير CSV'};
+const AR_TONE={'Professional, practical and concise':'احترافي وعملي ومختصر','Executive / board-ready':'تنفيذي مناسب لمجلس الإدارة','Training facilitator / accessible':'تدريبي واضح','Formal policy / compliance':'رسمي ومتوافق مع اللوائح','Egyptian Arabic + professional English':'عامية مصرية مع مصطلحات HR المهنية'};
+function buildArabicPrompt(c,v){
+ const item=AR_CASES[c.id]||[],mix=v('pLanguage')==='mix';
+ const role=v('pRole')==='Senior HR Consultant and evidence-driven HR analyst'?'استشاري موارد بشرية أول ومحلل HR يعتمد على الأدلة':v('pRole');
+ const enConstraints='Do not invent policies, laws, benchmarks or data. Use [NEEDS VERIFICATION] for unsupported claims. Separate facts from assumptions. Keep decisions subject to human review.';
+ const constraints=v('pConstraints')===enConstraints?'لا تختلق سياسات أو قوانين أو أرقامًا أو معايير سوقية. اكتب [يحتاج تحقق] عند غياب الدليل، وافصل الحقائق عن الافتراضات، وأخضع القرارات للمراجعة البشرية.':v('pConstraints')||'استخدم المعلومات الموثقة فقط.';
+ const task=v('pTask')===c.task?item[1]:v('pTask');
+ const context=v('pContext')===c.context?item[2]:v('pContext');
+ const depth={Low:'بسيط',Medium:'متوسط',High:'متقدم'}[v('promptEffort')]||v('promptEffort');
+ return [
+ 'WINNERS | برومبت الموارد البشرية العملي',
+ 'حالة الاستخدام: '+(item[0]||c.title),
+ 'مساعد AI المقترح: '+v('promptPlatform')+' | عمق التفكير: '+depth,
+ 'ملاحظة: ضبط عمق التفكير اختياري حسب إمكانيات المنصة.','','الدور المطلوب','تصرّف باعتبارك: '+role+'.',
+ '','المهمة',task,'','السياق',context,'','شكل المخرجات',AR_FORMAT[v('pFormat')]||v('pFormat'),
+ '','نبرة الكتابة',AR_TONE[v('pTone')]||v('pTone'),'','القيود والضوابط',constraints,
+ '','ضبط جودة الأدلة والمخرجات',
+ '- استند إلى المصادر المقدمة، واقتبس الدليل الأصلي عند الحاجة.',
+ '- عند نقص البيانات استخدم [مدخل ناقص] أو [يحتاج تحقق] ولا تختلق معلومات.',
+ '- افصل الوقائع عن الافتراضات والمخاطر والتوصيات.',
+ '- راعِ حماية البيانات وعدالة قرارات الموارد البشرية والامتثال القانوني.',
+ '- أضف خطوات التحقق وحدد القرارات التي يجب أن يعتمدها المسؤول البشري.',
+ '- اختم بقائمة تحقق نهائية قصيرة.',
+ '','التحقق الخاص بالحالة',item[3]||c.checks,
+ '','لغة المخرجات',mix?'اكتب بالعامية المصرية الطبيعية مع مصطلحات HR وBusiness الإنجليزية الضرورية، مع الحفاظ على الدقة المهنية.':'اكتب المخرجات بالعربية المهنية الواضحة، مع استخدام المصطلحات الفنية الإنجليزية عند الضرورة.',
+ '','تنبيه: احتفظ بالنص المخصص الذي كتبه المستخدم بنفسه كما هو، ولا تفترض ترجمته أو أي حقائق غير مذكورة.'
+ ].join('\n');
+}
 function buildPrompt(){const c=byCase($('promptCase').value), val=id=>$(id).value.trim();
+ if(val('pLanguage')!=='en'){const output=buildArabicPrompt(c,val);$('promptOutput').textContent=output;$('promptOutput').dir='rtl';$('promptOutput').style.textAlign='right';window._lastPrompt=output;return output;}
+ $('promptOutput').dir='ltr';$('promptOutput').style.textAlign='left';
  let lang=val('pLanguage')==='ar'?'Write the entire output in professional Arabic.':val('pLanguage')==='mix'?'Write in natural Egyptian Arabic with professional HR/Business English terms.':'Write the entire output in clear professional English.';
  let s=`WINNERS AI FOR HR — PRACTICAL PROMPT\nUse case: ${c.title}\nSuggested AI assistant: ${val('promptPlatform')} | Thinking depth: ${val('promptEffort')}\n(The thinking level is guidance. Set it manually if your platform supports it.)\n\nROLE\nAct as: ${val('pRole')||'[SPECIFY ROLE]'}.\n\nTASK\n${val('pTask')||'[SPECIFY TASK]'}\n\nCONTEXT\n${val('pContext')||'[PROVIDE ORGANIZATIONAL CONTEXT]'}\n\nOUTPUT FORMAT\n${val('pFormat')}\n\nTONE\n${val('pTone')}\n\nCONSTRAINTS\n${val('pConstraints')||'Only use provided and verified information.'}\n\nEVIDENCE & QUALITY CONTROL\n- Ground statements in supplied sources and quote source text where evidence is important.\n- If information is missing, use [MISSING INPUT] or [NEEDS VERIFICATION] rather than making it up.\n- Separate observed facts, assumptions, risks and recommendations.\n- Flag personal-data, employment fairness and legal/compliance considerations.\n- List verification checks and decisions requiring human approval.\n- End with a short "Validation Checklist".\n\nCASE-SPECIFIC VALIDATION\n${c.checks}\n\nLANGUAGE\n${lang}`;
  $('promptOutput').textContent=s;window._lastPrompt=s;return s;}
