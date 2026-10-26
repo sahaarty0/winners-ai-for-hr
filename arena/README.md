@@ -6,6 +6,7 @@
 
 - [Arena (redirects to live Apps Script)](https://sahaarty0.github.io/winners-ai-for-hr/arena/)
 - [Direct live Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec)
+- [Leader Form Preview (not connected to real participants)](https://sahaarty0.github.io/winners-ai-for-hr/arena/form.html?demo=1)
 - [Local Demo (fictional scores)](https://sahaarty0.github.io/winners-ai-for-hr/arena/?demo=1)
 - [Emergency Offline Manual Scoreboard](https://sahaarty0.github.io/winners-ai-for-hr/arena/?offline=1)
 - [Real Backend Google Sheet](https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit)
@@ -22,9 +23,18 @@
 - [Interactive frontend source](./app-free.js)
 - [Official logo and presenter/team cards](./index.html)
 
-**Completed by the instructor:** Web App published. **Next:** open the direct live Web App, enter the facilitator's private passphrase, press Create Session, save the team codes, then test one team submission and manual evaluation before using Gemini. If the Apps Script source is edited after deployment, redeploy its updated version through Manage deployments.
+**2026-10-26 — New Team Leader Workflow:** Each team has **one Leader** who records their full name and the members of their group in the [Leader Registration Form](./form.html). The backend automatically creates Group 01, Group 02, etc., with no preset team count. The Leader then submits **one group answer per stage**. Gemini attempts to score it automatically after Sheets saves it (if configured); the presenter must approve the score before reveal. **The instructor MUST update and redeploy the Apps Script Code.gs version to activate this new workflow.** The old published Apps Script version cannot be changed by editing GitHub alone.
 
 **Secrets never belong in GitHub.** Gemini quota exhaustion is handled via manual scoring; only presenter-approved and explicitly revealed grades become public.
+
+## Live classroom workflow
+
+1. Facilitator replaces Apps Script `Code.gs` with the **latest** [backend code](./apps-script/Code.gs) and deploys a **New Version** via Deploy → Manage deployments → Edit → Version: New version → Deploy. The existing `/exec` URL should remain unchanged.
+2. Facilitator runs `setupArena()` once to verify backend tabs and settings; keep all secrets in Script Properties. Open the live Arena and create a **new** session with **0** teams.
+3. Facilitator clicks **Copy Team Leader Form** and sends the link to all groups. Each group's Leader registers their name and member roster, creating `Group 01`, `Group 02`, etc.
+4. All registered groups automatically appear on the presenter’s cards, and the roster is visible only to the facilitator. Each Leader sees the current HR scenario and submits one answer per stage.
+5. The submission is **saved to Sheets before Gemini is called**. If Gemini quota fails, the submission stays available for Manual Scoring. Instructor approves and reveals scores.
+6. Returning Leaders should use the **same device/browser** (their private team token is kept in local storage); otherwise ask the facilitator rather than creating duplicate groups.
 
 ## Stages
 
