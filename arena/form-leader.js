@@ -139,6 +139,7 @@ el("submitBtn").addEventListener("click",async()=>{
 el("editBtn").addEventListener("click",()=>{show("receiptCard",false);el("answerText").focus()});
 el("sessionId").addEventListener("change",()=>{sessionId=el("sessionId").value.trim();if(!sessionId)return;let saved=getSaved();group=saved||null;refresh()});
 function setup(){
+ el("answerText").maxLength=12000;el("masterPrompt").maxLength=12000;
  if(demo&&!sessionId)sessionId="WDEMOSESSION";
  el("sessionId").value=sessionId;
  el("memberFields").replaceChildren();makeMember();el("memberFields").querySelector("input")?.blur();
