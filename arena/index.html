@@ -49,12 +49,13 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 </div>
 <div class="field"><label>📄 إجابة الجروب المقدمة — للمدرب فقط</label><div id="submittedAnswer" class="facts info-line" style="white-space:pre-wrap;max-height:290px;overflow:auto">اكتب كلمة مرور المحاضر واضغط تحميل التقييمات لمراجعة الإجابة.</div></div>
 <div class="field"><label for="judgeNote">ملخص نقاط القوة وما يحتاج تحسين</label><textarea id="judgeNote" rows="2" placeholder="تقييم مختصر قائم على الإجابة والمعايير..."></textarea></div>
-<div class="row-controls"><button id="saveManual" class="btn">💾 حفظ التقييم / اعتماد الدرجة</button><button id="geminiEvaluate" class="btn gold">✦ تقييم Gemini أو Manual</button><button id="openTeamLink" class="btn ghost">🔗 رابط واجهة المتدربين</button></div>
+<div class="row-controls"><button id="saveManual" class="btn">💾 حفظ التقييم / اعتماد الدرجة</button><button id="geminiEvaluate" class="btn gold">✦ تقييم Gemini أو Manual</button><button id="openTeamLink" class="btn ghost">🔗 نسخ رابط تسجيل الـTeam Leaders</button></div>
 <div class="field" id="passwordField"><label for="adminKey">🔐 كلمة مرور المحاضر (تُحفظ على السيرفر، لا تُحفظ في المتصفح)</label><input id="adminKey" type="password" autocomplete="off" placeholder="Secret passphrase from Apps Script Properties"></div>
 <div class="row-controls"><button id="refreshAdmin" class="btn">↻ تحميل تقييمات المحاضر</button><button id="manualBackup" class="btn ghost">💾 تجهيز تقييم يدوي بدون Gemini</button><button id="offlineBackup" class="btn danger">⚠ شاشة إنقاذ Offline</button><button id="exportOffline" class="btn ghost">⬇ تصدير الدرجات CSV</button></div>
 <div class="form-grid">
+<div id="teamRosterInfo" class="facts info-line" style="white-space:pre-wrap">أسماء الجروبات والـLeaders هتظهر هنا بعد تسجيلها من الفورم.</div>
 <div class="field"><label>جلسة التدريب / Session ID</label><input id="sessionInput" placeholder="يُنشأ بواسطة المحاضر في Firebase" autocomplete="off"></div>
-<div class="field"><label>إعداد الفرق</label><button id="createSession" class="btn wide">إنشاء جلسة 3 فرق (Apps Script)</button></div>
+<div class="field"><label>إعداد الفرق</label><button id="createSession" class="btn wide">إنشاء جلسة جديدة (Groups تلقائية)</button></div>
 </div>
 <p id="adminStatus" class="info-line">يمكن اختبار الواجهة في Demo. لتشغيل الجروبات، انشر كود Apps Script ثم أضف رابط الـWeb App إلى apps-script-config.js. مفاتيح Gemini تبقى في Script Properties فقط.</p>
 <div id="teamCodes" class="info-line" hidden></div>
