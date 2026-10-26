@@ -46,7 +46,7 @@ function doGet(e){
  'google.script.run.withSuccessHandler(function(result){e.source.postMessage({arena:true,id:req.id,result:result},ORIGIN)}).withFailureHandler(function(err){e.source.postMessage({arena:true,id:req.id,error:String(err&&err.message||err)},ORIGIN)}).arenaRpc({action:req.action,payload:req.payload||{}});'+
  '});'+
  (embed?'ready();':'document.getElementById("app").addEventListener("load",ready);')+
- '<\\/script></body></html>';
+ '</script></body></html>';
  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function limitStr_(s,max){return String(s==null?'':s).trim().slice(0,max||5000)}
