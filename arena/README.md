@@ -1,80 +1,52 @@
 # Winners AI Challenge Arena
 
-**Standalone interactive training arena** at [Launch Arena](https://sahaarty0.github.io/winners-ai-for-hr/arena/).
+**Official Winners AI for HR gamification project** using the exact approved Winners logo.
 
-**Status:** Frontend operational in **local demo mode**. Firebase + Gemini backend code has been committed but **is not deployed/connected** until the instructor completes Firebase configuration. No real participant scores or Gemini calls exist yet.
+## OPEN NOW (Demo)
 
-## What it does
+- [Arena on GitHub Pages](https://sahaarty0.github.io/winners-ai-for-hr/arena/)
+- [Emergency Offline Manual Scoreboard](https://sahaarty0.github.io/winners-ai-for-hr/arena/?offline=1)
+- [Real Backend Google Sheet](https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit)
 
-- Presenter screen: theatrical Gold / Silver / Bronze cards, scores, criteria, Gemini-feedback area, Stage navigation, Freeze, Reveal, approval/manual scoring.
-- Team screen: case narrative, facts, answers and submission flow.
-- 3 training stages: **Discovery**, **Level Up**, **Grand Finale**.
-- Local browser demo: team answers and manual scores persist in that browser only, with illustrative initial values. Demo is not shared across devices; it does not grade with AI.
-- Optional Firebase backend: session creation, per-team random codes, team submission, Google presenter sign-in, stage locks, Gemini judging, instructor review and explicit score reveal. Only approved scores are mirrored to public leaderboard.
+**Important:** The public page remains in **Local Demo mode** until the Apps Script Web App is deployed by the Spreadsheet owner. Demo scores are fictional; not Gemini evaluations. The fallback `?offline=1` starts with no scores, and its CSV export can be reconciled after class. **A live production-ready connection has not been claimed or verified.**
 
-## Source alignment (original Google Drive files)
+## Primary deployment path — NO BILLING
 
-**Stage 1 — Horizon Services / Discovery:**
-- Module 01 Gamified Business Cases (Mission 00)
-  https://drive.google.com/file/d/1MrDenI0VwLoNBFSS2w6AXbJZUSj-flNp/view
-- Module 01 Trainer Game Guide
-  https://drive.google.com/file/d/15eiBQx0XaZ_BNKSXU9ts6pHERagncwFx/view
+**GitHub Pages (UI) + Google Apps Script (server) + Google Sheets (storage) + Gemini Developer API (optional grader)**.
 
-**Stage 2 — Nova Retail / Level Up:**
-- Day 2 Master, Module 04, 18→24, 6-role hiring gap
-  https://drive.google.com/file/d/1lMrVwd7JnFR9AJMJ1QfodeuOTQQlOLgb/view
-- Module 02 Universal AI Execution Prompt
-  https://drive.google.com/file/d/1WOMnFnOAcliF4ll2HyeGrZBLkM8MSJtY/view
-- Module 02 Task Definition Worksheet
-  https://drive.google.com/file/d/1y8FpDYsGQJ0M4H-ECD2XpXyf2Wlk3PfQ/view
-- Module 02 Prompt Builder Worksheet
-  https://drive.google.com/file/d/1VymCuoRlBP6s-FFqdTtnpiqN7XhVyNp1/view
+- [Free setup guide](./apps-script/INSTALL.md)
+- [Apps Script server code to paste into your Sheet](./apps-script/Code.gs)
+- [Public App Script URL configuration](./apps-script-config.js) — currently **blank** until deployment
+- [Interactive frontend source](./app-free.js)
+- [Official logo and presenter/team cards](./index.html)
 
-**Stage 3 — Grand Finale:**
-- Return to the **same Horizon Services** case, professional solution requiring traceability, HR review, controlled tool choice and measurable business value.
-- Evidence checking principles and related trainer examples from Module 03.
-  https://drive.google.com/file/d/1gZR9mwGNwnWNtRW1s49-hjuq6GE-4dMz/view
+Start in the linked Google Sheet → Extensions → Apps Script, paste all `Code.gs`, add project Script Properties `ADMIN_PASSPHRASE` and optional `GEMINI_API_KEY`, run `setupArena`, deploy as a Web App (execute as owner, accessible to anyone), and open the resulting **/exec** URL. That Apps Script link can directly host the Winners Arena as an alternative to cross-origin iframe embedding.
 
-**Rubric disclaimer:** Stage 1/2/3 weightings are **design proposals**, not an approved scoring key. The original Module 01/03 XP rubrics are preserved as references; the Arena uses a new three-stage structure and should be reviewed before actual class evaluation.
+**Secrets never belong in GitHub.** Gemini quota exhaustion is handled via manual scoring; only presenter-approved and explicitly revealed grades become public.
 
-## Activate Firebase + Gemini (one-time trainer setup)
+## Stages
 
-1. Create a separate Firebase project at https://console.firebase.google.com/ (choose billing/plan appropriate for Cloud Functions). Register a **Web app**.
-2. Enable **Cloud Firestore** and Authentication: **Anonymous** (teams), **Google** (presenter). Add `sahaarty0.github.io` as an authorized Auth domain.
-3. In the Firebase project's Web App config, copy public identifiers into `../firebase-config.js`:
-   `firebaseConfig = {apiKey,authDomain,projectId,appId}`. The **Firebase Web API key** is a public app identifier, not the Gemini secret. Limit Firebase access using Security Rules.
-4. Install Node 22 and Firebase CLI: `npm i -g firebase-tools`, `firebase login`. Inside `arena/backend`, copy `.firebaserc.example` to `.firebaserc` with your Firebase project ID, then `cd functions && npm install && cd ..`.
-5. Deploy rules + functions: `firebase deploy --only firestore:rules,functions`.
-6. Store the Gemini API key **server-side only**: from `arena/backend`, run `firebase functions:secrets:set GEMINI_API_KEY`, then deploy functions as in step 5. Never commit this key to GitHub or expose it to students.
-7. Sign in on the Arena as **Google Presenter**. Copy the authenticated user's UID from Firebase Authentication in the Firebase Console. Using the Firestore console as project owner, create `admins/{GOOGLE_UID}` with field `active: true` (Boolean). No client can self-appoint an admin.
-8. Reload, log in as presenter, create a session. Copy the three generated **team codes immediately** and save them privately. They are returned once and stored hashed server-side. Give each team a code and the Team URL.
-9. After a team submits a response, select it on the Presenter view, run **Gemini Evaluate**, review the rubric breakdown and evidence, click **Approve Score**, then **Reveal Scores**. Never assume model-produced scores are authoritative.
+| Stage | Source case | Assessment |
+|---|---|---|
+| 01 Discovery | Horizon Services 320 employees, 90 CVs, 75 comments and leave policy | Baseline HR reasoning (no AI) |
+| 02 Level Up | Nova Retail 18 → 24 staff; six-position gap | Progress + Master Prompt application |
+| 03 Grand Finale | Return to Horizon Services | Full business solution, methods, evidence, KPIs, controls |
 
-### Deployment notes and limitations
+The stage rubric criteria and weights are **provisional design choices** pending trainer approval, not an independently validated learning metric.
 
-- Hosting stays on GitHub Pages. Firebase is a separate server service; GitHub alone cannot run protected Gemini API calls.
-- This project intentionally keeps the model secret in Firebase Secret Manager and excludes HR/candidate personal data. The scenarios are fictional.
-- Class participants must use one device per team code. Teams cannot join on a different UID/device once linked without a trainer-assisted reset.
-- Stage 2 contains an unaided answer **self-declaration** plus an assisted prompt, not a technically enforced no-AI sandbox. Improvement across different cases is indicative, not a controlled learning-impact measurement.
-- Current evaluator scores are advisory and require human approval, test against instructor gold answers before full use.
-- Optional public-sources scraping is a learning proposal only; this frontend does not execute web scraping or automate external services.
-- Firestore rules deny all client writes, and scores are only mirrored to the public board when approved and revealed.
-- Session/score synchronization works when Firebase is deployed/configured. Without config, **local demo mode** works only in the browser where the answers are typed.
+## Source documents from the AI for HR Drive folder
 
-## Repository layout
-```
-arena/
-  index.html             # official Winners logo embedded (exact PNG from Drive)
-  app.js                 # presenter, cards, team answer flows + Firebase adapters
-  firebase-config.js     # public config; null until configured
-  backend/
-    firebase.json
-    firestore.rules
-    .firebaserc.example
-    functions/
-      package.json
-      index.js           # protected callable API + Gemini judge + approval
-```
+- [Module 01 Business Cases and Gamified Labs](https://drive.google.com/file/d/1MrDenI0VwLoNBFSS2w6AXbJZUSj-flNp/view)
+- [Module 01 Trainer Guide](https://drive.google.com/file/d/15eiBQx0XaZ_BNKSXU9ts6pHERagncwFx/view)
+- [Module 02 Universal Execution Prompt](https://drive.google.com/file/d/1WOMnFnOAcliF4ll2HyeGrZBLkM8MSJtY/view)
+- [Day 02 Master / Nova Retail](https://drive.google.com/file/d/1lMrVwd7JnFR9AJMJ1QfodeuOTQQlOLgb/view)
+- [Module 03 Evidence Review Participant](https://drive.google.com/file/d/1gZR9mwGNwnWNtRW1s49-hjuq6GE-4dMz/view)
 
-The previous **AI for HR Practical Toolkit** continues to run unchanged at
-https://sahaarty0.github.io/winners-ai-for-hr/
+## Reliability & safety
+
+- The no-billing plan is suitable for a **small training cohort**, subject to Google's changing free-tier quotas. It cannot guarantee uninterrupted operation.
+- **Manual Scoring** avoids Gemini dependency; **Emergency Offline Scoreboard** protects the class if Apps Script or the Internet is unavailable, but submissions cannot sync while offline.
+- Use fictional/synthetic information exclusively. Never submit real candidates' CVs, employee records, confidential policies, or personally identifying data.
+- Gemini free-tier usage may be used by the provider to improve its products.
+- The old `backend/` Firebase code and `app.js` remain in the repo as **unused experimental alternatives**; `app-free.js` is the active script.
+- The original [AI for HR Practical Toolkit](https://sahaarty0.github.io/winners-ai-for-hr/) is preserved unchanged.
