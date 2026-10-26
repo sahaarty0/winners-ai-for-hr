@@ -32,19 +32,22 @@ function setupArena(){
   if(!p.getProperty('ADMIN_PASSPHRASE')||p.getProperty('ADMIN_PASSPHRASE').length<14)throw Error('First add ADMIN_PASSPHRASE (14+ characters) to Project Settings → Script Properties');
   return {ok:true,spreadsheetId:ss.getId(),geminiConfigured:!!p.getProperty('GEMINI_API_KEY')};
 }
-function doGet(){
- var html=HtmlService.createHtmlOutput(
-  '<!doctype html><html><head><meta charset="utf-8"></head><body style="font:13px Arial;color:#183e62;background:#f4f8ff"><p>Winners AI Challenge Arena · Secure Bridge</p><script>'+
-  'var ORIGIN='+JSON.stringify(ARENA_ORIGIN)+';'+
-  'window.addEventListener("message",function(e){'+
-  'if(e.origin!==ORIGIN||!e.data||e.data.arena!==true||typeof e.data.id!=="string")return;'+
-  'var req=e.data;'+
-  'google.script.run.withSuccessHandler(function(result){e.source.postMessage({arena:true,id:req.id,result:result},ORIGIN)}).withFailureHandler(function(err){e.source.postMessage({arena:true,id:req.id,error:String(err&&err.message||err)},ORIGIN)}).arenaRpc({action:req.action,payload:req.payload||{}});'+
-  '});'+
-  'parent.postMessage({arenaBridgeReady:true},ORIGIN);'+
-  '<\/script></body></html>');
- html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
- return html;
+function doGet(e){
+ var p=e&&e.parameter||{}, embed=p.embed==='1',origin=ARENA_ORIGIN;
+ var hostedUrl=ARENA_ORIGIN+'/winners-ai-for-hr/arena/?bridge=parent'+(p.session?'&session='+encodeURIComponent(String(p.session)):'');
+ var html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
+ '<style>html,body{margin:0;width:100%;height:100%;background:#06152c;color:white;font:14px Arial}iframe{border:0;width:100%;height:100%}</style></head><body>'+
+ (embed?'<p style="display:none">Winners Arena Bridge</p>':'<iframe id="app" src="'+hostedUrl+'" title="Winners Challenge Arena" allow="clipboard-write"></iframe>')+
+ '<script>var ORIGIN='+JSON.stringify(ARENA_ORIGIN)+';var EMBED='+JSON.stringify(embed)+';'+
+ 'function ready(){(EMBED?parent:document.getElementById("app").contentWindow).postMessage({arenaBridgeReady:true},ORIGIN)}'+
+ 'window.addEventListener("message",function(e){'+
+ 'if(e.origin!==ORIGIN||!e.data||e.data.arena!==true||typeof e.data.id!=="string")return;'+
+ 'var req=e.data;'+
+ 'google.script.run.withSuccessHandler(function(result){e.source.postMessage({arena:true,id:req.id,result:result},ORIGIN)}).withFailureHandler(function(err){e.source.postMessage({arena:true,id:req.id,error:String(err&&err.message||err)},ORIGIN)}).arenaRpc({action:req.action,payload:req.payload||{}});'+
+ '});'+
+ (embed?'ready();':'document.getElementById("app").addEventListener("load",ready);')+
+ '<\\/script></body></html>';
+ return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function limitStr_(s,max){return String(s==null?'':s).trim().slice(0,max||5000)}
 function args_(args){return args&&typeof args==='object'?args:{}}
@@ -63,7 +66,7 @@ function stamp_(){return new Date().toISOString()}
 function audit_(sid,action,tid,stage,note){sh_(TABS.audit).appendRow([stamp_(),sid,action,tid||'',stage||'',limitStr_(note,120)])}
 function session_(id){var s=findRow_(data_(TABS.sessions),function(r){return String(r[0])===id});if(!s)throw Error('Session not found');return s}
 function team_(sid,tid){var t=findRow_(data_(TABS.teams),function(r){return String(r[0])===sid&&String(r[1])===tid});if(!t)throw Error('Team not found');return t}
-function codeValid_(sid,tid,code){var t=team_(sid,tid);if(!secureEq_(limitStr_(code,40).toUpperCase(),String(t.row[3])))throw Error('Team code is incorrect');return t}
+function codeValid_(sid,tid,code){var t=team_(sid,tid);if(!secureEq_(sha_(limitStr_(code,40).toUpperCase()),String(t.row[3])))throw Error('Team code is incorrect');return t}
 function reval_(session,stage){return session.row[3+stage]===true}
 function pub_(sid){
  var session=session_(sid),s=session.row,ts=data_(TABS.teams).filter(function(t){return t[0]===sid});
@@ -87,6 +90,7 @@ function createSession_(p){
   return {ok:true,sessionId:sid,teams:codes};
  });
 }
+function verifyTeam_(p){var sid=sid_(p.sessionId),tid=tid_(p.teamId),t=codeValid_(sid,tid,p.code);return {ok:true,id:tid,name:String(t.row[2])};}
 function submit_(p){
  var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage),ans=args_(p.answer);
  return withLock_(function(){
@@ -179,6 +183,7 @@ function arenaRpc(req){
  if(a==='getPublicState')return pub_(sid_(p.sessionId));
  if(a==='createSession')return createSession_(p);
  if(a==='submitAnswer')return submit_(p);
+ if(a==='verifyTeamCode')return verifyTeam_(p);
  if(a==='getAdminState')return adminState_(p);
  if(a==='setArenaState')return setState_(p);
  if(a==='approveScore')return approve_(p);
