@@ -47,6 +47,7 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 </div><div class="form-grid">
 <div class="field"><label for="judgeTeam">الفريق المطلوب تقييمه</label><select id="judgeTeam"></select></div><div class="field"><label for="judgeScore">درجة المدرب (للتجربة أو المراجعة) / 100</label><input id="judgeScore" type="number" min="0" max="100" value="0"></div>
 </div>
+<div class="field"><label>📄 إجابة الجروب المقدمة — للمدرب فقط</label><div id="submittedAnswer" class="facts info-line" style="white-space:pre-wrap;max-height:290px;overflow:auto">اكتب كلمة مرور المحاضر واضغط تحميل التقييمات لمراجعة الإجابة.</div></div>
 <div class="field"><label for="judgeNote">ملخص نقاط القوة وما يحتاج تحسين</label><textarea id="judgeNote" rows="2" placeholder="تقييم مختصر قائم على الإجابة والمعايير..."></textarea></div>
 <div class="row-controls"><button id="saveManual" class="btn">💾 حفظ التقييم / اعتماد الدرجة</button><button id="geminiEvaluate" class="btn gold">✦ تقييم Gemini أو Manual</button><button id="openTeamLink" class="btn ghost">🔗 رابط واجهة المتدربين</button></div>
 <div class="field" id="passwordField"><label for="adminKey">🔐 كلمة مرور المحاضر (تُحفظ على السيرفر، لا تُحفظ في المتصفح)</label><input id="adminKey" type="password" autocomplete="off" placeholder="Secret passphrase from Apps Script Properties"></div>
