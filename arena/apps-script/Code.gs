@@ -1,5 +1,5 @@
 /**
- * Winners AI Challenge Arena — ZERO-BILLING Apps Script backend.
+ * Winners AI Challenge Arena — ZERO-BILLING Apps Script backend (V2 case scoring).
  * BOUND to Winners AI Challenge Arena Google Spreadsheet.
  * GitHub frontend uses a hidden HtmlService Bridge, NOT CORS or JSONP.
  * WARNING: anonymous Apps Script Web App => use strong presenter passphrase,
