@@ -51,6 +51,7 @@ function doGet(e){
  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function limitStr_(s,max){return String(s==null?'':s).trim().slice(0,max||5000)}
+function safeCell_(s,max){var v=limitStr_(s,max);return /^[=+\-@\t\r]/.test(v)?"'"+v:v}
 function args_(args){return args&&typeof args==='object'?args:{}}
 function props_(){return PropertiesService.getScriptProperties()}
 function ss_(){var id=props_().getProperty('SHEET_ID');if(!id)throw Error('Run setupArena() first');return SpreadsheetApp.openById(id)}
@@ -64,7 +65,7 @@ function sid_(x){var s=limitStr_(x,120);if(!/^[A-Za-z0-9_-]{6,120}$/.test(s))thr
 function tid_(x){var s=limitStr_(x,40);if(!/^T\d{1,3}$/.test(s))throw Error('Invalid team ID');return s}
 function stage_(n){n=Number(n);if(!STAGES[n])throw Error('Stage must be 1-3');return n}
 function stamp_(){return new Date().toISOString()}
-function audit_(sid,action,tid,stage,note){sh_(TABS.audit).appendRow([stamp_(),sid,action,tid||'',stage||'',limitStr_(note,120)])}
+function audit_(sid,action,tid,stage,note){sh_(TABS.audit).appendRow([stamp_(),sid,action,tid||'',stage||'',safeCell_(note,120)])}
 function session_(id){var s=findRow_(data_(TABS.sessions),function(r){return String(r[0])===id});if(!s)throw Error('Session not found');return s}
 function team_(sid,tid){var t=findRow_(data_(TABS.teams),function(r){return String(r[0])===sid&&String(r[1])===tid});if(!t)throw Error('Team not found');return t}
 function codeValid_(sid,tid,code){var t=team_(sid,tid);if(!secureEq_(sha_(limitStr_(code,40).toUpperCase()),String(t.row[3])))throw Error('Team code is incorrect');return t}
@@ -81,11 +82,11 @@ function withLock_(fn){var lock=LockService.getScriptLock();lock.waitLock(15000)
 function createSession_(p){
  admin_(p);return withLock_(function(){
   if(data_(TABS.sessions).length>=LIMITS.sessions)throw Error('Session archive limit reached; archive older data');
-  var names=Array.isArray(p.teamNames)?p.teamNames.map(function(x){return limitStr_(x,55)}):['Team Alpha','Team Bravo','Team Charlie'];
+  var names=Array.isArray(p.teamNames)?p.teamNames.map(function(x){return safeCell_(x,55)}):['Team Alpha','Team Bravo','Team Charlie'];
   if(names.length<2||names.length>LIMITS.teamsPerSession||names.some(function(n){return n.length<2}))throw Error('2–12 named teams required');
   if(new Set(names.map(function(x){return x.toLowerCase()})).size!==names.length)throw Error('Team names must be unique');
   var sid='W'+Utilities.getUuid().replace(/-/g,'').slice(0,13),now=stamp_();
-  sh_(TABS.sessions).appendRow([sid,limitStr_(p.title,140)||'Winners AI Challenge Arena',1,true,false,false,false,now,now]);
+  sh_(TABS.sessions).appendRow([sid,safeCell_(p.title,140)||'Winners AI Challenge Arena',1,true,false,false,false,now,now]);
   var codes=[];names.forEach(function(name,i){var id='T'+(i+1),code=Utilities.getUuid().replace(/-/g,'').slice(0,10).toUpperCase();sh_(TABS.teams).appendRow([sid,id,name,sha_(code)]);codes.push({id:id,name:name,code:code})});
   audit_(sid,'CREATE_SESSION','','',names.length+' teams');
   return {ok:true,sessionId:sid,teams:codes};
@@ -99,7 +100,7 @@ function submit_(p){
   codeValid_(sid,tid,p.code);
   var problem=limitStr_(ans.problem,LIMITS.answerChars);
   if(problem.length<25)throw Error('Problem analysis must have 25+ characters');
-  var fields=[problem,limitStr_(ans.tools,LIMITS.answerChars),limitStr_(ans.evidence,LIMITS.answerChars),stage===1?'':limitStr_(ans.prompt,LIMITS.answerChars)];
+  var fields=[safeCell_(problem,LIMITS.answerChars),safeCell_(ans.tools,LIMITS.answerChars),safeCell_(ans.evidence,LIMITS.answerChars),stage===1?'':safeCell_(ans.prompt,LIMITS.answerChars)];
   var prev=findRow_(data_(TABS.submissions),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage});
   var done=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage&&r[4]==='approved'});
   if(done)throw Error('Trainer has approved this stage score; revisions locked');
@@ -133,7 +134,7 @@ function submission_(sid,tid,stage){return findRow_(data_(TABS.submissions),func
 function saveEval_(sid,tid,stage,score,status,feedback,criteria,model){
  return withLock_(function(){
   var sheet=sh_(TABS.evaluations),old=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage});
-  var row=[sid,tid,stage,score,status,limitStr_(feedback,1600),JSON.stringify(criteria||[]),model||'',stamp_()];
+  var row=[sid,tid,stage,score,status,safeCell_(feedback,1600),JSON.stringify(criteria||[]),model||'',stamp_()];
   if(old)sheet.getRange(old.index,1,1,row.length).setValues([row]);else sheet.appendRow(row);
   audit_(sid,'EVAL_'+status,tid,stage,'Score '+score);return {ok:true,score:score,status:status,feedback:row[5],criteria:criteria||[]}
  });
