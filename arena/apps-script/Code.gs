@@ -122,7 +122,7 @@ function groupAccess_(sid,id,token){
  return team;
 }
 function leaderSubmit_(p){
- var sid=sid_(p.sessionId),id=tid_(p.teamId),stage=stage_(p.stage),answer=limitStr_(p.answer,5000).trim(),master=limitStr_(p.masterPrompt,5000);
+ var sid=sid_(p.sessionId),id=tid_(p.teamId),stage=stage_(p.stage),answer=limitStr_(p.answer,12000).trim(),master=limitStr_(p.masterPrompt,12000);
  if(answer.length<30)throw Error('Please enter an answer of at least 30 characters');
  var submitted=withLock_(function(){
    var sess=session_(sid);
@@ -131,7 +131,7 @@ function leaderSubmit_(p){
    if(approved)throw Error('The presenter already finalized this group stage');
    var tab=sh_(TABS.submissions),existing=findRow_(data_(TABS.submissions),function(r){return r[0]===sid&&r[1]===id&&Number(r[2])===stage});
    var revision=existing?Number(existing.row[3])+1:1;
-   var record=[sid,id,stage,revision,stamp_(),safeCell_(answer,5000),'','',''+(stage===1?'':safeCell_(master,5000))];
+   var record=[sid,id,stage,revision,stamp_(),safeCell_(answer,12000),'','',''+(stage===1?'':safeCell_(master,12000))];
    if(existing)tab.getRange(existing.index,1,1,record.length).setValues([record]);else tab.appendRow(record);
    var pending=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===id&&Number(r[2])===stage&&r[4]==='pending'});
    if(pending)sh_(TABS.evaluations).getRange(pending.index,5).setValue('stale');
