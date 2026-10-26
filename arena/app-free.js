@@ -14,7 +14,7 @@ const defaults=()=>({stage:1,reveal:false,open:true,teams:structuredClone(DEMO_S
 let demo;try{demo={...defaults(),...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch{demo=defaults()}
 if(!Array.isArray(demo.teams)||!demo.teams.length)demo.teams=structuredClone(DEMO_SEED);
 const el=id=>document.getElementById(id);const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const save=()=>localStorage.setItem(KEY,JSON.stringify(demo));const fmt=n=>typeof n==="number"?n.toFixed(1)+"%":"—";
-const hosted=!!(new URLSearchParams(location.search).get("bridge")==="parent" && /^https:\/\/(script\.google\.com|[\w.-]+\.googleusercontent\.com)\//.test(document.referrer));
+const hosted=new URLSearchParams(location.search).get("bridge")==="parent" && window.parent!==window; // RPC refuses untrusted parent origins; handshake must come from Google.
 const mode=hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl));
 let isAdmin=false,realSession=null,realEvals=[],joinedTeam=null,activeSessionId=new URLSearchParams(location.search).get("session")||defaultSessionId||localStorage.getItem("winners-arena-session")||"",liveError="",lastAdminSnapshot=null,bridgeReady=false,bridgeTarget=null;
 function notify(msg){const t=el("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.add("hidden"),4200)}
