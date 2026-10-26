@@ -83,8 +83,12 @@ function render(){renderStageNav();renderChoices();renderCards();renderCase();re
 function updateSelected(){
 const id=el("judgeTeam").value,st=currentStage();
 const e=realEvals.find(x=>x.teamId===id&&x.stage===st);
+const sub=lastAdminSnapshot?.submissions?.find(x=>x.teamId===id&&x.stage===st);
 const sc=e?.score??scoreInfo({id:id},st).score;
 el("judgeScore").value=sc??0;el("judgeNote").value=e?.feedback||scoreInfo({id:id},st).feedback||"";
+el("submittedAnswer").textContent=sub?
+("Revision "+sub.revision+" | "+sub.submittedAt+"\n\n1. Problem: "+sub.answer.problem+"\n\n2. Tools: "+sub.answer.tools+"\n\n3. Evidence: "+sub.answer.evidence+"\n\n4. Prompt: "+(sub.answer.prompt||"Not applicable")):
+(mode?"لا توجد إجابة مقدمة للجروب في المرحلة المختارة، أو لم يتم تحميل بيانات المحاضر.":"Demo Mode: إجابات الفرق محفوظة محليًا فقط.");
 renderFeedback();
 }
 function updateAnswerForm(){
