@@ -1,4 +1,10 @@
 import {appsScriptWebAppUrl,defaultSessionId,pollSeconds} from "./apps-script-config.js";
+const qs=new URLSearchParams(location.search);
+if(appsScriptWebAppUrl && !qs.has("bridge") && !qs.has("offline") && !qs.has("demo") && window.top===window.self){
+ const liveUrl=new URL(appsScriptWebAppUrl);
+ for(const key of ["session","view"])if(qs.get(key))liveUrl.searchParams.set(key,qs.get(key));
+ window.location.replace(liveUrl.href);
+}
 const STAGES=[
 {id:1,key:"discovery",name:"Discovery · Baseline",label:"Discovery",desc:"قبل التدريب — No AI · اكتشف طريقة التفكير",title:"Horizon Services — HR Challenge",description:"أنت ضمن فريق HR لشركة خدمات افتراضية بها 320 موظفًا. الإدارة تطلب خطة ذكية للتعامل مع ثلاث مشكلات HR. في هذه الجولة لا تستخدم أي مساعد AI.",facts:["90 CVs لوظيفتين مختلفتين؛ البيانات غير موحدة والمقارنة صعبة.","75 تعليقًا مجهول الهوية من الموظفين يحتاج تجميعًا موضوعيًا.","سياسة إجازات داخلية من 12 صفحة تحتاج شرحًا دقيقًا."],task:"حلل المشكلات، حدد الأولويات والخطوات والأدوات التي قد تساعد، والبيانات المطلوبة، وحدود تدخل الـAI والقرار البشري. بدون استخدام AI.",note:"مستوحى من Mission 00 الأصلي في Module 01. التقييم هنا Baseline تشخيصي، ولا يدخل مباشرة في ترتيب الفوز.",rubric:[["فهم المشكلة وتحديد الأولويات",25],["وضوح الإجراءات والمنطق",25],["اختيار الأدوات الملائمة",20],["البيانات والحوكمة والقرار البشري",20],["واقعية الحل",10]]},
 {id:2,key:"growth",name:"Level Up · Growth",label:"Level Up",desc:"نهاية السيشن — Measure growth + Master Prompt",title:"Nova Retail — Smart Workforce Response",description:"توسع شركة Nova Retail الافتراضية خلق فجوة في التوظيف. ابدأ بالحل من فهمك قبل استخدام AI، ثم حسّنه بالـMaster Prompt الذي تدربت عليه.",facts:["عدد الموظفين الحالي: 18، والمستهدف: 24؛ الفجوة = 6 وظائف.","Store Associates من 12 إلى 16، Supervisors من 3 إلى 4، Cashiers من 3 إلى 4.","الفرع الجديد Store D؛ نحتاج Workforce Gap + Org Structure + JD + CBI Questions."],task:"الجزء الأول: اكتب تحليلًا وخطواتك بدون AI. الجزء الثاني: استخدم Master Prompt مع المعلومات المتاحة وقدّم ناتجًا محسّنًا مع مراجعة الافتراضات والأدلة.",note:"مستند إلى Day 2 Module 04 (Nova Retail)، مع استخدام Universal AI Execution Prompt من Module 02. قياس الـGrowth يحتاج مقارنة عادلة بالـBaseline؛ الدرجات ليست اختبارًا علميًا معتمدًا.",rubric:[["تحليل الفجوة قبل استخدام AI",25],["تصميم الإجراءات والحلول",20],["جودة Master Prompt",25],["التحقق من الأرقام والأدلة",20],["الوضوح وقابلية التطبيق",10]]},
@@ -16,7 +22,7 @@ let demo;try{demo={...defaults(),...JSON.parse(localStorage.getItem(KEY)||"{}")}
 if(!Array.isArray(demo.teams)||!demo.teams.length)demo.teams=structuredClone(DEMO_SEED);
 const el=id=>document.getElementById(id);const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const save=()=>localStorage.setItem(KEY,JSON.stringify(demo));const fmt=n=>typeof n==="number"?n.toFixed(1)+"%":"—";
 const hosted=new URLSearchParams(location.search).get("bridge")==="parent" && window.parent!==window; // RPC refuses untrusted parent origins; handshake must come from Google.
-const mode=!OFFLINE&&(hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl)));
+const mode=!OFFLINE&&!new URLSearchParams(location.search).has("demo")&&(hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl)));
 let isAdmin=false,realSession=null,realEvals=[],joinedTeam=null,activeSessionId=new URLSearchParams(location.search).get("session")||defaultSessionId||localStorage.getItem("winners-arena-session")||"",liveError="",lastAdminSnapshot=null,bridgeReady=false,bridgeTarget=null;
 function notify(msg){const t=el("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.add("hidden"),4200)}
 function currentStage(){return mode&&realSession?realSession.currentStage:demo.stage}
@@ -50,7 +56,15 @@ function bridgeValidEvent(e){if(e.source!==bridgeTarget)return false;try{const u
 window.addEventListener("message",e=>{
  if(!bridgeValidEvent(e))return;
  const msg=e.data||{};
- if(msg.arenaBridgeReady===true){bridgeReady=true;el("connectionBadge").textContent="● Apps Script Connected";if(activeSessionId)refreshPublic();return}
+ if(msg.arenaBridgeReady===true){
+ bridgeReady=true;el("connectionBadge").textContent="● Checking Backend";
+ call("ping",{}).then(status=>{
+  if(status?.ready){el("connectionBadge").textContent="● Apps Script Backend Ready";liveError="";}
+  else{el("connectionBadge").textContent="⚠ Setup Required";liveError="شغّل setupArena() من محرر Google Apps Script مرة واحدة.";
+    el("adminStatus").textContent=liveError;}
+ }).catch(err=>{el("connectionBadge").textContent="⚠ Backend Error";liveError="تعذر التحقق من Backend: "+err.message;el("adminStatus").textContent=liveError});
+ if(activeSessionId)refreshPublic();return
+}
  if(msg.arena===true && msg.id && pending.has(msg.id)){
   const {resolve,reject,timer}=pending.get(msg.id);clearTimeout(timer);pending.delete(msg.id);msg.error?reject(new Error(msg.error)):resolve(msg.result);
  }
