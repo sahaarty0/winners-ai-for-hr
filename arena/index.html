@@ -67,6 +67,14 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 <div class="field"><label for="answerTools" id="answerToolsLabel">2. الأدوات ودور الـAI</label><textarea id="answerTools" maxlength="7000" placeholder="الأدوات التي ستستخدمها ولماذا، وما دور HR..."></textarea></div>
 <div class="field"><label for="answerEvidence" id="answerEvidenceLabel">3. الأدلة والتحقق والمخاطر</label><textarea id="answerEvidence" maxlength="7000" placeholder="مصادر البيانات، التحقق، القيود، والمراجعة البشرية..."></textarea></div>
 <div class="field" id="masterField"><label for="answerPrompt">4. Master Prompt / تنفيذ الحل (يظهر من المرحلة الثانية)</label><textarea id="answerPrompt" maxlength="7000" placeholder="النص النهائي للبرومبت، أو خطوات AI Research / Automation وخطة التنفيذ..."></textarea></div>
+<details class="panel" id="masterReference" style="background:#081c37;margin-top:13px">
+<summary style="cursor:pointer;color:#ffdb7f;font-weight:800">📚 Master Prompt الأصلي + Worksheet 01 / 02 (افتح المرجع)</summary>
+<p>Worksheet 01 — AI Task Definition: (1) HR Function (2) Process (3) Bottleneck (4) Available Inputs (5) Desired Outcome.</p>
+<p>Worksheet 02 — Prompt Builder: (1) Definition & Context (2) Task (3) Expected Output (4) Ground Rules & Constraints.</p>
+<div class="facts"><p dir="ltr" lang="en" id="universalPromptText">Read Form 01 to understand my HR task and available inputs. Then follow the instructions in Form 02 to produce the requested output. Use only the information provided, do not invent missing details, and ask for clarification if essential information is missing.</p></div>
+<button type="button" class="btn tiny" id="copyMasterPrompt">📋 نسخ Universal AI Execution Prompt</button>
+<p class="info-line">للتنفيذ الكامل: استخدم النموذجين الموجودين في Module 02، مع بيانات تدريبية غير حقيقية أو ملفات مصرح بها فقط.</p>
+</details>
 <div class="row-controls"><button id="submitTeam" class="btn gold">🚀 تسليم إجابة الفريق</button><button id="clearTeam" class="btn ghost">مسح حقول الكتابة</button></div><p id="teamStatus" class="info-line">البيانات في Demo محفوظة في متصفحك فقط، وغير متصلة بباقي الأجهزة.</p>
 </section>
 <footer class="footer">WINNERS BUSINESS CONSULTATION & TRAINING SERVICES <span>·</span> Dr. Saied El Saharty <span>·</span> Instructor-led Gamified Learning</footer>
