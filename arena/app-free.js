@@ -23,7 +23,7 @@ if(!Array.isArray(demo.teams)||!demo.teams.length)demo.teams=structuredClone(DEM
 const el=id=>document.getElementById(id);const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const save=()=>localStorage.setItem(KEY,JSON.stringify(demo));const fmt=n=>typeof n==="number"?n.toFixed(1)+"%":"—";
 const hosted=new URLSearchParams(location.search).get("bridge")==="parent" && window.parent!==window; // RPC refuses untrusted parent origins; handshake must come from Google.
 const mode=!OFFLINE&&!new URLSearchParams(location.search).has("demo")&&(hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl)));
-let isAdmin=false,realSession=null,realEvals=[],joinedTeam=null,activeSessionId=new URLSearchParams(location.search).get("session")||defaultSessionId||localStorage.getItem("winners-arena-session")||"",liveError="",lastAdminSnapshot=null,bridgeReady=false,bridgeTarget=null;
+let isAdmin=false,realSession=null,realEvals=[],realTeamRosters=[],joinedTeam=null,activeSessionId=new URLSearchParams(location.search).get("session")||defaultSessionId||localStorage.getItem("winners-arena-session")||"",liveError="",lastAdminSnapshot=null,bridgeReady=false,bridgeTarget=null;
 function notify(msg){const t=el("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.add("hidden"),4200)}
 function currentStage(){return mode&&realSession?realSession.currentStage:demo.stage}
 function revealed(){return mode&&realSession?!!realSession.reveal:!!demo.reveal}
@@ -36,8 +36,8 @@ return {score:pub&&Number.isFinite(Number(pub.score))?Number(pub.score):null,fee
 }
 function renderStageNav(){let curr=currentStage();el("stageNav").innerHTML=STAGES.map(s=>'<button class="stage-pill '+(curr===s.id?"current":"")+'" data-stage="'+s.id+'" title="'+escape(s.desc)+'"><span class="num">'+String(s.id).padStart(2,"0")+'</span><span><strong>'+escape(s.label)+'</strong><small>'+escape(s.desc)+'</small></span></button>').join("")}
 function renderCards(){const st=currentStage(),show=revealed(),teams=publicTeams();const ranked=[...teams].sort((a,b)=>{if(!show)return a.name.localeCompare(b.name);return (scoreInfo(b,st).score??-1)-(scoreInfo(a,st).score??-1)});
-el("teamCount").textContent=teams.length+" Teams";
-el("teamCards").innerHTML=teams.length?ranked.map((team,i)=>{let {score}=scoreInfo(team,st),rank=i+1,klass=show?["gold-card","silver-card","bronze-card"][Math.min(i,2)]:"silver-card",showScore=show&&score!==null;let chips=STAGES.map(stage=>{let si=scoreInfo(team,stage.id).score;return '<div class="mini"><b>'+((show&&stage.id===st&&si!==null)?Math.round(si):"—")+'</b>Stage '+stage.id+'</div>'}).join("");let growth=(show&&st===2&&scoreInfo(team,1).score!==null&&score!==null)?'<span class="positive">+'+(score-scoreInfo(team,1).score).toFixed(1)+' pts Growth</span>':'';return '<article class="team-card '+klass+'"><span class="shine"></span><div class="medal"><span class="medal-icon">'+(show?["🥇","🥈","🥉"][Math.min(i,2)]:"🛡")+'</span> '+(show?"RANK "+rank:"TEAM")+'</div><div><h3>'+escape(team.name)+'</h3><div class="subtitle">Winners AI Challenge Team</div></div><div><div class="score">'+(showScore?score.toFixed(1):"??")+'<small>'+(showScore?"%":"")+'</small></div><div class="xp-label">'+(showScore?"Gemini / Trainer Reviewed":"Awaiting Reveal")+'</div><div class="progress"><i style="width:'+(showScore?score:0)+'%"></i></div></div><div class="mini-chips">'+chips+'</div><div class="card-foot">'+growth+'</div></article>'}).join(""):'<div class="empty-state">مافيش فرق مسجلة لسه. إنشاء جلسة جديدة من شاشة المحاضر.</div>'}
+el("teamCount").textContent=teams.length+" Groups";
+el("teamCards").innerHTML=teams.length?ranked.map((team,i)=>{let {score}=scoreInfo(team,st),rank=i+1,klass=show?["gold-card","silver-card","bronze-card"][Math.min(i,2)]:"silver-card",showScore=show&&score!==null;let chips=STAGES.map(stage=>{let si=scoreInfo(team,stage.id).score;return '<div class="mini"><b>'+((show&&stage.id===st&&si!==null)?Math.round(si):"—")+'</b>Stage '+stage.id+'</div>'}).join("");let growth=(show&&st===2&&scoreInfo(team,1).score!==null&&score!==null)?'<span class="positive">+'+(score-scoreInfo(team,1).score).toFixed(1)+' pts Growth</span>':'';return '<article class="team-card '+klass+'"><span class="shine"></span><div class="medal"><span class="medal-icon">'+(show?["🥇","🥈","🥉"][Math.min(i,2)]:"🛡")+'</span> '+(show?"RANK "+rank:"TEAM")+'</div><div><h3>'+escape(team.name)+'</h3><div class="subtitle">Winners AI Challenge Group</div></div><div><div class="score">'+(showScore?score.toFixed(1):"??")+'<small>'+(showScore?"%":"")+'</small></div><div class="xp-label">'+(showScore?"Gemini / Trainer Reviewed":"Awaiting Reveal")+'</div><div class="progress"><i style="width:'+(showScore?score:0)+'%"></i></div></div><div class="mini-chips">'+chips+'</div><div class="card-foot">'+growth+'</div></article>'}).join(""):'<div class="empty-state">لسه مفيش جروبات سجلت. أول Leader يسجل هيظهر Group 01، واللي بعده Group 02…</div>'}
 function renderCase(){let s=STAGES[currentStage()-1];el("stageHeading").textContent=s.name;el("challengeStage").textContent="STAGE "+String(s.id).padStart(2,"0");el("caseTitle").textContent=s.title;el("caseDescription").textContent=s.description;el("caseFacts").innerHTML=s.facts.map(x=>'<li>'+escape(x)+'</li>').join("");el("caseTask").textContent=s.task;el("caseNote").textContent=s.note;el("rubricList").innerHTML=s.rubric.map(([name,w])=>'<div class="rubric-row"><span>'+escape(name)+'</span><span class="bar"><i style="width:'+w+'%"></i></span><b>'+w+'%</b></div>').join("");el("stageStatus").textContent=isOpen()?"التحدي مفتوح":"تم إغلاق التسليم";el("visibilityBadge").textContent=revealed()?"👁 Scores Revealed":"🙈 Scores Hidden";el("revealBtn").textContent=revealed()?"🙈 إخفاء الدرجات":"👁 إظهار الدرجات";el("freezeBtn").textContent=isOpen()?"⏸ إغلاق التحدي":"▶ فتح التحدي";el("connectionBadge").textContent=mode?(realSession?"● Google Sheets Live":bridgeReady?"● Apps Script Ready":"◉ Connecting to Apps Script"):(OFFLINE?"⚠ Emergency Local Scoreboard":"◉ Local Demo (Illustrative Scores)");el("sessionBadge").textContent="SESSION: "+(activeSessionId||"LOCAL");
 el("masterField").classList.toggle("hidden",s.id===1);el("masterReference").classList.toggle("hidden",s.id===1);el("answerProblemLabel").textContent=s.id===1?"1. تشخيص المشكلة والخطوات — بدون AI":s.id===2?"1. تحليل أولي — بدون AI":"1. تحليل المشكلة وتحديد الأولويات";el("answerToolsLabel").textContent=s.id===1?"2. أدوات AI المناسبة ولماذا — بدون استخدامها":s.id===2?"2. الخطوات والأدوات بعد التدريب":"2. AI Tools / Workflow وخطة التنفيذ";el("answerEvidenceLabel").textContent="3. Evidence / Verification / Human Judgment";el("submitTeam").disabled=!isOpen();el("prevStage").disabled=s.id===1;el("nextStage").disabled=s.id===3}
 function renderFeedback(){
@@ -98,6 +98,10 @@ function updateSelected(){
 const id=el("judgeTeam").value,st=currentStage();
 const e=realEvals.find(x=>x.teamId===id&&x.stage===st);
 const sub=lastAdminSnapshot?.submissions?.find(x=>x.teamId===id&&x.stage===st);
+const roster=realTeamRosters.find(x=>x.id===id);
+el("teamRosterInfo").textContent=roster?
+("👑 Leader: "+roster.leaderName+" | 👥 Members: "+[roster.leaderName,...(roster.members||[])].filter(Boolean).join(" · ")):
+"الجروب هيظهر هنا ومعاه أعضاؤه بعد تسجيل الـLeader من الفورم.";
 const sc=e?.score??scoreInfo({id:id},st).score;
 el("judgeScore").value=sc??0;el("judgeNote").value=e?.feedback||scoreInfo({id:id},st).feedback||"";
 el("submittedAnswer").textContent=sub?
@@ -117,7 +121,7 @@ el("sessionInput").value=id;
 }
 function changeView(v){demo.view=v;save();const u=new URL(location.href);u.searchParams.set("view",v);history.replaceState({}, "",u);render()}
 el("presenterTab").addEventListener("click",()=>changeView("presenter"));
-el("teamTab").addEventListener("click",()=>{changeView("team");updateAnswerForm()});
+el("teamTab").addEventListener("click",()=>openLeaderForm());
 el("stageNav").addEventListener("click",async e=>{const b=e.target.closest("[data-stage]");if(b&&(!mode||isAdmin))await changeStage(Number(b.dataset.stage))});
 el("prevStage").addEventListener("click",()=>changeStage(Math.max(1,currentStage()-1)));
 el("nextStage").addEventListener("click",()=>changeStage(Math.min(3,currentStage()+1)));
@@ -141,11 +145,11 @@ el("freezeBtn").addEventListener("click",()=>setState({open:!isOpen()}));
 el("judgeTeam").addEventListener("change",updateSelected);
 el("teamSelect").addEventListener("change",()=>{demo.lastTeam=el("teamSelect").value;joinedTeam=null;save();updateAnswerForm();render()});
 el("refreshAdmin").addEventListener("click",()=>refreshAdmin());
-el("adminKey").addEventListener("change",()=>{isAdmin=false;realEvals=[];lastAdminSnapshot=null;render()});
+el("adminKey").addEventListener("change",()=>{isAdmin=false;realEvals=[];realTeamRosters=[];lastAdminSnapshot=null;render()});
 async function refreshAdmin(quiet=false){
 if(!mode||!activeSessionId||!adminKey())return;
-try{const r=await call("getAdminState",identity());isAdmin=true;lastAdminSnapshot=r;realEvals=r.evaluations||[];realSession=r.public||realSession;liveError="";render();if(!quiet)notify("تم تحديث الإجابات والتقييمات من Sheets")}
-catch(e){isAdmin=false;realEvals=[];lastAdminSnapshot=null;liveError="فشل دخول المحاضر: "+e.message;render();if(!quiet)notify(liveError)}
+try{const r=await call("getAdminState",identity());isAdmin=true;lastAdminSnapshot=r;realEvals=r.evaluations||[];realTeamRosters=r.teams||[];realSession=r.public||realSession;liveError="";render();if(!quiet)notify("تم تحديث الإجابات والتقييمات من Sheets")}
+catch(e){isAdmin=false;realEvals=[];realTeamRosters=[];lastAdminSnapshot=null;liveError="فشل دخول المحاضر: "+e.message;render();if(!quiet)notify(liveError)}
 }
 el("manualBackup").addEventListener("click",()=>{notify("Manual Backup: اختر الفريق ثم اكتب Score وFeedback واضغط حفظ. لا يحتاج Gemini.");el("judgeScore").focus()});
 el("offlineBackup").addEventListener("click",()=>{
@@ -183,18 +187,22 @@ el("geminiEvaluate").addEventListener("click",async()=>{
  }catch(e){notify("Gemini unavailable — استخدم التقييم اليدوي. "+e.message)}
  finally{btn.disabled=false;btn.textContent="✦ تقييم Gemini أو Manual"}
 });
-el("openTeamLink").addEventListener("click",async()=>{
- const u=new URL(location.href);
- u.searchParams.delete("bridge");u.searchParams.set("view","team");
- if(activeSessionId)u.searchParams.set("session",activeSessionId);
- if(hosted){
+function getFormURL(){
+ let u;
  const published=new URLSearchParams(location.search).get("service");
- if(published&&/^https:\/\/script\.google\.com\/macros\/s\//.test(published)){
-  const liveUrl=new URL(published);liveUrl.searchParams.set("session",activeSessionId);liveUrl.searchParams.set("view","team");
-  u.href=liveUrl.href;
- }else{notify("رابط Apps Script لم يُضف للصفحة بعد — اطلبه من المحاضر");return}
+ if(hosted&&published&&/^https:\/\/script\.google\.com\/macros\/s\//.test(published))u=new URL(published);
+ else if(appsScriptWebAppUrl)u=new URL(appsScriptWebAppUrl);
+ else {u=new URL(location.href);u.pathname="/winners-ai-for-hr/arena/form.html";u.searchParams.set("demo","1")}
+ u.searchParams.set("view","form");
+ if(activeSessionId)u.searchParams.set("session",activeSessionId);
+ return u.href;
 }
- try{await navigator.clipboard.writeText(u.href);notify("تم نسخ رابط المتدربين")}catch{window.prompt("Team URL",u.href)}
+function openLeaderForm(){window.open(getFormURL(),"_blank","noopener,noreferrer")}
+el("openTeamLink").addEventListener("click",async()=>{
+ if(!activeSessionId)return notify("أنشئ Session أولًا");
+ const u=getFormURL();
+ try{await navigator.clipboard.writeText(u);notify("تم نسخ رابط فورم الـLeaders. كل Team Leader يسجل Group جديدة تلقائيًا.")}
+ catch{window.prompt("Team Leader Form URL",u)}
 });
 el("sessionInput").value=activeSessionId;
 el("sessionInput").addEventListener("change",async()=>{
@@ -206,11 +214,10 @@ el("createSession").addEventListener("click",async()=>{
  if(!adminKey())return notify("اكتب كلمة مرور المحاضر أولًا");
  const button=el("createSession");button.disabled=true;
  try{
-  const r=await call("createSession",{...identity(),title:"Winners AI for HR — Live Class",teamNames:["Team Alpha","Team Bravo","Team Charlie"]});
+  const r=await call("createSession",{...identity(),title:"Winners AI for HR — Live Class",teamNames:[]});
   setUrlSession(r.sessionId);el("teamCodes").hidden=false;
-  el("teamCodes").innerHTML="<b>انسخ الأكواد الآن، لأنها مش هتظهر مرة ثانية بعد تحديث الصفحة:</b> "+
-  r.teams.map(t=>'<span class="tag">'+escape(t.name)+": "+escape(t.code)+'</span>').join(" ");
-  notify("Session Created — Codes ready");await refreshPublic();await refreshAdmin(true);
+  el("teamCodes").textContent="Session جديدة بدون فرق مسبقة. ابعت رابط الـTeam Leaders. كل ليدر يسجل فريقه ويتم إنشاء Group جديدة.";
+  notify("Session Created — Auto Group Registration Ready");await refreshPublic();await refreshAdmin(true);
  }catch(e){notify("تعذر إنشاء Session: "+e.message)}
  finally{button.disabled=false}
 });
