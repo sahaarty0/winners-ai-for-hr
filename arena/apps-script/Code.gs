@@ -107,6 +107,8 @@ function submit_(p){
   var revision=prev?Number(prev.row[3])+1:1,row=[sid,tid,stage,revision,stamp_()].concat(fields);
   if(prev)sh_(TABS.submissions).getRange(prev.index,1,1,row.length).setValues([row]);
   else sh_(TABS.submissions).appendRow(row);
+  var pendingEval=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage&&r[4]==='pending'});
+  if(pendingEval)sh_(TABS.evaluations).getRange(pendingEval.index,5).setValue('stale');
   audit_(sid,'SUBMIT',tid,stage,'Revision '+revision);
   return {ok:true,revision:revision,submittedAt:row[4]};
  });
