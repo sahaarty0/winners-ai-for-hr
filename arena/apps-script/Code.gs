@@ -12,7 +12,7 @@ var STAGES = {
   3: {name:'Grand Finale',facts:'Return to Horizon Services Stage 1: 320 staff, 90 CVs for two vacancies, 75 anonymous staff comments, a 12-page leave policy. Propose full controlled HR workflow, tools, prompt, checks, risks, KPIs, human approval.',rubric:[['عمق التشخيص وربطه بالأدلة',20],['جودة الحل وتصميم Workflow',25],['Prompt / AI Tools Implementation',20],['السلامة والخصوصية والتحقق',20],['القيمة التجارية وخطة القياس',15]]}
 };
 var TABS = {sessions:'Sessions',teams:'Teams',submissions:'Submissions',evaluations:'Evaluations',audit:'Audit',participants:'ParticipantResponses'};
-var LIMITS = {sessions:40,teamsPerSession:12,answerChars:5000};
+var LIMITS = {sessions:40,teamsPerSession:50,answerChars:5000};
 /** Run once in Apps Script editor, after putting strong ADMIN_PASSPHRASE in Script Properties. */
 function setupArena(){
   var p=PropertiesService.getScriptProperties(),ss=SpreadsheetApp.getActiveSpreadsheet();
@@ -20,7 +20,7 @@ function setupArena(){
   p.setProperty('SHEET_ID',ss.getId());
   var names = {
     Sessions:['Session ID','Title','Stage','Open','Reveal Stage 1','Reveal Stage 2','Reveal Stage 3','Created At','Updated At'],
-    Teams:['Session ID','Team ID','Team Name','Code Hash'],
+    Teams:['Session ID','Team ID','Team Name','Code Hash','Leader Name','Members','Leader Token Hash','Registered At'],
     Submissions:['Session ID','Team ID','Stage','Revision','Submitted At','Problem Analysis','Tools & Actions','Evidence & Risks','Master Prompt'],
     Evaluations:['Session ID','Team ID','Stage','Score','Status','Feedback','Criteria JSON','Model','Updated At'],
     Audit:['Time','Session ID','Action','Team ID','Stage','Note'],
@@ -83,16 +83,74 @@ function pub_(sid){
 function withLock_(fn){var lock=LockService.getScriptLock();lock.waitLock(15000);try{return fn()}finally{lock.releaseLock()}}
 function createSession_(p){
  admin_(p);return withLock_(function(){
-  if(data_(TABS.sessions).length>=LIMITS.sessions)throw Error('Session archive limit reached; archive older data');
-  var names=Array.isArray(p.teamNames)?p.teamNames.map(function(x){return safeCell_(x,55)}):['Team Alpha','Team Bravo','Team Charlie'];
-  if(names.length<2||names.length>LIMITS.teamsPerSession||names.some(function(n){return n.length<2}))throw Error('2–12 named teams required');
-  if(new Set(names.map(function(x){return x.toLowerCase()})).size!==names.length)throw Error('Team names must be unique');
+  if(data_(TABS.sessions).length>=LIMITS.sessions)throw Error('Session archive limit reached; archive old records');
   var sid='W'+Utilities.getUuid().replace(/-/g,'').slice(0,13),now=stamp_();
   sh_(TABS.sessions).appendRow([sid,safeCell_(p.title,140)||'Winners AI Challenge Arena',1,true,false,false,false,now,now]);
-  var codes=[];names.forEach(function(name,i){var id='T'+(i+1),code=Utilities.getUuid().replace(/-/g,'').slice(0,10).toUpperCase();sh_(TABS.teams).appendRow([sid,id,name,sha_(code)]);codes.push({id:id,name:name,code:code})});
-  audit_(sid,'CREATE_SESSION','','',names.length+' teams');
-  return {ok:true,sessionId:sid,teams:codes};
+  audit_(sid,'CREATE_SESSION','','','0 groups — auto registration enabled');
+  return {ok:true,sessionId:sid,teams:[],mode:'LEADER_AUTO_GROUP'};
  });
+}
+function parseRoster_(p){
+ var leader=limitStr_(p.leaderName,90).replace(/\s+/g,' ').trim();
+ if(leader.length<3||/[<>{}=]/.test(leader))throw Error('Enter a valid team leader name');
+ var incoming=Array.isArray(p.members)?p.members:String(p.members||'').split(/[\n,،؛;]+/);
+ var members=incoming.map(function(n){return String(n||'').replace(/\s+/g,' ').trim()}).filter(function(n){return !!n});
+ if(members.length>25)throw Error('Maximum 25 member names');
+ if(members.some(function(n){return n.length<2||n.length>90||/[<>{}=]/.test(n)}))throw Error('Please check member names');
+ var unique=[leader.toLocaleLowerCase()].concat(members.map(function(n){return n.toLocaleLowerCase()}));
+ if(new Set(unique).size!==unique.length)throw Error('Member names must be unique');
+ return {leader:leader,members:members};
+}
+function registerLeaderGroup_(p){
+ var sid=sid_(p.sessionId),secret=limitStr_(p.leaderToken,100),roster=parseRoster_(p);
+ if(!/^[0-9a-fA-F-]{32,90}$/.test(secret))throw Error('Invalid leader registration token');
+ if(p.honeypot)throw Error('Invalid registration');
+ return withLock_(function(){
+  var sess=session_(sid);
+  if(sess.row[3]!==true)throw Error('Registration closed; facilitator must reopen stage');
+  var prior=data_(TABS.teams).filter(function(r){return r[0]===sid}),hashed=sha_(secret);
+  var own=prior.find(function(r){return r[6]===hashed});
+  if(own){return {ok:true,groupId:own[1],groupName:own[2],leaderName:own[4],members:String(own[5]||'').split(/\n/).filter(Boolean),alreadyRegistered:true}}
+  if(prior.length>=LIMITS.teamsPerSession)throw Error('Group capacity reached; ask facilitator');
+  var sameLeader=prior.some(function(r){return String(r[4]||'').trim().toLocaleLowerCase()===roster.leader.toLocaleLowerCase()});
+  if(sameLeader)throw Error('This leader name is already registered. Use the original device to continue.');
+  var next=Math.max(0,...prior.map(function(r){var m=/^T(\d+)$/.exec(String(r[1]));return m?Number(m[1]):0}))+1;
+  var id='T'+next,name='Group '+String(next).padStart(2,'0'),row=[sid,id,name,'',safeCell_(roster.leader,90),safeCell_(roster.members.join('\n'),2500),hashed,stamp_()];
+  sh_(TABS.teams).appendRow(row);audit_(sid,'REGISTER_GROUP',id,Number(sess.row[2]),'Leader registered, '+(roster.members.length+1)+' participants');
+  return {ok:true,groupId:id,groupName:name,leaderName:roster.leader,members:roster.members,alreadyRegistered:false};
+ });
+}
+function groupAccess_(sid,id,token){
+ var team=team_(sid,id),valid=String(team.row[6]||'');
+ if(!valid||!/^[a-f0-9]{64}$/.test(valid)||!secureEq_(sha_(limitStr_(token,100)),valid))throw Error('Invalid team leader token');
+ return team;
+}
+function leaderSubmit_(p){
+ var sid=sid_(p.sessionId),id=tid_(p.teamId),stage=stage_(p.stage),answer=limitStr_(p.answer,5000).trim(),master=limitStr_(p.masterPrompt,5000);
+ if(answer.length<30)throw Error('Please enter an answer of at least 30 characters');
+ var submitted=withLock_(function(){
+   var sess=session_(sid);
+   if(sess.row[3]!==true||Number(sess.row[2])!==stage)throw Error('This challenge stage is not open');
+   var team=groupAccess_(sid,id,p.leaderToken),approved=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===id&&Number(r[2])===stage&&r[4]==='approved'});
+   if(approved)throw Error('The presenter already finalized this group stage');
+   var tab=sh_(TABS.submissions),existing=findRow_(data_(TABS.submissions),function(r){return r[0]===sid&&r[1]===id&&Number(r[2])===stage});
+   var revision=existing?Number(existing.row[3])+1:1;
+   var record=[sid,id,stage,revision,stamp_(),safeCell_(answer,5000),'','',''+(stage===1?'':safeCell_(master,5000))];
+   if(existing)tab.getRange(existing.index,1,1,record.length).setValues([record]);else tab.appendRow(record);
+   var pending=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===id&&Number(r[2])===stage&&r[4]==='pending'});
+   if(pending)sh_(TABS.evaluations).getRange(pending.index,5).setValue('stale');
+   audit_(sid,'LEADER_SUBMIT',id,stage,'Revision '+revision);
+   return {ok:true,revision:revision,groupName:team.row[2],receivedAt:record[4],processing:'SAVED'};
+ });
+ // Google Sheets persists before any Gemini call. Gemini failure MUST NOT lose the answer.
+ if(props_().getProperty('GEMINI_API_KEY')){
+  try{
+   var result=evaluateSubmissionInternal_({sessionId:sid,teamId:id,stage:stage});
+   submitted.processing=result&&result.status==='pending'?'GEMINI_PENDING_TRAINER_APPROVAL':'SAVED_FOR_MANUAL_REVIEW';
+   if(result&&result.fallback)submitted.processingNote=result.message;
+  }catch(e){submitted.processing='SAVED_FOR_MANUAL_REVIEW';submitted.processingNote=limitStr_(e.message,170);}
+ }else submitted.processing='SAVED_FOR_MANUAL_REVIEW';
+ return submitted;
 }
 function verifyTeam_(p){var sid=sid_(p.sessionId),tid=tid_(p.teamId),t=codeValid_(sid,tid,p.code);return {ok:true,id:tid,name:String(t.row[2])};}
 
@@ -168,6 +226,7 @@ function adminState_(p){
  var subs=data_(TABS.submissions).filter(function(r){return r[0]===sid});
  var ev=data_(TABS.evaluations).filter(function(r){return r[0]===sid});
  return {ok:true,public:pub_(sid),
+ teams:data_(TABS.teams).filter(function(r){return r[0]===sid}).map(function(r){return {id:r[1],name:r[2],leaderName:r[4]||"",members:String(r[5]||"").split("\n").filter(Boolean),memberCount:1+String(r[5]||"").split("\n").filter(Boolean).length}}),
  submissions:subs.map(function(r){return {teamId:r[1],stage:Number(r[2]),revision:Number(r[3]),submittedAt:r[4],answer:{problem:r[5],tools:r[6],evidence:r[7],prompt:r[8]}}}),
  evaluations:ev.map(function(r){return {teamId:r[1],stage:Number(r[2]),score:Number(r[3]),status:r[4],feedback:r[5],criteria:r[6]?JSON.parse(String(r[6])):[],model:r[7]||''}})};
 }
@@ -199,8 +258,8 @@ function approve_(p){
  var criteria=old&&old.row[6]?JSON.parse(String(old.row[6])):[];
  return saveEval_(sid,tid,stage,Math.round(score*10)/10,'approved',p.feedback,criteria,old?old.row[7]:'Manual');
 }
-function evaluate_(p){
- admin_(p);var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage),ss=submission_(sid,tid,stage);
+function evaluate_(p){admin_(p);return evaluateSubmissionInternal_(p);}
+function evaluateSubmissionInternal_(p){var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage),ss=submission_(sid,tid,stage);
  if(!ss)throw Error('No submission: ask the team to submit first');
  var previous=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage});
  if(previous&&previous.row[4]==='approved')throw Error('Score already approved; cannot silently replace');
@@ -236,6 +295,8 @@ function arenaRpc(req){
  if(a==='ping')return {ok:true,service:'Winners Arena Apps Script',ready:!!props_().getProperty('SHEET_ID')};
  if(a==='getPublicState')return pub_(sid_(p.sessionId));
  if(a==='createSession')return createSession_(p);
+ if(a==='registerLeaderGroup')return registerLeaderGroup_(p);
+ if(a==='submitGroupAnswer')return leaderSubmit_(p);
  if(a==='submitAnswer')return submit_(p);
  if(a==='submitParticipant')return participantSubmit_(p);
  if(a==='verifyTeamCode')return verifyTeam_(p);
