@@ -14,11 +14,17 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;bac
 <section class="panel" id="identityCard">
 <div class="stage-pill">TEAM LEADER REGISTRATION</div>
 <h2>👑 سجل فريقك مرة واحدة</h2>
-<p>شخص واحد فقط من كل جروب هو الـLeader. اكتب اسمك وأسماء أعضاء الفريق، وهنخصص لكم تلقائيًا رقم Group جديد، وبعد التسجيل يظهر سؤال الجولة الحالية.</p>
+<p>شخص واحد فقط من كل جروب هو الـLeader. اكتب اسمك وأسماء أعضاء الفريق، واختاروا مشكلة HR واحدة من الثلاثة، وهنخصص لكم تلقائيًا رقم Group جديد. بعد التسجيل هتظهر أسئلة مشكلتكم فقط.</p>
 <div id="sessionField" class="field hide"><label class="label" for="sessionId">Session ID من المحاضر</label><input id="sessionId" autocomplete="off" placeholder="كود جلسة التدريب"></div>
 <div class="field"><label class="label" for="leaderName">اسم الـTeam Leader</label><input id="leaderName" maxlength="90" autocomplete="name" placeholder="اسمك بالكامل" required></div>
 <label class="label">أسماء أعضاء الفريق معاك</label>
 <div id="memberFields" class="members-list"></div>
+<div class="field" style="margin-top:18px"><label class="label" for="problemTrack">🎯 اختار مشكلة HR واحدة لفريقك</label>
+<select id="problemTrack" required><option value="">— حدد المشكلة اللي فريقك هيشتغل عليها —</option>
+<option value="recruitment">Recruitment & Selection — مقارنة 4 مرشحين لوظيفتين محددتين</option>
+<option value="experience">Employee Experience — تصنيف 12 تعليقًا موثّقًا</option>
+<option value="policy">Personnel & HR Policies — مراجعة 3 بنود من سياسة الإجازات</option></select>
+<p class="muted">اختيار واحد فقط، وهيفضل ثابت مع جروبك عبر المراحل الثلاث. عادي أكتر من Group تختار نفس المشكلة.</p></div>
 <div class="actions" style="justify-content:flex-start"><button id="addMember" class="btn" type="button">+ إضافة عضو تاني</button></div>
 <div class="field honeypot" aria-hidden="true"><label for="companyWebsite">Website</label><input id="companyWebsite" autocomplete="off" tabindex="-1"></div>
 <p class="muted">مش محتاج تختار Group أو تدخل كود. النظام هيعمل Group 01، ثم Group 02، ثم Group 03… تلقائيًا حسب تسجيل كل ليدر. احتفظ بنفس الجهاز للجولات التالية.</p>
