@@ -1,6 +1,6 @@
 # Winners AI Challenge Arena — FREE deployment
 
-**Status 26 Oct 2026:** The instructor published the [Apps Script Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec). The live Arena loaded successfully in a browser and displayed the Presenter/Team controls, with “Apps Script Connected”. **Admin login, Sheets submissions and Gemini scoring still require end-to-end classroom smoke tests.** The setup steps below are retained for future re-deployment.
+**Status 26 Oct 2026:** **Updated group-leader registration code must still be copied to Apps Script and deployed as a New Version.** The instructor published the [Apps Script Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec). The live Arena loaded successfully in a browser and displayed the Presenter/Team controls, with “Apps Script Connected”. **Admin login, Sheets submissions and Gemini scoring still require end-to-end classroom smoke tests.** The setup steps below are retained for future re-deployment.
 
 **Training database**: https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit
 
@@ -16,7 +16,8 @@
 5. Click **Deploy → New deployment → Type: Web app**. Set **Execute as: Me** and **Who has access: Anyone** (required for teams without Google sign-in). Click Deploy, complete OAuth authorization and copy the URL ending in `/exec`.
 6. **Recommended live presentation URL:** open the new `/exec` link directly. This launches the official Bavel-style Github Arena **inside the Apps Script host** via a nested website iframe. This route avoids depending solely on third-party Apps Script iframe embedding, which has shown intermittent browser issues in 2026. Verify on your exact devices before class.
 7. **Optional GitHub direct live link:** update `arena/apps-script-config.js` with your public **/exec URL only**. Do **not** include Gemini API key or `ADMIN_PASSPHRASE` there.
-8. On the Presenter screen, type the secret into the password field, choose **Create Session**. Copy all team codes immediately; these appear only once. Share the team URL. The facilitator selects the Stage and approves each grade. Participants select their team and enter their assigned code.
+8. **New group-leader workflow:** In the Presenter screen, enter the secret and click **Create Session** (this now creates *zero predefined groups*). Press **Copy Team Leader Form** and distribute to each group's designated Leader. Each Leader enters their name and team members and receives an automatically numbered Group 01, 02, 03, etc. They then submit one answer on behalf of the group. There are **no team codes to distribute**. The leader's private browser token authenticates future submissions.
+9. **For an existing /exec deployment:** after pasting the updated `Code.gs`, select **Deploy → Manage deployments → Edit (pencil) → Version: New version → Deploy**. The URL stays the same. Run `setupArena()` if not already run. Always create a **new classroom session** after upgrading to avoid legacy fixed groups.
 
 ## Operating the 3-stage training
 
@@ -29,7 +30,7 @@
 ## Real-time updates & safety
 
 - Presenter and team client communicate with `google.script.run` through an Apps Script bridge hosted over HTTPS. This avoids exposing the Gemini API key and keeps public scores separated from private responses.
-- The presenter view polls Google Sheets roughly every 12 seconds, not true push real-time. Teams can revise answers **until** grading is approved.
+- The presenter view polls Google Sheets roughly every 12 seconds, not true push real-time. Leaders can revise their one team answer **until** grading is approved. Each Leader should use the same browser across three stages.
 - Only approved scores for explicitly revealed stages become public; anonymous responses are not displayed in the leaderboard.
 - Gemini is optional. If unavailable or rate-limited, the presenter enters a score and feedback manually without blocking the training. If **Apps Script itself** or the network is unavailable, submissions cannot reach the shared Sheet: use paper/offline fallback and reconcile later.
 - Use fictional/synthetic training data only, no real employee or candidate personal data. Gemini free tier may use content to improve the provider's products; **do not send confidential HR data**.
