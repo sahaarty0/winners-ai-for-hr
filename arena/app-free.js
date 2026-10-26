@@ -127,11 +127,11 @@ el("freezeBtn").addEventListener("click",()=>setState({open:!isOpen()}));
 el("judgeTeam").addEventListener("change",updateSelected);
 el("teamSelect").addEventListener("change",()=>{demo.lastTeam=el("teamSelect").value;joinedTeam=null;save();updateAnswerForm();render()});
 el("refreshAdmin").addEventListener("click",()=>refreshAdmin());
-el("adminKey").addEventListener("change",()=>{isAdmin=false;realEvals=[];render()});
+el("adminKey").addEventListener("change",()=>{isAdmin=false;realEvals=[];lastAdminSnapshot=null;render()});
 async function refreshAdmin(quiet=false){
 if(!mode||!activeSessionId||!adminKey())return;
 try{const r=await call("getAdminState",identity());isAdmin=true;lastAdminSnapshot=r;realEvals=r.evaluations||[];realSession=r.public||realSession;liveError="";render();if(!quiet)notify("تم تحديث الإجابات والتقييمات من Sheets")}
-catch(e){isAdmin=false;realEvals=[];liveError="فشل دخول المحاضر: "+e.message;render();if(!quiet)notify(liveError)}
+catch(e){isAdmin=false;realEvals=[];lastAdminSnapshot=null;liveError="فشل دخول المحاضر: "+e.message;render();if(!quiet)notify(liveError)}
 }
 el("manualBackup").addEventListener("click",()=>{notify("Manual Backup: اختر الفريق ثم اكتب Score وFeedback واضغط حفظ. لا يحتاج Gemini.");el("judgeScore").focus()});
 el("offlineBackup").addEventListener("click",()=>{
