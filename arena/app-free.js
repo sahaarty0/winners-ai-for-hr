@@ -153,7 +153,13 @@ el("openTeamLink").addEventListener("click",async()=>{
  const u=new URL(location.href);
  u.searchParams.delete("bridge");u.searchParams.set("view","team");
  if(activeSessionId)u.searchParams.set("session",activeSessionId);
- if(hosted){u.host="sahaarty0.github.io";u.pathname="/winners-ai-for-hr/arena/"}
+ if(hosted){
+ const published=new URLSearchParams(location.search).get("service");
+ if(published&&/^https:\/\/script\.google\.com\/macros\/s\//.test(published)){
+  const liveUrl=new URL(published);liveUrl.searchParams.set("session",activeSessionId);liveUrl.searchParams.set("view","team");
+  u.href=liveUrl.href;
+ }else{notify("رابط Apps Script لم يُضف للصفحة بعد — اطلبه من المحاضر");return}
+}
  try{await navigator.clipboard.writeText(u.href);notify("تم نسخ رابط المتدربين")}catch{window.prompt("Team URL",u.href)}
 });
 el("sessionInput").value=activeSessionId;
