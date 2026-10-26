@@ -2,13 +2,15 @@
 
 **Official Winners AI for HR gamification project** using the exact approved Winners logo.
 
-## OPEN NOW (Demo)
+## OPEN NOW (Live frontend + offline backup)
 
-- [Arena on GitHub Pages](https://sahaarty0.github.io/winners-ai-for-hr/arena/)
+- [Arena (redirects to live Apps Script)](https://sahaarty0.github.io/winners-ai-for-hr/arena/)
+- [Direct live Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec)
+- [Local Demo (fictional scores)](https://sahaarty0.github.io/winners-ai-for-hr/arena/?demo=1)
 - [Emergency Offline Manual Scoreboard](https://sahaarty0.github.io/winners-ai-for-hr/arena/?offline=1)
 - [Real Backend Google Sheet](https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit)
 
-**Important:** The public page remains in **Local Demo mode** until the Apps Script Web App is deployed by the Spreadsheet owner. Demo scores are fictional; not Gemini evaluations. The fallback `?offline=1` starts with no scores, and its CSV export can be reconciled after class. **A live production-ready connection has not been claimed or verified.**
+**Deployment status (26 Oct 2026):** The instructor deployed the [Google Apps Script Web App](https://script.google.com/macros/s/AKfycbyZUW9VDB82FN37sM4DBaW559_-ClInkfpV3HlYPqFLZyonOXOcXDbF6LQ2FRTYDdBq/exec). A browser inspection confirmed that the live Arena and all three stage cards render and that the bridge reports “Apps Script Connected”. **A group submission, Gemini grade, admin authorization and Google Sheets write have not yet been end-to-end tested.** The default GitHub Arena URL automatically launches the direct live Web App; use [Demo Mode](https://sahaarty0.github.io/winners-ai-for-hr/arena/?demo=1) for fictional local values or [Emergency Offline](https://sahaarty0.github.io/winners-ai-for-hr/arena/?offline=1) for manual scores with local CSV backup.
 
 ## Primary deployment path — NO BILLING
 
@@ -16,11 +18,11 @@
 
 - [Free setup guide](./apps-script/INSTALL.md)
 - [Apps Script server code to paste into your Sheet](./apps-script/Code.gs)
-- [Public App Script URL configuration](./apps-script-config.js) — currently **blank** until deployment
+- [Public App Script URL configuration](./apps-script-config.js) — deployed Web App URL configured
 - [Interactive frontend source](./app-free.js)
 - [Official logo and presenter/team cards](./index.html)
 
-Start in the linked Google Sheet → Extensions → Apps Script, paste all `Code.gs`, add project Script Properties `ADMIN_PASSPHRASE` and optional `GEMINI_API_KEY`, run `setupArena`, deploy as a Web App (execute as owner, accessible to anyone), and open the resulting **/exec** URL. That Apps Script link can directly host the Winners Arena as an alternative to cross-origin iframe embedding.
+**Completed by the instructor:** Web App published. **Next:** open the direct live Web App, enter the facilitator's private passphrase, press Create Session, save the team codes, then test one team submission and manual evaluation before using Gemini. If the Apps Script source is edited after deployment, redeploy its updated version through Manage deployments.
 
 **Secrets never belong in GitHub.** Gemini quota exhaustion is handled via manual scoring; only presenter-approved and explicitly revealed grades become public.
 
