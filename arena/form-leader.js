@@ -46,7 +46,7 @@ function setStatus(message,good=false){el("liveStatus").textContent=message;el("
 function defaultDemo(){return {sessionId:"WDEMOSESSION",title:"Winners AI for HR · Demo",currentStage:1,open:true,publicTeams:[],publicBoard:{}}}
 function getTeamDraft(st){try{return JSON.parse(localStorage.getItem(sessionKey()+"_stage_"+st)||"null")}catch{return null}}
 function storeDraft(){if(!group)return;localStorage.setItem(sessionKey()+"_stage_"+stage,JSON.stringify({answer:el("answerText").value,master:el("masterPrompt").value}))}
-function restoreDraft(){let p=getTeamDraft(stage)||{};el("answerText").value=p.answer||"";el("masterPrompt").value=p.master||"";el("charCount").textContent=el("answerText").value.length+" / 5000 حرف"}
+function restoreDraft(){let p=getTeamDraft(stage)||{};el("answerText").value=p.answer||"";el("masterPrompt").value=p.master||"";el("charCount").textContent=el("answerText").value.length+" / 12000 حرف"}
 function makeMember(value=""){
  const wrap=document.createElement("div");wrap.className="member-item";
  const input=document.createElement("input");input.type="text";input.maxLength=90;input.placeholder="اسم عضو الفريق";input.value=value;input.setAttribute("aria-label","اسم عضو الفريق");
@@ -89,7 +89,7 @@ function render(){
 async function refresh(){
  if(!sessionId){show("sessionField",true);setStatus("اطلب رابط الجلسة من المحاضر");return}
  try{
-  const updated=demo?defaultDemo():await rpc("getPublicState",{sessionId},25000);
+  const updated=demo?defaultDemo():await rpc("getPublicState",{sessionId},212000);
   if(!updated?.sessionId)throw Error("Session ID غير صحيح");
   const oldStage=stage;
   session=updated;
@@ -99,7 +99,7 @@ async function refresh(){
  }catch(e){setStatus("مشكلة اتصال",false);notify("تعذر تحميل السؤال: "+e.message)}
 }
 el("addMember").addEventListener("click",()=>{if(el("memberFields").children.length>=25)return notify("الحد الأقصى 25 عضو");makeMember()});
-el("answerText").addEventListener("input",()=>{el("charCount").textContent=el("answerText").value.length+" / 5000 حرف";storeDraft()});
+el("answerText").addEventListener("input",()=>{el("charCount").textContent=el("answerText").value.length+" / 12000 حرف";storeDraft()});
 el("masterPrompt").addEventListener("input",storeDraft);
 el("registerLeader").addEventListener("click",async()=>{
  clearNotice();
