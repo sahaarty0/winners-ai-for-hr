@@ -9,13 +9,14 @@ const DEMO_SEED=[
 {id:"bravo",name:"Team Bravo",scores:{"1":61,"2":84,"3":87},feedback:{"1":"تشخيص قوي، والتحقق البشري يحتاج تفصيلًا.","2":"خطوات واضحة؛ حسّن الافتراضات المعلنة.","3":"نموذج عمل قابل للتطبيق مع بعض التحسينات."}},
 {id:"charlie",name:"Team Charlie",scores:{"1":35,"2":78,"3":94},feedback:{"1":"ضعف في اختيار الأدوات وتوثيق البيانات.","2":"تقدم ممتاز؛ أصبح يربط القرار بالدليل.","3":"أفضل مقترح في مؤشرات القيمة والتحقق."}}
 ];
-const KEY="winners-arena-demo-v1";
-const defaults=()=>({stage:1,reveal:false,open:true,teams:structuredClone(DEMO_SEED),answers:{},lastTeam:"alpha",notes:{},edited:{},view:new URLSearchParams(location.search).get("view")==="team"?"team":"presenter"});
+const OFFLINE=new URLSearchParams(location.search).get("offline")==="1";
+const KEY=OFFLINE?"winners-arena-offline-v1":"winners-arena-demo-v1";
+const defaults=()=>({stage:1,reveal:false,open:true,teams:OFFLINE?DEMO_SEED.map(t=>({...t,scores:{},feedback:{}})):structuredClone(DEMO_SEED),answers:{},lastTeam:"alpha",notes:{},edited:{},view:new URLSearchParams(location.search).get("view")==="team"?"team":"presenter"});
 let demo;try{demo={...defaults(),...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch{demo=defaults()}
 if(!Array.isArray(demo.teams)||!demo.teams.length)demo.teams=structuredClone(DEMO_SEED);
 const el=id=>document.getElementById(id);const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const save=()=>localStorage.setItem(KEY,JSON.stringify(demo));const fmt=n=>typeof n==="number"?n.toFixed(1)+"%":"—";
 const hosted=new URLSearchParams(location.search).get("bridge")==="parent" && window.parent!==window; // RPC refuses untrusted parent origins; handshake must come from Google.
-const mode=hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl));
+const mode=!OFFLINE&&(hosted||!!(appsScriptWebAppUrl && /^https:\/\/script\.google\.com\/macros\/s\//.test(appsScriptWebAppUrl)));
 let isAdmin=false,realSession=null,realEvals=[],joinedTeam=null,activeSessionId=new URLSearchParams(location.search).get("session")||defaultSessionId||localStorage.getItem("winners-arena-session")||"",liveError="",lastAdminSnapshot=null,bridgeReady=false,bridgeTarget=null;
 function notify(msg){const t=el("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.add("hidden"),4200)}
 function currentStage(){return mode&&realSession?realSession.currentStage:demo.stage}
@@ -31,7 +32,7 @@ function renderStageNav(){let curr=currentStage();el("stageNav").innerHTML=STAGE
 function renderCards(){const st=currentStage(),show=revealed(),teams=publicTeams();const ranked=[...teams].sort((a,b)=>{if(!show)return a.name.localeCompare(b.name);return (scoreInfo(b,st).score??-1)-(scoreInfo(a,st).score??-1)});
 el("teamCount").textContent=teams.length+" Teams";
 el("teamCards").innerHTML=teams.length?ranked.map((team,i)=>{let {score}=scoreInfo(team,st),rank=i+1,klass=show?["gold-card","silver-card","bronze-card"][Math.min(i,2)]:"silver-card",showScore=show&&score!==null;let chips=STAGES.map(stage=>{let si=scoreInfo(team,stage.id).score;return '<div class="mini"><b>'+((show&&stage.id===st&&si!==null)?Math.round(si):"—")+'</b>Stage '+stage.id+'</div>'}).join("");let growth=(show&&st===2&&scoreInfo(team,1).score!==null&&score!==null)?'<span class="positive">+'+(score-scoreInfo(team,1).score).toFixed(1)+' pts Growth</span>':'';return '<article class="team-card '+klass+'"><span class="shine"></span><div class="medal"><span class="medal-icon">'+(show?["🥇","🥈","🥉"][Math.min(i,2)]:"🛡")+'</span> '+(show?"RANK "+rank:"TEAM")+'</div><div><h3>'+escape(team.name)+'</h3><div class="subtitle">Winners AI Challenge Team</div></div><div><div class="score">'+(showScore?score.toFixed(1):"??")+'<small>'+(showScore?"%":"")+'</small></div><div class="xp-label">'+(showScore?"Gemini / Trainer Reviewed":"Awaiting Reveal")+'</div><div class="progress"><i style="width:'+(showScore?score:0)+'%"></i></div></div><div class="mini-chips">'+chips+'</div><div class="card-foot">'+growth+'</div></article>'}).join(""):'<div class="empty-state">مافيش فرق مسجلة لسه. إنشاء جلسة جديدة من شاشة المحاضر.</div>'}
-function renderCase(){let s=STAGES[currentStage()-1];el("stageHeading").textContent=s.name;el("challengeStage").textContent="STAGE "+String(s.id).padStart(2,"0");el("caseTitle").textContent=s.title;el("caseDescription").textContent=s.description;el("caseFacts").innerHTML=s.facts.map(x=>'<li>'+escape(x)+'</li>').join("");el("caseTask").textContent=s.task;el("caseNote").textContent=s.note;el("rubricList").innerHTML=s.rubric.map(([name,w])=>'<div class="rubric-row"><span>'+escape(name)+'</span><span class="bar"><i style="width:'+w+'%"></i></span><b>'+w+'%</b></div>').join("");el("stageStatus").textContent=isOpen()?"التحدي مفتوح":"تم إغلاق التسليم";el("visibilityBadge").textContent=revealed()?"👁 Scores Revealed":"🙈 Scores Hidden";el("revealBtn").textContent=revealed()?"🙈 إخفاء الدرجات":"👁 إظهار الدرجات";el("freezeBtn").textContent=isOpen()?"⏸ إغلاق التحدي":"▶ فتح التحدي";el("connectionBadge").textContent=mode?(realSession?"● Google Sheets Live":bridgeReady?"● Apps Script Ready":"◉ Connecting to Apps Script"):"◉ Local Demo (Illustrative Scores)";el("sessionBadge").textContent="SESSION: "+(activeSessionId||"LOCAL");
+function renderCase(){let s=STAGES[currentStage()-1];el("stageHeading").textContent=s.name;el("challengeStage").textContent="STAGE "+String(s.id).padStart(2,"0");el("caseTitle").textContent=s.title;el("caseDescription").textContent=s.description;el("caseFacts").innerHTML=s.facts.map(x=>'<li>'+escape(x)+'</li>').join("");el("caseTask").textContent=s.task;el("caseNote").textContent=s.note;el("rubricList").innerHTML=s.rubric.map(([name,w])=>'<div class="rubric-row"><span>'+escape(name)+'</span><span class="bar"><i style="width:'+w+'%"></i></span><b>'+w+'%</b></div>').join("");el("stageStatus").textContent=isOpen()?"التحدي مفتوح":"تم إغلاق التسليم";el("visibilityBadge").textContent=revealed()?"👁 Scores Revealed":"🙈 Scores Hidden";el("revealBtn").textContent=revealed()?"🙈 إخفاء الدرجات":"👁 إظهار الدرجات";el("freezeBtn").textContent=isOpen()?"⏸ إغلاق التحدي":"▶ فتح التحدي";el("connectionBadge").textContent=mode?(realSession?"● Google Sheets Live":bridgeReady?"● Apps Script Ready":"◉ Connecting to Apps Script"):(OFFLINE?"⚠ Emergency Local Scoreboard":"◉ Local Demo (Illustrative Scores)");el("sessionBadge").textContent="SESSION: "+(activeSessionId||"LOCAL");
 el("masterField").classList.toggle("hidden",s.id===1);el("masterReference").classList.toggle("hidden",s.id===1);el("answerProblemLabel").textContent=s.id===1?"1. تشخيص المشكلة والخطوات — بدون AI":s.id===2?"1. تحليل أولي — بدون AI":"1. تحليل المشكلة وتحديد الأولويات";el("answerToolsLabel").textContent=s.id===1?"2. أدوات AI المناسبة ولماذا — بدون استخدامها":s.id===2?"2. الخطوات والأدوات بعد التدريب":"2. AI Tools / Workflow وخطة التنفيذ";el("answerEvidenceLabel").textContent="3. Evidence / Verification / Human Judgment";el("submitTeam").disabled=!isOpen();el("prevStage").disabled=s.id===1;el("nextStage").disabled=s.id===3}
 function renderFeedback(){
 const id=el("judgeTeam").value,stage=currentStage();
@@ -129,6 +130,21 @@ try{const r=await call("getAdminState",identity());isAdmin=true;lastAdminSnapsho
 catch(e){isAdmin=false;realEvals=[];liveError="فشل دخول المحاضر: "+e.message;render();if(!quiet)notify(liveError)}
 }
 el("manualBackup").addEventListener("click",()=>{notify("Manual Backup: اختر الفريق ثم اكتب Score وFeedback واضغط حفظ. لا يحتاج Gemini.");el("judgeScore").focus()});
+el("offlineBackup").addEventListener("click",()=>{
+const u=new URL(location.href);u.searchParams.set("offline","1");u.searchParams.delete("bridge");u.searchParams.delete("service");
+u.host="sahaarty0.github.io";u.pathname="/winners-ai-for-hr/arena/";
+window.open(u.href,"_blank","noopener,noreferrer");
+notify("تم فتح شاشة طوارئ محلية مستقلة. الدرجات لا تتزامن مع Sheets.");
+});
+el("exportOffline").addEventListener("click",()=>{
+if(!OFFLINE)return notify("التصدير مخصص لشاشة Offline. التقييمات الحية تُسجل في Google Sheets.");
+const csv=[["Team","Stage","Score","Feedback"],...demo.teams.flatMap(t=>STAGES.map(st=>[t.name,st.name,t.scores?.[st.id]??"",t.feedback?.[st.id]??""]))];
+const escapeCSV=x=>'"'+String(x??"").replace(/"/g,'""')+'"';
+const content="\uFEFF"+csv.map(row=>row.map(escapeCSV).join(",")).join("\r\n");
+const blob=new Blob([content],{type:"text/csv;charset=utf-8"});
+const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Winners_Arena_Offline_Scores.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+notify("تم تصدير CSV. أدخِل الدرجات في Sheets لاحقًا بعد استعادة الاتصال.");
+});
 el("saveManual").addEventListener("click",async()=>{
  const teamId=el("judgeTeam").value,score=Number(el("judgeScore").value),feedback=el("judgeNote").value.trim();
  if(!teamId||!Number.isFinite(score)||score<0||score>100)return notify("أدخل درجة 0–100");
