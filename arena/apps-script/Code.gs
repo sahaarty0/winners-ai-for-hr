@@ -11,7 +11,7 @@ var STAGES = {
   2: {name:'Level Up',facts:'Nova Retail: 18 staff currently, 24 target; +4 Store Associates, +1 Supervisor, +1 Cashier. Build headcount gap, org structure, supervisor JD and 3 CBI questions. Pre-AI reasoning first; master prompt application afterward.',rubric:[['تحليل الفجوة قبل استخدام AI',25],['تصميم الإجراءات والحلول',20],['جودة Master Prompt',25],['التحقق من الأرقام والأدلة',20],['الوضوح وقابلية التطبيق',10]]},
   3: {name:'Grand Finale',facts:'Return to Horizon Services Stage 1: 320 staff, 90 CVs for two vacancies, 75 anonymous staff comments, a 12-page leave policy. Propose full controlled HR workflow, tools, prompt, checks, risks, KPIs, human approval.',rubric:[['عمق التشخيص وربطه بالأدلة',20],['جودة الحل وتصميم Workflow',25],['Prompt / AI Tools Implementation',20],['السلامة والخصوصية والتحقق',20],['القيمة التجارية وخطة القياس',15]]}
 };
-var TABS = {sessions:'Sessions',teams:'Teams',submissions:'Submissions',evaluations:'Evaluations',audit:'Audit'};
+var TABS = {sessions:'Sessions',teams:'Teams',submissions:'Submissions',evaluations:'Evaluations',audit:'Audit',participants:'ParticipantResponses'};
 var LIMITS = {sessions:40,teamsPerSession:12,answerChars:5000};
 /** Run once in Apps Script editor, after putting strong ADMIN_PASSPHRASE in Script Properties. */
 function setupArena(){
@@ -23,7 +23,8 @@ function setupArena(){
     Teams:['Session ID','Team ID','Team Name','Code Hash'],
     Submissions:['Session ID','Team ID','Stage','Revision','Submitted At','Problem Analysis','Tools & Actions','Evidence & Risks','Master Prompt'],
     Evaluations:['Session ID','Team ID','Stage','Score','Status','Feedback','Criteria JSON','Model','Updated At'],
-    Audit:['Time','Session ID','Action','Team ID','Stage','Note']
+    Audit:['Time','Session ID','Action','Team ID','Stage','Note'],
+    ParticipantResponses:['Submitted At','Session ID','Stage','Participant Name','Team ID','Team Name','Answer','Master Prompt','Response ID','Processing Status']
   };
   for(var name in names){var sh=ss.getSheetByName(name)||ss.insertSheet(name);
     var heads=names[name];if(sh.getRange(1,1,1,heads.length).getValues()[0][0]!=='Session ID'&&name!=='Audit'||(name==='Audit'&&sh.getRange(1,1).getValue()!=='Time'))sh.getRange(1,1,1,heads.length).setValues([heads]);
@@ -35,7 +36,8 @@ function setupArena(){
 function doGet(e){
  var p=e&&e.parameter||{}, embed=p.embed==='1',origin=ARENA_ORIGIN;
  var serviceUrl=ScriptApp.getService().getUrl()||'';
- var hostedUrl=ARENA_ORIGIN+'/winners-ai-for-hr/arena/?bridge=parent&service='+encodeURIComponent(serviceUrl)+(p.session?'&session='+encodeURIComponent(String(p.session)):'')+(p.view?'&view='+encodeURIComponent(String(p.view)):'');
+ var isForm=p.view==='form';
+ var hostedUrl=ARENA_ORIGIN+'/winners-ai-for-hr/arena/'+(isForm?'form.html':'')+'?bridge=parent&service='+encodeURIComponent(serviceUrl)+(p.session?'&session='+encodeURIComponent(String(p.session)):'')+(p.view&&!isForm?'&view='+encodeURIComponent(String(p.view)):'');
  var html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
  '<style>html,body{margin:0;width:100%;height:100%;background:#06152c;color:white;font:14px Arial}iframe{border:0;width:100%;height:100%}</style></head><body>'+
  (embed?'<p style="display:none">Winners Arena Bridge</p>':'<iframe id="app" src="'+hostedUrl+'" title="Winners Challenge Arena" allow="clipboard-write"></iframe>')+
@@ -93,6 +95,54 @@ function createSession_(p){
  });
 }
 function verifyTeam_(p){var sid=sid_(p.sessionId),tid=tid_(p.teamId),t=codeValid_(sid,tid,p.code);return {ok:true,id:tid,name:String(t.row[2])};}
+
+/** Each student submits once per session/stage/device. Name + team are the visible inputs. No code required. */
+function participantSubmit_(p){
+  var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage);
+  var name=limitStr_(p.participantName,90).replace(/\s+/g,' ').trim();
+  var answer=limitStr_(p.answer,3600),master=stage===1?'':limitStr_(p.masterPrompt,3600);
+  var responseId=limitStr_(p.responseId,90);
+  if(name.length<3||name.length>90||/[<>{}]/.test(name))throw Error('Please provide your real first and last name (3-90 characters).');
+  if(answer.length<30)throw Error('Your written answer must have at least 30 characters.');
+  if(!/^[a-zA-Z0-9_-]{18,90}$/.test(responseId))throw Error('Invalid participant form identifier');
+  if(p.honeypot)throw Error('Cannot submit form');
+  var key='arenaPost:'+sha_(sid+':'+responseId).slice(0,30), cache=CacheService.getScriptCache();
+  if(cache.get(key))throw Error('تم تسجيل إجابة قبل لحظات. يرجى عدم إرسالها مرتين.');
+  return withLock_(function(){
+    var sess=session_(sid);
+    if(sess.row[3]!==true||Number(sess.row[2])!==stage)throw Error('The question is closed or the stage has changed');
+    var t=team_(sid,tid),stageName=STAGES[stage].name;
+    var pass=findRow_(data_(TABS.evaluations),function(x){return x[0]===sid&&x[1]===tid&&Number(x[2])===stage&&x[4]==='approved'});
+    if(pass)throw Error('This team stage has already been graded; submissions are closed');
+    var tab=sh_(TABS.participants),oldData=data_(TABS.participants);
+    var prev=findRow_(oldData,function(r){return r[1]===sid&&Number(r[2])===stage&&r[8]===responseId});
+    if(oldData.filter(function(r){return r[1]===sid}).length>=250&&!prev)throw Error('Session reached maximum participant submissions');
+    var record=[stamp_(),sid,stage,safeCell_(name,90),tid,t.row[2],safeCell_(answer,3600),safeCell_(master,3600),responseId,'RECEIVED'];
+    if(prev){
+      if(prev.row[4]!==tid)throw Error('An existing submission is already linked to another team');
+      tab.getRange(prev.index,1,1,record.length).setValues([record]);
+    }else tab.appendRow(record);
+    // Group-wide aggregated answer; all participant records remain complete above.
+    var entries=data_(TABS.participants).filter(function(r){return r[1]===sid&&r[4]===tid&&Number(r[2])===stage}).sort(function(a,b){return String(a[0]).localeCompare(String(b[0]))});
+    var capacity=stage===1?3:4,maxPeople=60,recent=entries.slice(-maxPeople);
+    var perPerson=Math.max(120,Math.min(1000,Math.floor((capacity*4600-1200)/Math.max(1,recent.length))));
+    var joined='GROUP SUBMISSIONS (individual responses; group of '+entries.length+'; excerpted for scoring):\n'+
+      recent.map(function(r,i){return 'Member '+(i+1)+' ['+String(r[3])+']: '+limitStr_(r[6],perPerson)+
+        (r[7]?' | MASTER PROMPT: '+limitStr_(r[7],Math.min(320,perPerson)):'')}).join('\n---\n');
+    if(entries.length>maxPeople)joined+='\nNOTE: '+(entries.length-maxPeople)+' earlier submissions are stored separately, but omitted from this aggregate due to AI context budget.';
+    var chunks=[],text=joined;
+    while(text.length&&chunks.length<capacity){chunks.push(text.slice(0,4700));text=text.slice(4700)}
+    while(chunks.length<4)chunks.push('');
+    var sub=sh_(TABS.submissions),prior=findRow_(data_(TABS.submissions),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage});
+    var rev=prior?Number(prior.row[3])+1:1,recordSub=[sid,tid,stage,rev,stamp_()].concat(chunks.slice(0,4).map(function(x){return safeCell_(x,4700)}));
+    if(prior)sub.getRange(prior.index,1,1,recordSub.length).setValues([recordSub]);else sub.appendRow(recordSub);
+    var pend=findRow_(data_(TABS.evaluations),function(r){return r[0]===sid&&r[1]===tid&&Number(r[2])===stage&&r[4]==='pending'});
+    if(pend)sh_(TABS.evaluations).getRange(pend.index,5).setValue('stale');
+    audit_(sid,'PARTICIPANT_RESPONSE',tid,stage,'Member registered; group count '+entries.length);
+    cache.put(key,'1',20);
+    return {ok:true,status:'RECEIVED_FOR_GROUP_REVIEW',teamName:String(t.row[2]),participantName:name,stage:stage,memberCount:entries.length,receipt:responseId.slice(-9)};
+  });
+}
 function submit_(p){
  var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage),ans=args_(p.answer);
  return withLock_(function(){
@@ -187,6 +237,7 @@ function arenaRpc(req){
  if(a==='getPublicState')return pub_(sid_(p.sessionId));
  if(a==='createSession')return createSession_(p);
  if(a==='submitAnswer')return submit_(p);
+ if(a==='submitParticipant')return participantSubmit_(p);
  if(a==='verifyTeamCode')return verifyTeam_(p);
  if(a==='getAdminState')return adminState_(p);
  if(a==='setArenaState')return setState_(p);
