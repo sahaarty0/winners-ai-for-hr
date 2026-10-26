@@ -1,4 +1,4 @@
-import {DETAILED_CASES} from "./case-details.js";
+import {getTrackStage,TRACK_OPTIONS} from "./tracks.js";
 import {renderCasePack} from "./case-view.js";
 import {appsScriptWebAppUrl,pollSeconds} from "./apps-script-config.js";
 const query=new URLSearchParams(location.search);
@@ -9,7 +9,6 @@ if(!hosted&&!demo&&appsScriptWebAppUrl&&window.top===window.self){
  if(query.get("session"))u.searchParams.set("session",query.get("session"));
  window.location.replace(u.href);
 }
-const PHASES=DETAILED_CASES.map(d=>({name:d.label.toUpperCase(),title:d.title,intro:d.description,facts:d.facts,task:d.task,details:d}));
 const caseCss=document.createElement("link");caseCss.rel="stylesheet";caseCss.href="./case-style.css";document.head.appendChild(caseCss);
 const el=id=>document.getElementById(id), show=(id,v)=>el(id).classList.toggle("hide",!v);
 const origin="https://sahaarty0.github.io";
@@ -56,6 +55,7 @@ function makeMember(value=""){
 function teamMembers(){return Array.from(el("memberFields").querySelectorAll("input")).map(x=>x.value.trim()).filter(Boolean)}
 function validateRoster(){
  const leader=el("leaderName").value.replace(/\s+/g," ").trim(),members=teamMembers();
+ if(!TRACK_OPTIONS.some(x=>x.id===el("problemTrack").value))return "لازم تختار مشكلة HR واحدة لفريقك";
  if(leader.length<3)return "اكتب اسم الـLeader بالكامل";
  if(!members.length)return "اكتب على الأقل اسم عضو واحد من اللي معاك";
  if(members.some(m=>m.length<2))return "راجع أسماء أعضاء الفريق";
@@ -66,10 +66,13 @@ function render(){
  if(!session){show("identityCard",true);show("challengeCard",false);return}
  if(group){
    show("identityCard",false);show("challengeCard",true);
-   const c=PHASES[Math.max(0,Math.min(2,Number(session.currentStage||1)-1))],newStage=Number(session.currentStage||1);
+   const newStage=Number(session.currentStage||1);
+   const selected=getTrackStage(newStage,group.track);
+   if(!selected){show("challengeCard",false);notify("الـGroup ده من نسخة قديمة ولم يحدد مشكلة HR. اطلب من المحاضر إنشاء Session جديدة.");return}
+   const c={name:selected.label,title:selected.title,intro:selected.description,facts:selected.facts,task:selected.task,details:selected};
    if(newStage!==stage){storeDraft();stage=newStage;restoreDraft();show("receiptCard",false)}
    el("stagePill").textContent="STAGE "+String(stage).padStart(2,"0")+" · "+c.name;
-   el("teamFocus").textContent="🏆 "+group.groupName+" · 👑 Leader: "+group.leaderName;
+   el("teamFocus").textContent="🏆 "+group.groupName+" · 🎯 "+selected.label+" · 👑 Leader: "+group.leaderName;
    el("welcomeTitle").textContent="تحدي فريق "+group.groupName;
    el("teamRosterSummary").textContent="أعضاء الفريق: "+[group.leaderName,...group.members].join(" · ");
    el("questionTitle").textContent=c.title;el("questionIntro").textContent=c.intro;
@@ -77,7 +80,7 @@ function render(){
    el("questionTask").textContent=c.task;
    let sourcePanel=document.getElementById("caseEvidence");
    if(!sourcePanel){sourcePanel=document.createElement("div");sourcePanel.id="caseEvidence";el("questionTask").closest(".question").after(sourcePanel)}
-   if(sourcePanel.dataset.stage!==String(stage)){renderCasePack(sourcePanel,c.details);sourcePanel.dataset.stage=String(stage)}
+   if(sourcePanel.dataset.stage!==String(stage)+"_"+group.track){renderCasePack(sourcePanel,c.details);sourcePanel.dataset.stage=String(stage)+"_"+group.track}
 
    show("masterBlock",stage>1);
    el("submitBtn").disabled=!session.open||requestBusy;
@@ -106,13 +109,13 @@ el("registerLeader").addEventListener("click",async()=>{
  if(requestBusy)return;const warning=validateRoster();if(warning)return notify(warning);
  if(!sessionId)return notify("محتاج رابط الجلسة أو Session ID من المحاضر");
  if(!session?.open)return notify("التسجيل غير مفتوح حاليًا");
- const leaderName=el("leaderName").value.trim(),members=teamMembers();
+ const leaderName=el("leaderName").value.trim(),members=teamMembers(),track=el("problemTrack").value;
  const existing=getSaved(),leaderToken=existing?.leaderToken||uuid();
  const btn=el("registerLeader");requestBusy=true;btn.disabled=true;btn.textContent="جاري إنشاء الجروب...";
  try{
-  const value=demo?{ok:true,groupId:"T1",groupName:"Group 01",leaderName,members}:
-   await rpc("registerLeaderGroup",{sessionId,leaderName,members,leaderToken,honeypot:el("companyWebsite").value});
-  group={groupId:value.groupId,groupName:value.groupName,leaderName:value.leaderName||leaderName,members:value.members||members,leaderToken};
+  const value=demo?{ok:true,groupId:"T1",groupName:"Group 01",leaderName,members,track}:
+   await rpc("registerLeaderGroup",{sessionId,leaderName,members,track,leaderToken,honeypot:el("companyWebsite").value});
+  group={groupId:value.groupId,groupName:value.groupName,leaderName:value.leaderName||leaderName,members:value.members||members,track:value.track||track,leaderToken};
   saveLeader(group);stage=Number(session.currentStage||1);render();restoreDraft();
   notify("تم تسجيل "+group.groupName+" باسم "+leaderName+". السؤال ظهر تحت.",false);
  }catch(e){notify("تعذر إنشاء الفريق: "+e.message)}
@@ -143,7 +146,7 @@ function setup(){
  if(demo&&!sessionId)sessionId="WDEMOSESSION";
  el("sessionId").value=sessionId;
  el("memberFields").replaceChildren();makeMember();el("memberFields").querySelector("input")?.blur();
- group=getSaved();if(group){el("leaderName").value=group.leaderName;for(const m of group.members||[])makeMember(m)}
+ group=getSaved();if(group){el("leaderName").value=group.leaderName;el("problemTrack").value=group.track||"";for(const m of group.members||[])makeMember(m)}
  if(demo){session=defaultDemo();setStatus("Demo — الأسماء والتقييمات مش بتتحفظ على السيرفر",true);render();restoreDraft();return}
  if(hosted){bridgeTarget=window.parent}
  else if(appsScriptWebAppUrl){
