@@ -1,3 +1,5 @@
+import {DETAILED_CASES} from "./case-details.js";
+import {renderCasePack} from "./case-view.js";
 import {appsScriptWebAppUrl,pollSeconds} from "./apps-script-config.js";
 const query=new URLSearchParams(location.search);
 const hosted=query.get("bridge")==="parent"&&window.parent!==window;
@@ -7,17 +9,8 @@ if(!hosted&&!demo&&appsScriptWebAppUrl&&window.top===window.self){
  if(query.get("session"))u.searchParams.set("session",query.get("session"));
  window.location.replace(u.href);
 }
-const PHASES=[
- {name:"DISCOVERY",title:"Horizon Services — Three HR Challenges",intro:"إنت وفريقك انضمّيتوا لشركة Horizon Services الافتراضية، فيها 320 موظف. الإدارة بتسألكم: إزاي ممكن AI يساعد فريق HR؟",
- facts:["90 CVs لوظيفتين؛ أشكال السِيَر مختلفة والمقارنة صعبة.","75 تعليقًا مجهول الهوية للموظفين يحتاج تجميع Themes.","سياسة إجازات داخلية من 12 صفحة تحتاج تبسيطًا من غير تغيير معناها."],
- task:"قبل استخدام أي AI: حلّلوا المشكلات، واقترحوا الإجراءات والأدوات المناسبة، والبيانات المطلوبة، وحدود دور الذكاء الاصطناعي ومسؤولية HR."},
- {name:"LEVEL UP",title:"Nova Retail — Workforce Planning Challenge",intro:"شركة Nova Retail الافتراضية بتتوسع وعندها فجوة Workforce. اعرضوا أولًا تحليلكم، وبعدها طبقوا الـMaster Prompt لتطوير الحل.",
- facts:["العدد الحالي 18 موظفًا، والمطلوب 24 موظفًا.","Store Associates: 12 → 16؛ Supervisors: 3 → 4؛ Cashiers: 3 → 4.","المخرجات المطلوبة: Headcount Gap، Org Structure، Supervisor JD، وCBI Questions."],
- task:"قدّموا التحليل والخطوات قبل AI، وبعدها وضّحوا استخدام الـMaster Prompt والنتيجة المقترحة وكيفية التحقق منها."},
- {name:"GRAND FINALE",title:"Horizon Services — Professional AI Business Solution",intro:"رجعنا لحالة Horizon Services من أول تحدي. دلوقتي المطلوب Business Solution احترافي متكامل من الفريق.",
- facts:["320 موظفًا و90 CVs لوظيفتين مختلفتين.","75 تعليقًا مجهول الهوية يحتاج تصنيفًا مبنيًا على الأدلة.","سياسة إجازات 12 صفحة تحتاج تفسيرًا مطابقًا للنص المعتمد."],
- task:"قدّموا التشخيص، AI Workflow، اختيار الأدوات، Master Prompt أو Automation مناسب، إجراءات المراجعة البشرية والخصوصية، مؤشرات الأداء وقيمة الحل."}
-];
+const PHASES=DETAILED_CASES.map(d=>({name:d.label.toUpperCase(),title:d.title,intro:d.description,facts:d.facts,task:d.task,details:d}));
+const caseCss=document.createElement("link");caseCss.rel="stylesheet";caseCss.href="./case-style.css";document.head.appendChild(caseCss);
 const el=id=>document.getElementById(id), show=(id,v)=>el(id).classList.toggle("hide",!v);
 const origin="https://sahaarty0.github.io";
 let bridgeTarget=null,ready=false,seq=0,stage=1,session=null,group=null,pending=new Map(),lastStatus="",introShown=false,requestBusy=false;
@@ -82,6 +75,10 @@ function render(){
    el("questionTitle").textContent=c.title;el("questionIntro").textContent=c.intro;
    el("questionFacts").replaceChildren(...c.facts.map(s=>{const li=document.createElement("li");li.textContent=s;return li}));
    el("questionTask").textContent=c.task;
+   let sourcePanel=document.getElementById("caseEvidence");
+   if(!sourcePanel){sourcePanel=document.createElement("div");sourcePanel.id="caseEvidence";el("questionTask").closest(".question").after(sourcePanel)}
+   if(sourcePanel.dataset.stage!==String(stage)){renderCasePack(sourcePanel,c.details);sourcePanel.dataset.stage=String(stage)}
+
    show("masterBlock",stage>1);
    el("submitBtn").disabled=!session.open||requestBusy;
    el("submitHint").textContent=session.open?"الإجابة هتتحفظ باسم الفريق كله. Gemini هيعالجها إن كان متاحًا، والنتيجة لازم يراجعها المدرب.":"الجولة الحالية مقفولة من المحاضر.";
