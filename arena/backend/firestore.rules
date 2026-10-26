@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signedIn() { return request.auth != null; }
+  function isAdmin() {
+    return signedIn() &&
+      exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+      get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true &&
+      request.auth.token.firebase.sign_in_provider == 'google.com';
+  }
+  // Admin access provisioned manually in Firebase Console. No public writes.
+  match /admins/{uid} {
+    allow read: if signedIn() && request.auth.uid == uid;
+    allow write: if false;
+  }
+  // Session publicBoard contains ONLY approved and explicitly revealed scores.
+  match /sessions/{sessionId} {
+    allow get: if signedIn();
+    allow list: if false;
+    allow write: if false;
+    match /teams/{teamId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.joinedUid == request.auth.uid);
+      allow write: if false;
+    }
+    match /submissions/{submissionId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+    match /evaluations/{evaluationId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+ }
+}
