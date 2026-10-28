@@ -113,7 +113,13 @@ function xrSalaryEvidenceCategories_(points) {
 }
 function xrIndependentSourceCount_(points) {
   return new Set((points||[]).map(function(x){
-    return getXRayDomain_(x.url||'').toLowerCase().replace(/^www\./,'');
+    let d=getXRayDomain_(x.url||'').toLowerCase();
+    d=d.replace(/^(www|m|eg|en)\./,'');
+    // A regional subdomain is not an independent publisher.
+    const a=d.split('.').filter(Boolean);
+    if(a.length>=3 && ['co','com','org','net'].includes(a[a.length-2]) &&
+      a[a.length-1].length===2)return a.slice(-3).join('.');
+    return a.length>=2?a.slice(-2).join('.'):d;
   }).filter(Boolean)).size;
 }
 function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
@@ -1548,7 +1554,10 @@ function extractSalaryEvidenceFromSearchSnippets_(
       max_salary: maxSalary,
       currency: 'EGP',
       period: period,
-      pay_basis: 'UNKNOWN',
+      pay_basis: /\b(gross|gross salary|إجمالي)\b/i.test(text)?'GROSS_SALARY':
+        /\b(basic|base salary|أساسي)\b/i.test(text)?'BASE_SALARY':
+        /\b(net|take.home|صافي)\b/i.test(text)?'NET_SALARY':
+        /total compensation|total cash|إجمالي التعويضات/i.test(text)?'TOTAL_COMPENSATION':'UNKNOWN',
       location: request.city || request.country || null,
       explicit_numeric_salary: true,
       confidence_score: getSnippetSalaryConfidence_(source, roleMatch),
