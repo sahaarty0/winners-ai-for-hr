@@ -2937,7 +2937,11 @@ function createNotRequestedSalary_() {
       min: null,
       max: null,
       period: null,
-      evidence_ids: []
+      evidence_ids: [],
+      pay_basis:null,
+      label:'NOT_REQUESTED',
+      survey_classification:'NOT_A_STATISTICAL_SURVEY',
+      p25:null,p50:null,p75:null
     },
 
     estimated_company_range: {
@@ -3121,7 +3125,11 @@ function createEmptyCompanyXRayResult_(
             min: null,
             max: null,
             period: null,
-            evidence_ids: []
+            evidence_ids: [],
+            pay_basis: null,
+            label:'INSUFFICIENT_EVIDENCE',
+            survey_classification:'NOT_A_STATISTICAL_SURVEY',
+            p25:null,p50:null,p75:null
           },
 
           estimated_company_range: {
