@@ -2,7 +2,7 @@
  * ============================================================
  * COMPANY X-RAY
  * Integrated Research Engine
- * Version 3.0 — evidence-governed benchmark
+ * Version 3.1 — evidence-governed diagnostics
  * ============================================================
  *
  * Scope:
@@ -139,15 +139,59 @@ function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
       currency:p.currency,pay_basis:p.payBasis,original_period:p.originalPeriod,
       monthly_min:p.monthlyMin,monthly_max:p.monthlyMax,source_type:p.sourceType,
       used_in_benchmark:Boolean(p.benchmarkSelected),
+      source_excerpt:p.sourceSnippet||'',page_content_verified:false,
       location_verified:p.locationVerified||false,source_fresh:p.sourceFresh||false};
   });
   const bad=(rejected||[]).map(function(p){
     const ev=evidenceMap[Number(p.evidenceId||0)]||{};
     return {evidence_id:p.evidenceId||null,status:'EXCLUDED',reason:p.reason,
-      url:ev.url||null,title:ev.title||null,publication_date:xrSourceDate_(ev.date)};
+      url:ev.url||null,title:ev.title||null,publication_date:xrSourceDate_(ev.date),
+      source_excerpt:String(ev.snippet||'').slice(0,380),page_content_verified:false};
   });
   return good.concat(bad);
 }
+
+/**
+ * v3.1 — Clear, non-statistical source audit. These are search-result
+ * snippets, NOT independent verification of the linked page, and should
+ * never be marketed as a current employer salary survey.
+ */
+function xrEvidenceAuditSummary_(ledger){
+  const observed=(ledger||[]).filter(function(x){return x.status!=='EXCLUDED';});
+  const excluded=(ledger||[]).filter(function(x){return x.status==='EXCLUDED';});
+  const reasons={};
+  (ledger||[]).forEach(function(x){
+    const k=String(x.reason||'UNSPECIFIED');
+    reasons[k]=(reasons[k]||0)+1;
+  });
+  const context=observed.map(function(x){
+    return {
+      evidence_id:x.evidence_id,
+      status:x.status,reason:x.reason,
+      title:x.title,url:x.url,
+      monthly_min:x.monthly_min,monthly_max:x.monthly_max,
+      currency:x.currency,period:'monthly',
+      pay_basis:x.pay_basis,
+      publication_date:x.publication_date,
+      location_verified:x.location_verified,
+      source_fresh:x.source_fresh,
+      evidence_type:'SEARCH_SNIPPET_ONLY',
+      page_content_verified:false,
+      sample_size:null,
+      note:'Number appeared in a search excerpt; current source-page salary is not verified.'
+    };
+  });
+  return {
+    extracted_count:(ledger||[]).length,
+    observed_count:observed.length,
+    benchmark_count:observed.filter(function(x){return x.used_in_benchmark===true;}).length,
+    excluded_count:excluded.length,
+    reason_counts:reasons,
+    observed_public_signals:context,
+    verification_limit:'Search snippets can differ from the live source page; page-level audit is required before treating amounts as confirmed.'
+  };
+}
+
 function xrStrictSurveyStatus_(points) {
   // Aggregate snippets are NOT a microdata survey. No P25/P50/P75.
   return {
@@ -407,26 +451,14 @@ function runCompanyXRay_(request) {
   };
 
   console.log('Company X-Ray completed.');
-
-  console.log(
-    'Salary accepted evidence: ' +
-    (
-      finalResult.salary &&
-      finalResult.salary.diagnostics
-        ? finalResult.salary.diagnostics.acceptedEvidenceCount
-        : 0
-    )
-  );
-
-  console.log(
-    'Salary rejected evidence: ' +
-    (
-      finalResult.salary &&
-      finalResult.salary.diagnostics
-        ? finalResult.salary.diagnostics.rejectedEvidenceCount
-        : 0
-    )
-  );
+  const audit=finalResult.salary&&finalResult.salary.evidence_audit;
+  if(audit) {
+    console.log('Salary observed snippet signals: '+audit.observed_count);
+    console.log('Salary benchmark-qualified signals: '+audit.benchmark_count);
+    console.log('Salary excluded extraction records: '+audit.excluded_count);
+    console.log('Salary exclusion/context reason counts: '+JSON.stringify(audit.reason_counts));
+    console.log('Source-page content verified: 0 (Serper snippets only)');
+  }
 
   return finalResult;
 }
@@ -1959,6 +1991,12 @@ function normalizeCompanyXRayResult_(
 
   company.confidence_score=null; // No statistical respondent sample supports a percentage.
   if(validCompanySources.length){
+    // Gemini prose cannot assert a specific office or operating address
+    // that is not supported by directly linked company evidence.
+    company.notes='Identity inferred from '+validCompanySources.length+
+      ' public search-result page(s). Corporate facts need source-page verification.';
+  }
+  if(validCompanySources.length){
     const hasOfficial=validCompanySources.some(function(x){return x.sourceType==='OFFICIAL';});
     if(!hasOfficial&&company.identity_status==='CONFIRMED')company.identity_status='LIKELY';
     ['company_size_range','main_location','industry'].forEach(function(k){
@@ -2146,6 +2184,7 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
   const quality=benchmark?'INDICATIVE_PUBLIC_EVIDENCE':'INSUFFICIENT_COMPARABLE_EVIDENCE';
   const sourceDates=candidates.map(function(x){return x.sourceDate;}).filter(Boolean);
   const ledger=xrEvidenceLedger_(accepted,rejected,em);
+  const audit=xrEvidenceAuditSummary_(ledger);
   const notes=[
     'PUBLIC EVIDENCE, NOT A SALARY SURVEY. P25/P50/P75 require survey microdata and a documented representative methodology.',
     'No automatic -15% market discount, synthetic +/-10% spread, company-size pay uplift or unsupported salary-offer predictions.',
@@ -2173,6 +2212,9 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
     confidence_score:null,evidence_grade:quality,
     methodology_notes:notes,
     evidence_ledger:ledger,
+    evidence_audit:audit,
+    observed_public_signals:audit.observed_public_signals,
+    source_verification:'SEARCH_SNIPPET_ONLY',
     source_date_span:{earliest:sourceDates.length?sourceDates.sort()[0]:null,latest:sourceDates.length?sourceDates.sort().slice(-1)[0]:null},
     survey_statistics:xrStrictSurveyStatus_(candidates),
     regulatory_context:{
@@ -2184,6 +2226,9 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
     diagnostics:{
       acceptedEvidenceCount:benchmark?candidates.length:0,
       observedEvidenceCount:accepted.length,rejectedEvidenceCount:rejected.length,
+      reasonsByCount:audit.reason_counts,
+      contextEvidenceCount:audit.observed_count-audit.benchmark_count,
+      sourcePageVerifiedCount:0,
       totalExtractedSalaryEvidence:(rawSalaryEvidence||[]).length,
       independentPublishers:benchmark?xrIndependentSourceCount_(candidates):0,
       observed_public_range:benchmark?{min:benchmark.min,max:benchmark.max,currency:currency,period:'monthly'}:null,
@@ -2249,6 +2294,7 @@ function normalizeSalaryEvidenceItem_(item,evidenceMap,targetCurrency,targetSeni
     monthlyMin:min,monthlyMax:max,midpoint:(min+max)/2,currency:currency,
     originalPeriod:period,payBasis:basis,location:item.location||null,
     evidenceConfidence:null,weight:1,
+    sourceSnippet:String(source.snippet||'').slice(0,380),weightingMethod:'NO_WEIGHTING',
     notes:'Numerical amount, pay period and URL checked against the original search evidence. Date/location/basis evaluated separately.'
   }};
 }
@@ -3156,14 +3202,35 @@ function testFullCompanyXRay() {
     depth: 'professional'
   });
 
-  console.log(
-    JSON.stringify(
-      result,
-      null,
-      2
-    )
-  );
-
+  const salary=result.salary||{};
+  const diagnostic=salary.diagnostics||{};
+  const audit=salary.evidence_audit||{};
+  // Short log avoids Google Apps Script "Logging output too large".
+  console.log('--- Live X-Ray QA Summary ---');
+  console.log(JSON.stringify({
+    success:result.success,
+    company:result.request&&result.request.company,
+    salary_status:salary.status,
+    evidence_grade:salary.evidence_grade||null,
+    observed_snippet_signals:audit.observed_count||0,
+    benchmark_qualified:audit.benchmark_count||0,
+    excluded_extraction_records:audit.excluded_count||0,
+    reason_counts:audit.reason_counts||{},
+    market_range:salary.market_range||null,
+    market_adjustment_percent:diagnostic.marketAdjustmentPercent,
+    gemini_model:result.research&&result.research.geminiModel,
+    gemini_fallback:result.research&&result.research.geminiFallbackUsed,
+    processing_warning:result.research&&result.research.warning,
+    research_depth:result.research&&result.research.depth,
+    searches:result.research&&result.research.searchesExecuted
+  },null,2));
+  (audit.observed_public_signals||[]).slice(0,6).forEach(function(x){
+    console.log('Context signal '+x.evidence_id+': '+
+      JSON.stringify({url:x.url,pay_basis:x.pay_basis,
+       monthly_min:x.monthly_min,monthly_max:x.monthly_max,
+       source_fresh:x.source_fresh,
+       page_content_verified:x.page_content_verified}));
+  });
   return result;
 }
 
