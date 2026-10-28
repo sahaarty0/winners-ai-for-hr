@@ -56,6 +56,16 @@
       {name:'Company Match Confidence',score:result.company&&result.company.confidence_score},
       {name:'Feedback Confidence',score:result.feedback&&result.feedback.confidence_score}
     ];
+    if(result.salary&&result.salary.confidence_score===null){
+      var salaryLeaves=root.querySelectorAll('span,div,small,p,strong');
+      for(var k=0;k<salaryLeaves.length;k++){
+        var cell=salaryLeaves[k];
+        if(cell.children.length)continue;
+        var current=String(cell.textContent||'');
+        if(/^Confidence\s*:\s*0\s*%/i.test(current))
+          cell.textContent=current.replace(/^Confidence\s*:\s*0\s*%\s*(?:\(Low\))?/i,'Confidence: Not assessed');
+      }
+    }
     labels.forEach(function(entry){
       if(entry.score!==null&&entry.score!==undefined)return;
       var nodes=root.querySelectorAll('span,div,small,p,strong');
