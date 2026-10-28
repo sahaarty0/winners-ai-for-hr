@@ -1948,6 +1948,18 @@ function normalizeCompanyXRayResult_(
       company.official_website=null;
   }
 
+  company.confidence_score=null; // No statistical respondent sample supports a percentage.
+  if(validCompanySources.length){
+    const hasOfficial=validCompanySources.some(function(x){return x.sourceType==='OFFICIAL';});
+    if(!hasOfficial&&company.identity_status==='CONFIRMED')company.identity_status='LIKELY';
+    ['company_size_range','main_location','industry'].forEach(function(k){
+      const value=normalizeXRayText_(String(company[k]||'')).trim();
+      if(value && !validCompanySources.some(function(src){
+        return normalizeXRayText_([src.title||'',src.snippet||''].join(' ')).indexOf(value)>=0;
+      }))company[k]=null;
+    });
+  }
+
   const feedback = normalizeEmployeeFeedback_(
     data.feedback,
     evidence,
@@ -2619,52 +2631,26 @@ function calculateSalaryConfidence_(points,confirmedCompanyPoints){return null; 
  * ============================================================
  */
 
-function normalizeSalaryBenefits_(benefits, evidenceMap) {
-
-  if (!Array.isArray(benefits)) {
-    return [];
-  }
-
-  return benefits
-    .map(function(item) {
-
-      const ids = Array.isArray(item.evidence_ids)
-        ? item.evidence_ids
-            .map(Number)
-            .filter(function(id) {
-              return Boolean(evidenceMap[id]);
-            })
-        : [];
-
-      if (!item.benefit || !ids.length) {
-        return null;
-      }
-
-      const sourceTypes = ids.map(function(id) {
-        return evidenceMap[id].sourceType;
-      });
-
-      let verification = String(
-        item.verification || 'UNVERIFIED'
-      ).toUpperCase();
-
-      /** Social-only evidence cannot be CONFIRMED. */
-      if (
-        verification === 'CONFIRMED' &&
-        sourceTypes.every(function(type) {
-          return type === 'SOCIAL_MEDIA';
-        })
-      ) {
-        verification = 'LIKELY';
-      }
-
-      return {
-        benefit: String(item.benefit).trim(),
-        verification: verification,
-        evidence_ids: Array.from(new Set(ids))
-      };
-    })
-    .filter(Boolean);
+function normalizeSalaryBenefits_(benefits,evidenceMap){
+  if(!Array.isArray(benefits))return [];
+  return benefits.map(function(x){
+    const label=String(x.benefit||'').trim();
+    if(!label)return null;
+    const ids=(Array.isArray(x.evidence_ids)?x.evidence_ids:[]).map(Number).filter(function(id){
+      const e=evidenceMap[id];if(!e)return false;
+      // Benefit claim must be visible on cited source excerpt, not AI recall.
+      const words=getXRayTokens_(label);
+      const text=normalizeXRayText_([e.title||'',e.snippet||''].join(' '));
+      return words.length>0&&words.some(function(w){return text.indexOf(w)>=0;});
+    });
+    if(!ids.length)return null;
+    const direct=ids.some(function(id){return ['OFFICIAL','JOB_BOARD'].includes(evidenceMap[id].sourceType);});
+    return {
+      benefit:label,verification:direct?'LIKELY':'UNVERIFIED',
+      evidence_ids:Array.from(new Set(ids)),
+      note:'Benefit phrase appears in cited search excerpt; contract eligibility not independently verified.'
+    };
+  }).filter(Boolean);
 }
 
 
@@ -2850,7 +2836,9 @@ function createEmptyFeedback_() {
   return {
     status: 'INSUFFICIENT_PUBLIC_FEEDBACK',
     overall_signal: 'INSUFFICIENT',
-    confidence_score: 0,
+    confidence_score: null,
+    evidence_grade:'INSUFFICIENT',
+    survey_classification:'NOT_AN_EMPLOYEE_SURVEY',
     positive_themes: [],
     negative_themes: [],
     categories: {
