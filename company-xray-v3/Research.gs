@@ -3148,3 +3148,55 @@ function testFullCompanyXRay() {
 
   return result;
 }
+
+/** v3 local self-test. No Serper/Gemini calls, no credentials, no Sheet writes.
+ * Run this once in Apps Script editor before redeploying Company X-Ray. */
+function runCompanyXRayV3SelfTest(){
+  const q={company:'Vodafone Egypt',country:'Egypt',city:'Cairo',jobTitle:'HR Specialist',experienceLevel:'3-5 years'};
+  const mk=function(id,domain,value,basis,date,city,role){
+    role=role||'HR Specialist';city=city||'Cairo';
+    const s={evidenceId:id,title:role+' salary '+city+' Egypt',
+      snippet:role+' salary '+city+' Egypt EGP '+value+' per month',
+      url:'https://'+domain+'/salary/'+id,domain:domain,
+      sourceType:'SALARY_PLATFORM',date:date===undefined?'2026-08-20':date};
+    const x={evidence_id:id,role_title:role,role_match:'EXACT',seniority_match:'CLOSE',
+      company_specific:false,company_name:null,min_salary:value,max_salary:value,
+      period:'MONTHLY',currency:'EGP',pay_basis:basis||'GROSS_SALARY',
+      explicit_numeric_salary:true,location:city,confidence_score:75};
+    return {s:s,x:x};
+  };
+  const a=mk(1,'indeed.com',15000),b=mk(2,'glassdoor.com',17000),c=mk(3,'wuzzuf.net',19000);
+  function run(arr){return buildDeterministicSalaryResult_(q,{},arr.map(z=>z.x),[],arr.map(z=>z.s),'SPECIALIST');}
+  const cases=[
+    ['3 independent', [a,b,c],15000],
+    ['1 source',[a],null],['2 sources',[a,b],null],
+    ['3 pages same domain',[mk(1,'indeed.com',15000),mk(2,'indeed.com',17000),mk(3,'indeed.com',19000)],null],
+    ['gross/net mismatch',[a,b,mk(3,'wuzzuf.net',19000,'NET_SALARY')],null],
+    ['outdated source',[a,b,mk(3,'wuzzuf.net',19000,'GROSS_SALARY','2023-01-01')],null],
+    ['undated source',[a,b,mk(3,'wuzzuf.net',19000,'GROSS_SALARY',null)],null],
+    ['wrong city',[a,b,mk(3,'wuzzuf.net',19000,'GROSS_SALARY',undefined,'Alexandria')],null],
+    ['wrong role',[a,b,mk(3,'wuzzuf.net',19000,'GROSS_SALARY',undefined,'Cairo','Marketing Specialist')],null],
+    ['duplicate page',[a,a,b],null],
+    ['unknown pay basis',[a,b,mk(3,'wuzzuf.net',19000,'UNKNOWN')],null],
+    ['consistent base pay',[mk(1,'indeed.com',15000,'BASE_SALARY'),mk(2,'glassdoor.com',17000,'BASE_SALARY'),mk(3,'wuzzuf.net',19000,'BASE_SALARY')],15000]
+  ];
+  const failures=[];
+  cases.forEach(function(c){
+    try{
+      const out=run(c[1]);
+      if(out.market_range.min!==c[2]||out.market_range.p25!==null||
+        out.market_range.p75!==null||out.diagnostics.marketAdjustmentPercent!==0||
+        out.estimated_company_range.min!==null||out.most_probable_offer.min!==null||
+        out.confidence_score!==null) failures.push({case:c[0],actual:out.market_range});
+    }catch(e){failures.push({case:c[0],error:String(e)});}
+  });
+  const empty=createEmptyFeedback_();
+  if(empty.confidence_score!==null||empty.overall_signal!=='INSUFFICIENT')failures.push({case:'empty feedback'});
+  const noRole=createNotRequestedSalary_();
+  if(noRole.diagnostics.marketAdjustmentPercent!==0)failures.push({case:'no role retains legacy discount'});
+  const result={passed:14-failures.length,total:14,ok:!failures.length,failures:failures,
+    note:'Synthetic data test only; live search, Gemini and deployment must be checked separately.'};
+  console.log(JSON.stringify(result));
+  if(!result.ok)throw Error('Company X-Ray v3 self-test failed '+JSON.stringify(failures));
+  return result;
+}
