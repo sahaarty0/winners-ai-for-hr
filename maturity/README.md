@@ -17,9 +17,21 @@ A source-grounded, bilingual assessment based on **HR Maturity Assessment M&D (1
 - Green >= 80%; Yellow >= 60% and <80%; Red <60%.
 - Combined "Overall Maturity Index" is an **additional metric** produced by the app as the average of all 20 core scores; this is *not an existing formula in the original workbook*.
 
+## Flexible scope — release 2026-10-28
+Three scopes are selectable from the assessment page:
+- **Full HR Maturity:** all 20 cores, 100 required answers.
+- **Functional Assessment:** 11 functional cores, 55 required answers.
+- **Focused Assessment:** any one or more of the 20 cores, 5 questions per selected core.
+
+Completion is defined as **all questions in the selected scope answered**; 100 source questions are not mandatory for Functional or Focused mode. Per-core and track scores use exactly the original 0/1 rules. An excluded core shows **NOT ASSESSED** even if it has saved answers from a different scope. It is never counted as zero and never used in the selected-scope result.
+
+The combined score and track scores in limited modes are **scoped estimates, not company-wide HR maturity**. Exports include the selected scope, and the consulting gate considers scoped completion. Changing scope does not erase previously entered answers; use "Start over" only to clear them.
+
+The original Excel source is still read-only. No authenticated client login, cloud storage, automatic receipt of assessments or direct write-back is implemented.
+
 ## User workflow
 1. Enter organization/assessor metadata (optional).
-2. Answer the 20 stages (5 questions per stage).
+2. Answer the stages in the selected scope (5 questions per core).
 3. Mark each requirement as Available and evidenced or Not Available; optionally write an auditor note.
 4. The app saves answers in browser local storage, and stage progress is visible.
 5. The report shows per-core scores once *every* question in that core has been answered. It does not silently treat unanswered questions as 0.
