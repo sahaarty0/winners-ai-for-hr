@@ -84,6 +84,7 @@
  <p class="footeralert">No AI API connection in this version. Registration and Premium verification details are sent to Winners. Prompt inputs remain in your browser; premium case templates are retrieved only after email verification and administrative approval. Recommendations are rule-based training guidance and require professional judgment.</p><footer class="mainfoot">Winners Business Consultation &amp; Training Services · AI for HR · Created by Dr. Saied El Saharty</footer>
 </main></div><div id="regGate" class="reg-gate" hidden dir="rtl" role="dialog" aria-modal="true" aria-labelledby="regTitle"><form class="reg-card" id="regForm" novalidate><div class="reg-eyebrow">WINNERS · AI for HR</div><h2 id="regTitle">سجّل بياناتك عشان تفتح الأداة</h2><p class="reg-sub">التسجيل مرة واحدة بس من الجهاز ده.</p><label for="regName">الاسم بالكامل<input id="regName" autocomplete="name" maxlength="80" required></label><label for="regEmail">الإيميل<input id="regEmail" type="email" dir="ltr" autocomplete="email" placeholder="name@company.com" maxlength="120" required></label><input id="regWebsite" class="reg-hp" tabindex="-1" autocomplete="off" aria-hidden="true"><label class="reg-check"><input type="checkbox" id="regConsent"><span>أوافق على أن تحتفظ Winners باسمي وإيميلي لإدارة الدخول على الأداة والتواصل معي بخصوصها.</span></label><label class="reg-check"><input type="checkbox" id="regMarketing"><span>أوافق على استقبال عروض التدريبات والبرامج الجديدة (اختياري).</span></label><div class="reg-err" id="regErr" role="alert"></div><button class="reg-btn" id="regBtn" type="submit">افتح الأداة</button><p class="reg-note">أي حاجة بتكتبها جوه الأدوات بتفضل على جهازك ومش بتتبعت.</p></form></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./prompt-engine.js?v=1"></script>
 <script>
 'use strict';
 const FREE_CASE={id:'custom',module:'Free Tools',title:'Custom HR Task',task:'Describe your own HR task clearly using non-personal data.',format:'Structured table with actions',context:'Add your organization, industry, objectives and constraints without personal identifiers.',checks:'Verify sources, fairness, calculations, privacy and accountable HR sign-off.'};
@@ -151,8 +152,8 @@ function buildArabicPrompt(c,v){
  'WINNERS | برومبت الموارد البشرية العملي',
  'حالة الاستخدام: '+(item[0]||c.title),
  'مساعد AI المقترح: '+v('promptPlatform')+' | عمق التفكير: '+depth,
- 'ملاحظة: ضبط عمق التفكير اختياري حسب إمكانيات المنصة.','','الدور المطلوب','تصرّف باعتبارك: '+role+'.',
- '','المهمة',task,'','السياق',context,'','البيانات المرفقة',v('pInput')||'[لا توجد بيانات مرفقة — اطلب مني البيانات المطلوبة قبل التحليل]',...($('pAsk').checked?['','طريقة العمل','قبل كتابة المخرج النهائي، اسألني حتى 5 أسئلة توضيحية قصيرة عن أي معلومة ناقصة أو غير واضحة، وانتظر إجاباتي.']:[]),'','شكل المخرجات',AR_FORMAT[v('pFormat')]||v('pFormat'),
+ 'ملاحظة: ضبط عمق التفكير اختياري حسب إمكانيات المنصة.','',...waiAdaptivePrompt(c,v),'','الدور المطلوب','تصرّف باعتبارك: '+role+'.',
+ '','المهمة',task,'','السياق',context,'','البيانات المرفقة',v('pInput')||'[لا توجد بيانات مرفقة — اطلب مني البيانات المطلوبة قبل التحليل]',...($('pAsk').checked?['','طريقة العمل',waiClarify(v('promptEffort'),true)]:[]),'','شكل المخرجات',AR_FORMAT[v('pFormat')]||v('pFormat'),
  '','نبرة الكتابة',AR_TONE[v('pTone')]||v('pTone'),'','القيود والضوابط',constraints,
  '','ضبط جودة الأدلة والمخرجات',
  '- استند إلى المصادر المقدمة، واقتبس الدليل الأصلي عند الحاجة.',
@@ -172,7 +173,7 @@ function buildPrompt(){const c=byCase($('promptCase').value), val=id=>$(id).valu
  $('promptOutput').dir='ltr';$('promptOutput').style.textAlign='left';
  let lang=val('pLanguage')==='ar'?'Write the entire output in professional Arabic.':val('pLanguage')==='mix'?'Write in natural Egyptian Arabic with professional HR/Business English terms.':'Write the entire output in clear professional English.';
  const inp=val('pInput'),ask=$('pAsk').checked;
- let s=`WINNERS AI FOR HR — PRACTICAL PROMPT\nUse case: ${c.title}\nSuggested AI assistant: ${val('promptPlatform')} | Thinking depth: ${val('promptEffort')}\n(The thinking level is guidance. Set it manually if your platform supports it.)\n\nROLE\nAct as: ${val('pRole')||'[SPECIFY ROLE]'}.\n\nTASK\n${val('pTask')||'[SPECIFY TASK]'}\n\nCONTEXT\n${val('pContext')||'[PROVIDE ORGANIZATIONAL CONTEXT]'}\n\nINPUT DATA\n${inp||'[No data attached — ask me for the data you need before analysing.]'}${ask?'\n\nWORKING METHOD\nBefore producing the final output, ask me up to 5 short clarifying questions about anything missing or unclear, then wait for my answers.':''}\n\nOUTPUT FORMAT\n${val('pFormat')}\n\nTONE\n${val('pTone')}\n\nCONSTRAINTS\n${val('pConstraints')||'Only use provided and verified information.'}\n\nEVIDENCE & QUALITY CONTROL\n- Ground statements in supplied sources and quote source text where evidence is important.\n- If information is missing, use [MISSING INPUT] or [NEEDS VERIFICATION] rather than making it up.\n- Separate observed facts, assumptions, risks and recommendations.\n- Flag personal-data, employment fairness and legal/compliance considerations.\n- List verification checks and decisions requiring human approval.\n- End with a short "Validation Checklist".\n\nCASE-SPECIFIC VALIDATION\n${c.checks}\n\nLANGUAGE\n${lang}`;
+ let s=`WINNERS AI FOR HR — PRACTICAL PROMPT\nUse case: ${c.title}\nSuggested AI assistant: ${val('promptPlatform')} | Thinking depth: ${val('promptEffort')}\n(The thinking level is guidance. Set it manually if your platform supports it.)\n\n${waiAdaptivePrompt(c,val).join('\n')}\n\nROLE\nAct as: ${val('pRole')||'[SPECIFY ROLE]'}.\n\nTASK\n${val('pTask')||'[SPECIFY TASK]'}\n\nCONTEXT\n${val('pContext')||'[PROVIDE ORGANIZATIONAL CONTEXT]'}\n\nINPUT DATA\n${inp||'[No data attached — ask me for the data you need before analysing.]'}${ask?'\n\nWORKING METHOD\n'+waiClarify(val('promptEffort'),false):''}\n\nOUTPUT FORMAT\n${val('pFormat')}\n\nTONE\n${val('pTone')}\n\nCONSTRAINTS\n${val('pConstraints')||'Only use provided and verified information.'}\n\nEVIDENCE & QUALITY CONTROL\n- Ground statements in supplied sources and quote source text where evidence is important.\n- If information is missing, use [MISSING INPUT] or [NEEDS VERIFICATION] rather than making it up.\n- Separate observed facts, assumptions, risks and recommendations.\n- Flag personal-data, employment fairness and legal/compliance considerations.\n- List verification checks and decisions requiring human approval.\n- End with a short "Validation Checklist".\n\nCASE-SPECIFIC VALIDATION\n${c.checks}\n\nLANGUAGE\n${lang}`;
  $('promptOutput').textContent=s;window._lastPrompt=s;return s;}
 $('pLanguage').addEventListener('change',buildPrompt);
 const AI_LINKS={ChatGPT:'https://chatgpt.com/',Claude:'https://claude.ai/new',Gemini:'https://gemini.google.com/app',Copilot:'https://copilot.microsoft.com/'};
@@ -201,18 +202,18 @@ const V_STYLE_AR={'Corporate clean':'رسمي ونظيف','Modern bold':'عصر�
 function renderVisual(c,val){const ar=val('pLanguage')!=='en',a=c.ar,ask=$('pAsk').checked,inp=val('pInput'),rule=V_RULE[c.kind];
  const enC='Do not invent policies, laws, benchmarks or data. Use [NEEDS VERIFICATION] for unsupported claims. Separate facts from assumptions. Keep decisions subject to human review.';
  let L;
- if(!ar){L=['WINNERS AI FOR HR — ADVANCED VISUAL PROMPT','Use case: '+c.title,'Suggested AI assistant: '+val('promptPlatform')+' | Thinking depth: '+val('promptEffort'),'',
+ if(!ar){L=['WINNERS AI FOR HR — ADVANCED VISUAL PROMPT','Use case: '+c.title,'Suggested AI assistant: '+val('promptPlatform')+' | Thinking depth: '+val('promptEffort'),'',...waiAdaptivePrompt(c,val),'',
   'ROLE','Act as: '+(val('pRole')||c.role)+'.','','GOAL',val('pTask')||c.task,'','CONTEXT',val('pContext')||c.context,'',
   'BRAND KIT','- Colors: '+(val('vColors')||'[ADD HEX CODES]'),'- Fonts: '+(val('vFont')||'[ADD FONTS]'),'- Logo: '+(val('vLogo')||'[DESCRIBE LOGO]')+' (logo file attached)','- Visual style: '+val('vStyle'),'- Tone: '+val('pTone'),'',
   'CANVAS / DELIVERABLE',val('vSize'),'','EXACT TEXT TO USE (verbatim, do not rewrite)',val('vText')||'[None]','',
   'INPUT DATA',inp||'[No data attached. Ask me for it if you need it.]','',
   'REQUIREMENTS',...c.reqs.map(x=>'- '+x),'','AVOID',val('vAvoid')||'-','','CONSTRAINTS',val('pConstraints')||enC,'',rule.en[0],rule.en[1],'',
-  'WORKING METHOD — 3 STAGES','1) Spec: restate the brief and propose the layout / structure'+(ask?', and ask me up to 5 short clarifying questions':'')+'. Wait for my approval.','2) Build: produce the deliverable exactly per the approved spec and brand kit.','3) QA: check the result against the checklist below and report any item that fails.','',
+  ...waiVisualWorkflow(val('promptEffort'),ask,false),'',
   'QA CHECKLIST',...c.qa.map(x=>'[ ] '+x),'',
   'ITERATION','For revisions I will ask for targeted changes (for example, "change only the headline color"). Change only what I ask and keep everything else identical.','',
   'LANGUAGE','Write all explanations in clear professional English.'];}
  else{const same=(id,v)=>val(id)===v;
-  L=['WINNERS | برومبت تصميم متقدم','حالة الاستخدام: '+a.title,'مساعد AI المقترح: '+val('promptPlatform')+' | عمق التفكير: '+({Low:'بسيط',Medium:'متوسط',High:'متقدم'}[val('promptEffort')]||val('promptEffort')),'',
+  L=['WINNERS | برومبت تصميم متقدم','حالة الاستخدام: '+a.title,'مساعد AI المقترح: '+val('promptPlatform')+' | عمق التفكير: '+({Low:'بسيط',Medium:'متوسط',High:'متقدم'}[val('promptEffort')]||val('promptEffort')),'',...waiAdaptivePrompt(c,val),'',
   'الدور المطلوب','تصرّف باعتبارك: '+(same('pRole',c.role)?a.role:val('pRole'))+'.','','الهدف',same('pTask',c.task)?a.task:val('pTask'),'','السياق',same('pContext',c.context)?a.context:val('pContext'),'',
   'هوية العلامة (Brand kit)','- الألوان: '+(val('vColors')||'[أضف أكواد HEX]'),'- الخطوط: '+(val('vFont')||'[أضف الخطوط]'),'- اللوجو: '+(val('vLogo')||'[صف اللوجو]')+' (ملف اللوجو مرفق)','- الطابع البصري: '+(V_STYLE_AR[val('vStyle')]||val('vStyle')),'- النبرة: '+((typeof AR_TONE!=='undefined'&&AR_TONE[val('pTone')])||val('pTone')),'',
   'المقاس / شكل التسليم',val('vSize'),'','النص المطلوب كما هو حرفيًا (لا تعِد صياغته)',val('vText')||'[لا يوجد]','',
@@ -220,7 +221,7 @@ function renderVisual(c,val){const ar=val('pLanguage')!=='en',a=c.ar,ask=$('pAsk
   'المتطلبات',...a.reqs.map(x=>'- '+x),'','تجنّب',val('vAvoid')||'-','',
   'القيود والضوابط',same('pConstraints',enC)?'لا تختلق سياسات أو قوانين أو أرقامًا أو معايير سوقية. اكتب [يحتاج تحقق] عند غياب الدليل، وافصل الحقائق عن الافتراضات، وأخضع القرارات للمراجعة البشرية.':val('pConstraints'),'',
   rule.ar[0],rule.ar[1],'',
-  'طريقة العمل — 3 مراحل','1) المواصفات: أعد صياغة المطلوب واقترح التصميم أو الهيكل'+(ask?'، واسألني حتى 5 أسئلة توضيحية قصيرة':'')+'، وانتظر موافقتي.','2) التنفيذ: نفّذ المخرج حسب المواصفات المعتمدة وهوية العلامة بالضبط.','3) المراجعة: راجع النتيجة على قائمة التحقق التالية، وبلّغني بأي بند لم يتحقق.','',
+  ...waiVisualWorkflow(val('promptEffort'),ask,true),'',
   'قائمة التحقق',...a.qa.map(x=>'[ ] '+x),'',
   'التعديلات','عند التعديل سأطلب تغييرًا محددًا (مثل: «غيّر لون العنوان فقط»). غيّر المطلوب فقط واترك كل شيء آخر كما هو.','',
   'لغة المخرجات',val('pLanguage')==='mix'?'اكتب الشرح بالعامية المصرية مع مصطلحات HR وBusiness الإنجليزية الضرورية.':'اكتب الشرح بالعربية المهنية الواضحة.'];}
