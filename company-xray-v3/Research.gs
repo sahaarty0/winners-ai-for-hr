@@ -63,7 +63,7 @@ function xrSourceDate_(value, now) {
     return d.toISOString().slice(0,10);
   }
   const y=raw.match(/\b(20\d{2})\b/);
-  if(!y)return null;
+  if(!y || /^20\d{2}$/.test(raw))return null;
   const dt=new Date(value);
   if(Number.isFinite(dt.getTime()))return dt.toISOString().slice(0,10);
   return null; // A bare year is not precise enough to certify recency.
@@ -124,13 +124,15 @@ function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
     const note=!p.sourceFresh?'OLD_OR_UNDATED_SOURCE':
       !p.locationVerified?'CITY_NOT_VERIFIED':
       !['GROSS_SALARY','BASE_SALARY'].includes(p.payBasis)?'PAY_BASIS_NOT_COMPARABLE':
-      !usable?'SOURCE_NOT_SUITABLE_FOR_BENCHMARK':'COMPARABLE_SIGNAL_ONLY';
+      !usable?'SOURCE_NOT_SUITABLE_FOR_BENCHMARK':
+      !p.benchmarkSelected?'INSUFFICIENT_COMPARABLE_PUBLISHERS_OR_SOURCES':'COMPARABLE_BENCHMARK_SIGNAL';
     return {evidence_id:p.evidenceId,
-      status:usable?'OBSERVED_COMPARABLE':'OBSERVED_CONTEXT_ONLY',
+      status:p.benchmarkSelected?'IN_BENCHMARK':'OBSERVED_CONTEXT_ONLY',
       reason:note,verification_level:'SEARCH_SNIPPET_ONLY',
       url:p.url,title:p.title,publication_date:p.sourceDate||null,
       currency:p.currency,pay_basis:p.payBasis,original_period:p.originalPeriod,
       monthly_min:p.monthlyMin,monthly_max:p.monthlyMax,source_type:p.sourceType,
+      used_in_benchmark:Boolean(p.benchmarkSelected),
       location_verified:p.locationVerified||false,source_fresh:p.sourceFresh||false};
   });
   const bad=(rejected||[]).map(function(p){
@@ -292,16 +294,19 @@ function runCompanyXRay_(request) {
 
   console.log('Sending evidence to Gemini...');
 
-  const aiResult = geminiStructuredAnalysis_({
-    input: prompt,
-    schema: getCompanyXRaySchema_(),
-    thinkingLevel: depthConfig.thinkingLevel,
-    maxOutputTokens: 12000
-  });
-
-  if (!aiResult.data) {
-    aiResult.data = {};
+  let aiResult;
+  try {
+    aiResult = geminiStructuredAnalysis_({
+      input: prompt,
+      schema: getCompanyXRaySchema_(),
+      thinkingLevel: depthConfig.thinkingLevel,
+      maxOutputTokens: 12000
+    }) || {};
+  } catch (error) {
+    console.warn('Gemini evidence extraction failed; falling back to direct Serper snippets.');
+    aiResult = {data:{},interaction:null,usage:null,error_code:'GEMINI_EXTRACTION_UNAVAILABLE'};
   }
+  if (!aiResult.data) aiResult.data={};
 
 
   /**
@@ -388,6 +393,7 @@ function runCompanyXRay_(request) {
         ? aiResult.interaction.fallbackUsed
         : false,
       geminiUsage: aiResult.usage || null,
+      warning:aiResult.error_code||null,
       durationSeconds: Math.round(
         (completedAt - startedAt) / 1000
       )
@@ -1922,6 +1928,25 @@ function normalizeCompanyXRayResult_(
   data = data || {};
 
   const company = data.company || {};
+  const companyIds=(Array.isArray(company.evidence_ids)?company.evidence_ids:[]).map(Number);
+  const validCompanySources=evidence.filter(function(x){
+    return companyIds.indexOf(Number(x.evidenceId))>=0 &&
+      xrCompanyMatch_(request,x) && /^https:\/\//i.test(x.url||'');
+  });
+  // Only claimed company details that have a real, matching source survive.
+  if(!validCompanySources.length) {
+    company.identity_status='AMBIGUOUS';
+    company.official_website=null;
+    company.company_size_range=null;
+    company.main_location=null;
+    company.industry=null;
+    company.confidence_score=null;
+    company.notes='Company identity and corporate facts are not backed by traceable evidence.';
+  } else if(company.official_website) {
+    const officialDomain=getXRayDomain_(company.official_website);
+    if(!validCompanySources.some(function(x){return x.domain===officialDomain;}))
+      company.official_website=null;
+  }
 
   const feedback = normalizeEmployeeFeedback_(
     data.feedback,
@@ -1996,6 +2021,9 @@ function normalizeEmployeeFeedback_(rawFeedback,evidence,requestedCompany){
     if(!s||s.sourceType!=='EMPLOYEE_REVIEW')return false;
     const text=[s.title||'',s.snippet||''].join(' ');
     if(!/review|employee|working at|management|culture|مراجعة|العمل|موظف/i.test(text))return false;
+    const sn=String(s.snippet||'').trim();
+    if(sn.length<55 || !/pros|cons|worked|working|management|salary|culture|موظف|إدارة|بيئة العمل|مزايا|عيوب/i.test(sn))
+      return false; // A review landing page title alone is not an actual review.
     if(requestedCompany&&!xrCompanyMatch_({company:requestedCompany},s))return false;
     if(!/^https:\/\//i.test(s.url||''))return false;
     independent.add(normalizeXRayUrl_(s.url));
@@ -2005,7 +2033,9 @@ function normalizeEmployeeFeedback_(rawFeedback,evidence,requestedCompany){
     return (Array.isArray(items)?items:[]).map(function(x){
       const ids=(Array.isArray(x.evidence_ids)?x.evidence_ids:[]).map(Number).filter(trueReview);
       if(!ids.length)return null;
-      return {theme:String(x.theme||''),summary:String(x.summary||''),evidence_ids:Array.from(new Set(ids))};
+      const snippets=ids.map(function(id){return String(map[id].snippet||'').trim();}).filter(Boolean);
+      return {theme:String(x.theme||''),summary:snippets.slice(0,2).join(' | ').slice(0,550),
+        evidence_ids:Array.from(new Set(ids)),evidence_basis:'DIRECT_SOURCE_SNIPPET'};
     }).filter(Boolean);
   }
   const positive=themes(rawFeedback.positive_themes);
@@ -2064,7 +2094,20 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
       ['EXACT','CLOSE'].includes(x.roleMatch) && x.seniorityMatch!=='MISMATCH' &&
       !['SOCIAL_MEDIA','UNKNOWN','EMPLOYEE_REVIEW'].includes(x.sourceType);
   });
-  const payBuckets=xrSalaryEvidenceCategories_(comparison);
+  const uniqueComparisons=[],sourceKeys={};
+  comparison.forEach(function(x){
+    const k=normalizeXRayUrl_(x.url)+'|'+x.payBasis;
+    if(sourceKeys[k]){
+      // Same source+pay basis must not count twice as independent salary evidence.
+      // If amounts conflict, exclude this page entirely until corroborated.
+      const old=sourceKeys[k];
+      if(old.monthlyMin!==x.monthlyMin||old.monthlyMax!==x.monthlyMax)old.conflict=true;
+      return;
+    }
+    sourceKeys[k]=x;uniqueComparisons.push(x);
+  });
+  const cleanComparisons=uniqueComparisons.filter(function(x){return !x.conflict;});
+  const payBuckets=xrSalaryEvidenceCategories_(cleanComparisons);
   let candidates=[],benchmark=null,basisUsed=null;
   for(const b of ['GROSS_SALARY','BASE_SALARY']){
     const pts=payBuckets[b]||[];
@@ -2076,9 +2119,9 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
   // percentile labels. If data are insufficient, return null—not guessed pay.
   if(candidates.length)benchmark=calculateCoreMarketBenchmark_(candidates,currency);
   const comparableIds=new Set(candidates.map(function(x){return x.evidenceId;}));
-  comparison.filter(function(x){return !comparableIds.has(x.evidenceId);}).forEach(function(x){
-    rejected.push({evidenceId:x.evidenceId,reason:'INCOMPARABLE_OR_INSUFFICIENT_PAY_BASIS_SAMPLE'});
-  });
+  // An observed salary signal is not "rejected" merely because there
+  // are too few comparable observations for a published market band.
+  accepted.forEach(function(x){x.benchmarkSelected=Boolean(benchmark&&comparableIds.has(x.evidenceId));});
   const quality=benchmark?'INDICATIVE_PUBLIC_EVIDENCE':'INSUFFICIENT_COMPARABLE_EVIDENCE';
   const sourceDates=candidates.map(function(x){return x.sourceDate;}).filter(Boolean);
   const ledger=xrEvidenceLedger_(accepted,rejected,em);
@@ -2140,6 +2183,11 @@ function normalizeSalaryEvidenceItem_(item,evidenceMap,targetCurrency,targetSeni
   if(item.explicit_numeric_salary!==true)return reject('NO_EXPLICIT_NUMERIC_SALARY');
   const match=String(item.role_match||'MISMATCH').toUpperCase();
   if(match!=='EXACT'&&match!=='CLOSE')return reject('ROLE_MISMATCH');
+  const roleTokens=getXRayTokens_(request.jobTitle||'');
+  const original=normalizeXRayText_([source.title||'',source.snippet||''].join(' '));
+  const matched=roleTokens.filter(function(x){return original.indexOf(x)>=0;});
+  if(!roleTokens.length || matched.length/roleTokens.length<0.75)
+    return reject('ROLE_NOT_VERIFIABLE_IN_ORIGINAL_SOURCE');
   const txt=[source.title||'',source.snippet||'',item.role_title||''].join(' ');
   const seniorityDetected=inferEvidenceSeniorityFromText_(txt);
   const seniorityMatch=seniorityDetected==='UNKNOWN'?
