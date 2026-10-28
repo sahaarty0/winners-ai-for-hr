@@ -2,7 +2,7 @@
  * ============================================================
  * COMPANY X-RAY
  * Integrated Research Engine
- * Version 3.1 — evidence-governed diagnostics
+ * Version 3.2 — observed salary evidence + report presentation
  * ============================================================
  *
  * Scope:
@@ -149,6 +149,76 @@ function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
       source_excerpt:String(ev.snippet||'').slice(0,380),page_content_verified:false};
   });
   return good.concat(bad);
+}
+
+
+/** These are narrow job-title aliases only, not broad occupational-family matches.
+ * Seniority is always checked separately. */
+function xrRoleAliasPhrases_(role){
+  const key=normalizeXRayText_(role);
+  const sets=[
+    ['tech recruiter','technical recruiter','it recruiter','technology recruiter'],
+    ['hr specialist','human resources specialist','human resource specialist'],
+    ['recruitment specialist','recruiting specialist'],
+    ['personnel specialist','personnel officer']
+  ];
+  const group=sets.find(function(list){return list.indexOf(key)!==-1;});
+  return group||[key];
+}
+function xrRoleEvidenceMatch_(requestedRole,sourceText){
+  const role=normalizeXRayText_(requestedRole);
+  const text=normalizeXRayText_(sourceText);
+  if(!role||!text)return 'MISMATCH';
+  if(text.indexOf(role)!==-1)return 'EXACT';
+  const aliases=xrRoleAliasPhrases_(role);
+  if(aliases.some(function(alias){return text.indexOf(alias)!==-1;}))
+     return 'CLOSE';
+  return 'MISMATCH';
+}
+function xrSalaryPresentation_(marketRange,sourceAudit,currency){
+  const observations=(sourceAudit&&sourceAudit.observed_public_signals||[])
+   .filter(function(x){
+     return x.currency===currency &&
+       Number.isFinite(Number(x.monthly_min)) &&
+       Number.isFinite(Number(x.monthly_max)) &&
+       Number(x.monthly_min)>0 && Number(x.monthly_max)>0 &&
+       x.location_verified===true;
+   })
+   .map(function(x){
+     return {
+       evidence_id:x.evidence_id,
+       monthly_min:x.monthly_min,
+       monthly_max:x.monthly_max,
+       currency:x.currency,
+       pay_basis:x.pay_basis||'UNKNOWN',
+       source_title:x.title,
+       source_url:x.url,
+       publication_date:x.publication_date,
+       current_source_page_verified:false,
+       market_eligible:x.status==='IN_BENCHMARK',
+       evidence_grade:x.status==='IN_BENCHMARK'?'SOURCE_COMPARABLE':'CONTEXT_ONLY',
+       limitation:x.reason||'SOURCE_SNIPPET_ONLY'
+     };
+   });
+  return {
+    headline_status:(marketRange&&marketRange.label==='INDICATIVE_PUBLIC_RANGE')?
+       'INDICATIVE_PUBLIC_RANGE':observations.length?'PUBLIC_SALARY_MENTIONS_ONLY':'NO_USABLE_PUBLIC_SALARY_MENTIONS',
+    headline_title:observations.length?'Published Salary Mentions':'No verifiable salary figures',
+    market_range_valid:!!(marketRange&&marketRange.min!==null&&marketRange.max!==null),
+    market_range:marketRange||null,
+    published_salary_mentions:observations,
+    published_mentions_count:observations.length,
+    unit:currency||null,
+    key_disclosure:'Published search snippets are NOT a market salary survey. A source number is shown only as an individual observation, with its pay basis and verification status. Do not combine unknown, net and gross pay into a company offer.',
+    inferred_company_offer:null,
+    estimated_offer_is_available:false
+  };
+}
+function xrSanitizeCompanyAliases_(requestedCompany,aliases){
+  const req=normalizeXRayText_(requestedCompany);
+  return (Array.isArray(aliases)?aliases:[]).filter(function(alias){
+    return normalizeXRayText_(alias)===req;
+  }).slice(0,4);
 }
 
 /**
@@ -1519,6 +1589,9 @@ function extractSalaryEvidenceFromSearchSnippets_(
     }
 
     if (roleMatch === 'MISMATCH') {
+      roleMatch=xrRoleEvidenceMatch_(request.jobTitle,text);
+    }
+    if (roleMatch === 'MISMATCH') {
       return;
     }
 
@@ -2008,6 +2081,7 @@ function normalizeCompanyXRayResult_(
   }
 
   company.confidence_score=null; // No statistical respondent sample supports a percentage.
+  company.aliases=xrSanitizeCompanyAliases_(request.company,company.aliases);
   if(validCompanySources.length){
     // Gemini prose cannot assert a specific office or operating address
     // that is not supported by directly linked company evidence.
@@ -2203,6 +2277,11 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
   const sourceDates=candidates.map(function(x){return x.sourceDate;}).filter(Boolean);
   const ledger=xrEvidenceLedger_(accepted,rejected,em);
   const audit=xrEvidenceAuditSummary_(ledger);
+  const presentation=xrSalaryPresentation_(
+    {min:benchmark?benchmark.min:null,max:benchmark?benchmark.max:null,
+      label:benchmark?'INDICATIVE_PUBLIC_RANGE':'INSUFFICIENT_EVIDENCE'},
+    audit,currency
+  );
   const notes=[
     'PUBLIC EVIDENCE, NOT A SALARY SURVEY. P25/P50/P75 require survey microdata and a documented representative methodology.',
     'No automatic -15% market discount, synthetic +/-10% spread, company-size pay uplift or unsupported salary-offer predictions.',
@@ -2232,6 +2311,7 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
     evidence_ledger:ledger,
     evidence_audit:audit,
     observed_public_signals:audit.observed_public_signals,
+    presentation:presentation,
     source_verification:'SEARCH_SNIPPET_ONLY',
     source_date_span:{earliest:sourceDates.length?sourceDates.sort()[0]:null,latest:sourceDates.length?sourceDates.sort().slice(-1)[0]:null},
     survey_statistics:xrStrictSurveyStatus_(candidates),
@@ -2271,13 +2351,12 @@ function normalizeSalaryEvidenceItem_(item,evidenceMap,targetCurrency,targetSeni
   const reject=function(reason){return {accepted:false,reason:reason};};
   if(!source||!/^https:\/\//i.test(source.url||''))return reject('UNVERIFIED_OR_INVALID_URL');
   if(item.explicit_numeric_salary!==true)return reject('NO_EXPLICIT_NUMERIC_SALARY');
-  const match=String(item.role_match||'MISMATCH').toUpperCase();
-  if(match!=='EXACT'&&match!=='CLOSE')return reject('ROLE_MISMATCH');
-  const roleTokens=getXRayTokens_(request.jobTitle||'');
   const original=normalizeXRayText_([source.title||'',source.snippet||''].join(' '));
-  const matched=roleTokens.filter(function(x){return original.indexOf(x)>=0;});
-  if(!roleTokens.length || matched.length/roleTokens.length<0.75)
-    return reject('ROLE_NOT_VERIFIABLE_IN_ORIGINAL_SOURCE');
+  const directRoleMatch=xrRoleEvidenceMatch_(request.jobTitle||'',original);
+  if(directRoleMatch==='MISMATCH')return reject('ROLE_NOT_VERIFIABLE_IN_ORIGINAL_SOURCE');
+  // Do not reject correct role synonyms simply because Gemini marked them
+  // as mismatched. This correction requires the alias phrase in source.
+  const match=directRoleMatch;
   const txt=[source.title||'',source.snippet||'',item.role_title||''].join(' ');
   const seniorityDetected=inferEvidenceSeniorityFromText_(txt);
   const seniorityMatch=seniorityDetected==='UNKNOWN'?
@@ -3236,6 +3315,7 @@ function testFullCompanyXRay() {
     excluded_extraction_records:audit.excluded_count||0,
     reason_counts:audit.reason_counts||{},
     market_range:salary.market_range||null,
+    published_salary_mentions:(salary.presentation&&salary.presentation.published_salary_mentions)||[],
     market_adjustment_percent:diagnostic.marketAdjustmentPercent,
     gemini_model:result.research&&result.research.geminiModel,
     gemini_fallback:result.research&&result.research.geminiFallbackUsed,
@@ -3321,7 +3401,30 @@ function runCompanyXRayV3SelfTest(){
      failures.push({case:'Audit count and unverified source provenance'});
   if(xrSourceDate_('2026')!==null||xrSalarySourceFresh_(null))
     failures.push({case:'Year-only or undated sources cannot imply current publication'});
-  const result={passed:18-failures.length,total:18,ok:!failures.length,failures:failures,
+  const alias=xrRoleEvidenceMatch_('Tech Recruiter','Salary for IT Recruiter Cairo');
+  if(alias!=='CLOSE')failures.push({case:'Tech Recruiter accepted exact synonym'});
+  if(xrRoleEvidenceMatch_('Tech Recruiter','Talent Acquisition Manager salary')!=='MISMATCH')
+    failures.push({case:'No broad recruiter-to-manager mapping'});
+  const pres=xrSalaryPresentation_({min:null,max:null,label:'INSUFFICIENT_EVIDENCE'},
+    {observed_public_signals:[
+     {evidence_id:1,title:'Company A',url:'https://example.com/a',currency:'EGP',
+      monthly_min:16000,monthly_max:16000,pay_basis:'UNKNOWN',publication_date:null,
+      status:'OBSERVED_CONTEXT_ONLY',location_verified:true,reason:'PAY_BASIS_NOT_COMPARABLE'},
+     {evidence_id:2,title:'Company B',url:'https://example.org/b',currency:'EGP',
+      monthly_min:20000,monthly_max:25000,pay_basis:'UNKNOWN',publication_date:null,
+      status:'OBSERVED_CONTEXT_ONLY',location_verified:true,reason:'OLD_OR_UNDATED_SOURCE'}
+    ]},'EGP');
+  if(pres.published_mentions_count!==2 || pres.estimated_offer_is_available!==false ||
+     pres.headline_status!=='PUBLIC_SALARY_MENTIONS_ONLY' ||
+     pres.published_salary_mentions[1].monthly_max!==25000)
+     failures.push({case:'Published observed salary amounts visible but not benchmark or offer'});
+  const emptyPres=xrSalaryPresentation_({min:null,max:null,label:'INSUFFICIENT_EVIDENCE'},
+    {observed_public_signals:[]},'EGP');
+  if(emptyPres.headline_status!=='NO_USABLE_PUBLIC_SALARY_MENTIONS')
+    failures.push({case:'Zero salary evidence is explicitly empty'});
+  if(xrSanitizeCompanyAliases_('Winners',['Winners Developer','Winners']).join('|')!=='Winners')
+    failures.push({case:'Reject off-target company aliases'});
+  const result={passed:22-failures.length,total:22,ok:!failures.length,failures:failures,
     note:'Synthetic data test only; live search, Gemini and deployment must be checked separately.'};
   console.log(JSON.stringify(result));
   if(!result.ok)throw Error('Company X-Ray v3 self-test failed '+JSON.stringify(failures));
