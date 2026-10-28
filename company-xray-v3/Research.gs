@@ -2175,6 +2175,12 @@ function buildDeterministicSalaryResult_(request,company,rawSalaryEvidence,benef
     evidence_ledger:ledger,
     source_date_span:{earliest:sourceDates.length?sourceDates.sort()[0]:null,latest:sourceDates.length?sourceDates.sort().slice(-1)[0]:null},
     survey_statistics:xrStrictSurveyStatus_(candidates),
+    regulatory_context:{
+      country:'Egypt',reference:'National Wages Council private-sector minimum',
+      amount_egp:7000,effective_date:'2025-03-01',
+      source_url:'https://sis.gov.eg/en/media-center/news/egypt-raises-minimum-wage-for-private-sector-to-egp-7-000',
+      note:'Regulatory context only; the statutory wage definition differs from published basic/gross/total-cash salary indicators. Check subsequent law before applying; no salary amount is overwritten.'
+    },
     diagnostics:{
       acceptedEvidenceCount:benchmark?candidates.length:0,
       observedEvidenceCount:accepted.length,rejectedEvidenceCount:rejected.length,
@@ -2995,6 +3001,9 @@ function createEmptyCompanyXRayResult_(
 
           benefits: [],
           confidence_score: null,
+          evidence_grade:'INSUFFICIENT_COMPARABLE_EVIDENCE',
+          evidence_ledger:[],
+          survey_statistics:{survey_classification:'NOT_A_STATISTICAL_SURVEY',p25:null,p50:null,p75:null,sample_size:null},
           methodology_notes: [
             'No usable public salary evidence was found.'
           ],
