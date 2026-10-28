@@ -699,15 +699,17 @@ function buildCompanyXRaySearchPlan_(
       num: 10
     });
 
-    /** Salary platforms */
+    /** Dated Egypt-specific salary survey signals (small-sample aware). */
     searches.push({
       module: 'salary_market',
       query: buildXRayQuery_([
-        '"' + role + '"',
+        'site:eg.indeed.com/career/human-resources-specialist/salaries',
+        role,
+        city,
         country,
-        'SalaryExpert PayScale Talent salary'
+        year
       ]),
-      num: 10
+      num: 8
     });
 
     /** Arabic salary query */
@@ -1479,7 +1481,7 @@ function extractSalaryEvidenceFromSearchSnippets_(
     const normalized = normalizeXRayText_(text);
 
     /** Must contain an Egyptian currency signal. */
-    if (!/(\bEGP\b|\bLE\b|L\.E\.|E£|جنيه|جنيه مصري)/i.test(text)) {
+    if (!/(\bEGP\b|\bLE\b|L\.E\.|E£|جنيه|ج\s*\.\s*م)/i.test(text)) {
       return;
     }
 
@@ -1617,9 +1619,25 @@ function extractSalaryEvidenceFromSearchSnippets_(
  * In the last example, 457 MONTHLY is selected. 5,482 is never
  * mislabeled as a monthly salary.
  */
+/** Normalize Egyptian salary numerals, punctuation and currency spelling.
+ * Never infer currency or period when the source does not show it. */
+function normalizeEgyptSalaryText_(value){
+  const arabic='٠١٢٣٤٥٦٧٨٩',persian='۰۱۲۳۴۵۶۷۸۹';
+  return String(value||'')
+    .replace(/[٠-٩۰-۹]/g,function(d){
+      const ai=arabic.indexOf(d),pi=persian.indexOf(d);
+      return String(ai>=0?ai:pi);
+    })
+    .replace(/٬/g,',').replace(/٫/g,'.')
+    .replace(/\u00a0/g,' ')
+    .replace(/ج\s*\.\s*م\s*\.?/g,'EGP ')
+    .replace(/جنيه\s+مصري(?:ة)?/g,'EGP')
+    .replace(/\/\s*شهر\b/g,' شهري');
+}
+
 function extractPeriodBoundSalary_(text) {
 
-  text = String(text || '');
+  text = normalizeEgyptSalaryText_(text);
 
   const amount = '(\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?|\\d{1,7}(?:\\.\\d+)?|\\d+(?:\\.\\d+)?\\s*[kK])';
   const currency = '(?:EGP|LE|L\\.E\\.|E£|جنيه(?:\\s+مصري)?)';
@@ -2429,6 +2447,7 @@ function normalizeCurrencyCode_(value) {
     text === 'LE' ||
     text === 'L.E.' ||
     text === 'E£' ||
+    text === 'ج.م.' || text === 'ج.م' ||
     text.indexOf('EGYPT') !== -1 ||
     text.indexOf('جنيه') !== -1
   ) {
