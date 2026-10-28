@@ -3080,7 +3080,7 @@ function createEmptyCompanyXRayResult_(
   searchRuns
 ) {
 
-  return {
+  const response = {
 
     success: true,
     request: request,
@@ -3187,6 +3187,15 @@ function createEmptyCompanyXRayResult_(
       )
     }
   };
+  if(response.salary){
+    response.salary.presentation=xrSalaryPresentation_(
+      {min:null,max:null,label:'INSUFFICIENT_EVIDENCE'},
+      {observed_public_signals:[]},response.salary.currency
+    );
+    response.salary.source_verification='NO_SOURCES_FOUND';
+    response.salary.evidence_audit=xrEvidenceAuditSummary_([]);
+  }
+  return response;
 }
 
 
