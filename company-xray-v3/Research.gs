@@ -155,7 +155,7 @@ function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
 /** These are narrow job-title aliases only, not broad occupational-family matches.
  * Seniority is always checked separately. */
 function xrRoleAliasPhrases_(role){
-  const key=normalizeXRayText_(role);
+  const key=normalizeXRayText_(role).replace(/^(?:junior|jr|senior|sr|lead)\s+/, '').trim();
   const sets=[
     ['tech recruiter','technical recruiter','it recruiter','technology recruiter'],
     ['hr specialist','human resources specialist','human resource specialist'],
@@ -169,9 +169,13 @@ function xrRoleEvidenceMatch_(requestedRole,sourceText){
   const role=normalizeXRayText_(requestedRole);
   const text=normalizeXRayText_(sourceText);
   if(!role||!text)return 'MISMATCH';
-  if(text.indexOf(role)!==-1)return 'EXACT';
+  const direct=' '+text+' ';
+  // A requested seniority adjective is validated by a separate check;
+  // remove it here only for the role-title equivalence test.
+  const core=role.replace(/^(?:junior|jr|senior|sr|lead)\s+/, '').trim();
+  if(direct.indexOf(' '+core+' ')!==-1)return 'EXACT';
   const aliases=xrRoleAliasPhrases_(role);
-  if(aliases.some(function(alias){return text.indexOf(alias)!==-1;}))
+  if(aliases.some(function(alias){return direct.indexOf(' '+alias+' ')!==-1;}))
      return 'CLOSE';
   return 'MISMATCH';
 }
