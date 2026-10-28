@@ -110,3 +110,14 @@ function premiumGetCases_(input) {
     return {ok:false,error:'cases_not_ready'};
   return {ok:true,cases:cases};
 }
+
+function premiumInstallCheck() {
+  const registration = premiumSheet_(PREMIUM_CFG.registrationsTab);
+  const cases = premiumSheet_(PREMIUM_CFG.casesTab);
+  const quota = MailApp.getRemainingDailyQuota();
+  return {
+    registrationsPresent: registration.getRange(1, 9).getDisplayValue() === 'Premium Access',
+    premiumCases: Math.max(0, cases.getLastRow() - 1),
+    dailyEmailQuotaRemaining: quota
+  };
+}
