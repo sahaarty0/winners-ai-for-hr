@@ -39,7 +39,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;bac
 <h3 id="questionTitle">...</h3><p id="questionIntro"></p><ul id="questionFacts"></ul>
 <p><b>المطلوب من فريقك:</b> <span id="questionTask"></span></p>
 </div>
-<div class="field"><label class="label" for="answerText">✍️ إجابة الفريق (الـLeader يرسل إجابة واحدة)</label><textarea id="answerText" maxlength="5000" placeholder="اكتبوا تحليل المشكلة والإجراءات والأدوات المطلوبة ومبررات الحل هنا..."></textarea><div class="muted" id="charCount">0 / 5000 حرف</div></div>
+<div class="field"><label class="label" for="answerText">✍️ إجابة الفريق (الـLeader يرسل إجابة واحدة)</label><textarea id="answerText" maxlength="5000" placeholder="Q1:&#10;1. ...&#10;2. ...&#10;&#10;Q2:&#10;1. ...&#10;2. ...&#10;&#10;Q3:&#10;1. ...&#10;&#10;Q4:&#10;1. ..."></textarea><div class="muted" id="charCount">0 / 5000 حرف</div></div>
 <div id="masterBlock" class="hide">
 <details><summary>📚 مراجعة Universal Master Prompt</summary><div class="promptref">Read Form 01 to understand my HR task and available inputs. Then follow the instructions in Form 02 to produce the requested output. Use only the information provided, do not invent missing details, and ask for clarification if essential information is missing.</div></details>
 <div class="field"><label class="label" for="masterPrompt">Master Prompt / تطبيقات AI (اختياري)</label><textarea id="masterPrompt" maxlength="5000" placeholder="اكتب البرومبت أو خطوات تطبيق أدوات AI، إذا كانت المرحلة تسمح بها..."></textarea></div>

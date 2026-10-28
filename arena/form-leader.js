@@ -1,5 +1,5 @@
 import {getTrackStage,TRACK_OPTIONS} from "./tracks.js";
-import {renderCasePack} from "./case-view.js";
+import {renderCasePack,bidiFill} from "./case-view.js";
 import {appsScriptWebAppUrl,pollSeconds} from "./apps-script-config.js";
 const query=new URLSearchParams(location.search);
 const hosted=query.get("bridge")==="parent"&&window.parent!==window;
@@ -72,17 +72,17 @@ function render(){
    const c={name:selected.label,title:selected.title,intro:selected.description,facts:selected.facts,task:selected.task,details:selected};
    if(newStage!==stage){storeDraft();stage=newStage;restoreDraft();show("receiptCard",false)}
    el("stagePill").textContent="STAGE "+String(stage).padStart(2,"0")+" · "+c.name;
-   el("teamFocus").textContent="🏆 "+group.groupName+" · 🎯 "+selected.label+" · 👑 Leader: "+group.leaderName;
-   el("welcomeTitle").textContent="تحدي فريق "+group.groupName;
+   bidiFill(el("teamFocus"),"🏆 "+group.groupName+" · 🎯 "+selected.label+" · 👑 قائد الفريق: "+group.leaderName);
+   bidiFill(el("welcomeTitle"),"تحدي فريق "+group.groupName);
    el("teamRosterSummary").textContent="أعضاء الفريق: "+[group.leaderName,...group.members].join(" · ");
-   el("questionTitle").textContent=c.title;el("questionIntro").textContent=c.intro;
-   el("questionFacts").replaceChildren(...c.facts.map(s=>{const li=document.createElement("li");li.textContent=s;return li}));
-   el("questionTask").textContent=c.task;
+   bidiFill(el("questionTitle"),c.title);bidiFill(el("questionIntro"),c.intro);
+   el("questionFacts").replaceChildren(...c.facts.map(s=>bidiFill(document.createElement("li"),s)));
+   bidiFill(el("questionTask"),c.task);
    let sourcePanel=document.getElementById("caseEvidence");
    if(!sourcePanel){sourcePanel=document.createElement("div");sourcePanel.id="caseEvidence";el("questionTask").closest(".question").after(sourcePanel)}
    if(sourcePanel.dataset.stage!==String(stage)+"_"+group.track){renderCasePack(sourcePanel,c.details);sourcePanel.dataset.stage=String(stage)+"_"+group.track}
 
-   show("masterBlock",stage>1);
+   show("masterBlock",false); // المراحل كلها بقت إجابة بالخطوات، من غير Prompt منفصل
    el("submitBtn").disabled=!session.open||requestBusy;
    el("submitHint").textContent=session.open?"الإجابة هتتحفظ باسم الفريق كله. Gemini هيعالجها إن كان متاحًا، والنتيجة لازم يراجعها المدرب.":"الجولة الحالية مقفولة من المحاضر.";
  }else{
