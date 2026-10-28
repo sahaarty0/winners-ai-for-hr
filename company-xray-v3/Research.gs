@@ -17,7 +17,7 @@
  *
  * IMPORTANT:
  * - Gemini does NOT calculate the final salary benchmark.
- * - Confirmed company salary is NEVER reduced by 15%.
+ * - Verified salary observations remain unmodified.
  * - Raw observed public salary evidence is NEVER altered.
  */
 
@@ -113,13 +113,21 @@ function xrSalaryEvidenceCategories_(points) {
 }
 function xrIndependentSourceCount_(points) {
   return new Set((points||[]).map(function(x){
-    try{return new URL(x.url).hostname.toLowerCase().replace(/^www\./,'');}
-    catch(e){return '';}
+    return getXRayDomain_(x.url||'').toLowerCase().replace(/^www\./,'');
   }).filter(Boolean)).size;
 }
 function xrEvidenceLedger_(accepted,rejected,evidenceMap) {
   const good=(accepted||[]).map(function(p){
-    return {evidence_id:p.evidenceId,status:'OBSERVED',reason:'EXPLICIT_SOURCE_SALARY',
+    const usable=p.sourceFresh && p.locationVerified &&
+      ['GROSS_SALARY','BASE_SALARY'].includes(p.payBasis) &&
+      !['SOCIAL_MEDIA','UNKNOWN','EMPLOYEE_REVIEW'].includes(p.sourceType);
+    const note=!p.sourceFresh?'OLD_OR_UNDATED_SOURCE':
+      !p.locationVerified?'CITY_NOT_VERIFIED':
+      !['GROSS_SALARY','BASE_SALARY'].includes(p.payBasis)?'PAY_BASIS_NOT_COMPARABLE':
+      !usable?'SOURCE_NOT_SUITABLE_FOR_BENCHMARK':'COMPARABLE_SIGNAL_ONLY';
+    return {evidence_id:p.evidenceId,
+      status:usable?'OBSERVED_COMPARABLE':'OBSERVED_CONTEXT_ONLY',
+      reason:note,verification_level:'SEARCH_SNIPPET_ONLY',
       url:p.url,title:p.title,publication_date:p.sourceDate||null,
       currency:p.currency,pay_basis:p.payBasis,original_period:p.originalPeriod,
       monthly_min:p.monthlyMin,monthly_max:p.monthlyMax,source_type:p.sourceType,
@@ -2011,7 +2019,7 @@ function normalizeEmployeeFeedback_(rawFeedback,evidence,requestedCompany){
   if(independent.size<2)return empty;
   return {
     status:'LIMITED',
-    overall_signal:'MIXED', // Cannot infer company-wide sentiment from web snippets.
+    overall_signal:'MIXED', // No representative employee survey: no company-wide conclusion.
     confidence_score:null, // No known respondent sample to support a percentage.
     positive_themes:positive,negative_themes:negative,
     categories:empty.categories,repeated_signals:signals,
@@ -2327,7 +2335,7 @@ function normalizeCurrencyCode_(value) {
  * CONFIRMED COMPANY SALARY
  * ============================================================
  *
- * Never reduced by the 15% adjustment.
+ * Never altered by a made-up market discount.
  */
 
 function buildConfirmedCompanySalary_(points, currency) {
@@ -2461,7 +2469,7 @@ function filterSalaryOutliers_(points) {
  * One strong source is allowed with LOW confidence.
  * Weak single sources are rejected.
  *
- * Final calculated benchmark = Raw benchmark × 0.85.
+ * Evidence-only comparative range: no market multiplier or invented percentiles.
  */
 
 function calculateCoreMarketBenchmark_(points,currency){
@@ -2492,7 +2500,7 @@ function calculateCoreMarketBenchmark_(points,currency){
  * COMPANY ADJUSTMENT
  * ============================================================
  *
- * Applied after the -15% market adjustment.
+ * Legacy company multiplier is disabled in v3.
  * Maximum uplift = +5%.
  */
 
@@ -2759,8 +2767,8 @@ function createNotRequestedSalary_() {
     },
 
     benefits: [],
-    confidence_score: 0,
-    methodology_notes: [],
+    confidence_score: null,
+    methodology_notes: ['No salary study was requested; no statistical confidence is asserted.'],
 
     diagnostics: {
       acceptedEvidenceCount: 0,
@@ -2772,7 +2780,7 @@ function createNotRequestedSalary_() {
         currency: null,
         period: null
       },
-      marketAdjustmentPercent: -15,
+      marketAdjustmentPercent: 0,
       marketAdjustmentFactor: COMPANY_XRAY_SALARY_MARKET_FACTOR_,
       raw_market_benchmark: null,
       adjusted_market_benchmark: null,
@@ -2884,7 +2892,7 @@ function createEmptyCompanyXRayResult_(
 
     company: {
       identity_status: 'NOT_FOUND',
-      confidence_score: 0,
+      confidence_score: null,
       canonical_name: null,
       aliases: [],
       country: request.country || null,
@@ -2941,7 +2949,7 @@ function createEmptyCompanyXRayResult_(
           },
 
           benefits: [],
-          confidence_score: 0,
+          confidence_score: null,
           methodology_notes: [
             'No usable public salary evidence was found.'
           ],
@@ -2956,7 +2964,7 @@ function createEmptyCompanyXRayResult_(
               currency: 'EGP',
               period: 'monthly'
             },
-            marketAdjustmentPercent: -15,
+            marketAdjustmentPercent: 0,
             marketAdjustmentFactor: COMPANY_XRAY_SALARY_MARKET_FACTOR_,
             raw_market_benchmark: null,
             adjusted_market_benchmark: null,
