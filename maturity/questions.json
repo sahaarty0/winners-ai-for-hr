@@ -1,0 +1,1013 @@
+{
+  "schemaVersion": 1,
+  "version": "2026-10-28",
+  "source": {
+    "title": "HR Maturity Assessment M&D (1).xlsx",
+    "url": "https://docs.google.com/spreadsheets/d/1ktAbKUblCeQ1BfZcv5yOAgk-6NO2KSGw/edit",
+    "note": "Question wording and core grouping transcribed from source workbook. App snapshot; it does not automatically write back to XLSX."
+  },
+  "scoring": {
+    "available": 1,
+    "notAvailable": 0,
+    "questionsPerCore": 5,
+    "greenMin": 0.8,
+    "yellowMin": 0.6,
+    "method": "Equal-weight 0/1 average within each core, average cores within each audit. Combined overall index is an app-derived mean of the 20 cores."
+  },
+  "tracks": [
+    {
+      "id": "functional",
+      "title": "Functional HR Audit",
+      "ar": "التقييم الوظيفي لإدارة الموارد البشرية",
+      "cores": [
+        {
+          "id": "F01",
+          "sheet": "F1",
+          "name": "HR Governance & Policies",
+          "descriptionEn": "Assesses the quality of HR governance, policies, authority, controls, and consistency of application.",
+          "descriptionAr": "بيقيس جودة حوكمة الـHR والسياسات والصلاحيات والضوابط ومدى ثبات التطبيق.",
+          "questions": [
+            {
+              "id": "F1-Q04",
+              "en": "Are HR policies formally documented, approved, and accessible to employees?",
+              "ar": "هل سياسات الـHR مكتوبة ومعتمدة رسميًا والموظفين يقدروا يرجعوا لها بسهولة؟",
+              "origin": "F1!B5",
+              "sourceSheet": "F1",
+              "sourceRow": 5
+            },
+            {
+              "id": "F1-Q05",
+              "en": "Are roles, responsibilities, and approval authorities within HR clearly defined?",
+              "ar": "هل أدوار ومسؤوليات وصلاحيات الموافقات جوه الـHR محددة وواضحة؟",
+              "origin": "F1!B6",
+              "sourceSheet": "F1",
+              "sourceRow": 6
+            },
+            {
+              "id": "F1-Q06",
+              "en": "Are HR policies reviewed and updated on a defined schedule?",
+              "ar": "هل سياسات الـHR بتتراجع وبتتحدث بشكل دوري وفي مواعيد محددة؟",
+              "origin": "F1!B7",
+              "sourceSheet": "F1",
+              "sourceRow": 7
+            },
+            {
+              "id": "F1-Q07",
+              "en": "Are HR procedures applied consistently across departments and employee groups?",
+              "ar": "هل إجراءات الـHR بتتطبق بنفس الشكل على الإدارات وفئات الموظفين المختلفة؟",
+              "origin": "F1!B8",
+              "sourceSheet": "F1",
+              "sourceRow": 8
+            },
+            {
+              "id": "F1-Q08",
+              "en": "Is there an effective control and escalation mechanism for policy exceptions?",
+              "ar": "هل في آلية واضحة للرقابة والتصعيد لما يحصل استثناء أو مخالفة لسياسة؟",
+              "origin": "F1!B9",
+              "sourceSheet": "F1",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "F02",
+          "sheet": "F1",
+          "name": "Workforce Planning & Manpower",
+          "descriptionEn": "Assesses how workforce demand, headcount, productivity, and cost are planned and controlled.",
+          "descriptionAr": "بيقيس إزاي الشركة بتخطط للاحتياج من العمالة والعدد والإنتاجية والتكلفة وبتتحكم فيهم.",
+          "questions": [
+            {
+              "id": "F1-Q09",
+              "en": "Is there an approved annual manpower plan linked to business targets and budget?",
+              "ar": "هل في خطة سنوية معتمدة للقوى العاملة مرتبطة بأهداف البيزنس والميزانية؟",
+              "origin": "F1!B10",
+              "sourceSheet": "F1",
+              "sourceRow": 10
+            },
+            {
+              "id": "F1-Q10",
+              "en": "Are headcount needs based on workload, productivity, and future business demand?",
+              "ar": "هل الاحتياج للعمالة بيتحدد على أساس حجم الشغل والإنتاجية واحتياجات البيزنس الجاية؟",
+              "origin": "F1!B11",
+              "sourceSheet": "F1",
+              "sourceRow": 11
+            },
+            {
+              "id": "F1-Q11",
+              "en": "Are vacancies, replacements, and new positions tracked against the manpower plan?",
+              "ar": "هل الوظائف الشاغرة والإحلال والوظائف الجديدة بتتتابع مقارنة بخطة القوى العاملة؟",
+              "origin": "F1!B12",
+              "sourceSheet": "F1",
+              "sourceRow": 12
+            },
+            {
+              "id": "F1-Q12",
+              "en": "Are workforce gaps and surpluses identified by function, role, and location?",
+              "ar": "هل الشركة بتحدد العجز أو الزيادة في العمالة حسب الإدارة والوظيفة والموقع؟",
+              "origin": "F1!B13",
+              "sourceSheet": "F1",
+              "sourceRow": 13
+            },
+            {
+              "id": "F1-Q13",
+              "en": "Is actual headcount and workforce cost regularly compared with the approved plan?",
+              "ar": "هل العدد الفعلي للموظفين وتكلفتهم بيتقارنوا بشكل دوري بالخطة المعتمدة؟",
+              "origin": "F1!B14",
+              "sourceSheet": "F1",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "F03",
+          "sheet": "F1",
+          "name": "Personnel & HR Operations",
+          "descriptionEn": "Assesses the accuracy, timeliness, documentation, and control of day-to-day HR operations.",
+          "descriptionAr": "بيقيس دقة وسرعة وتوثيق وضبط عمليات الـHR اليومية.",
+          "questions": [
+            {
+              "id": "F1-Q14",
+              "en": "Are employee files complete, updated, and maintained under a standard filing process?",
+              "ar": "هل ملفات الموظفين كاملة ومحدثة وبتتحفظ بنظام موحد وواضح؟",
+              "origin": "F1!B15",
+              "sourceSheet": "F1",
+              "sourceRow": 15
+            },
+            {
+              "id": "F1-Q15",
+              "en": "Are contracts, attendance, leave, and employee movements processed accurately and on time?",
+              "ar": "هل العقود والحضور والإجازات وحركات الموظفين بتتعمل بدقة وفي وقتها؟",
+              "origin": "F1!B16",
+              "sourceSheet": "F1",
+              "sourceRow": 16
+            },
+            {
+              "id": "F1-Q16",
+              "en": "Are payroll inputs reviewed and approved before payroll processing?",
+              "ar": "هل مدخلات المرتبات بتتراجع وبتتعتمد قبل تنفيذ الـPayroll؟",
+              "origin": "F1!B17",
+              "sourceSheet": "F1",
+              "sourceRow": 17
+            },
+            {
+              "id": "F1-Q17",
+              "en": "Are joiners, transfers, promotions, and leavers handled through documented workflows?",
+              "ar": "هل التعيين والنقل والترقية وإنهاء الخدمة ليهم إجراءات مكتوبة وواضحة؟",
+              "origin": "F1!B18",
+              "sourceSheet": "F1",
+              "sourceRow": 18
+            },
+            {
+              "id": "F1-Q18",
+              "en": "Are HR operational records traceable and easy to retrieve when needed?",
+              "ar": "هل سجلات عمليات الـHR سهل تتبعها والوصول لها وقت الاحتياج؟",
+              "origin": "F1!B19",
+              "sourceSheet": "F1",
+              "sourceRow": 19
+            }
+          ]
+        },
+        {
+          "id": "F04",
+          "sheet": "F1",
+          "name": "Compliance & HR Risk",
+          "descriptionEn": "Assesses labor compliance, statutory documentation, control exposure, and HR risk management.",
+          "descriptionAr": "بيقيس الالتزام القانوني والمستندات المطلوبة والضوابط وطريقة إدارة مخاطر الـHR.",
+          "questions": [
+            {
+              "id": "F1-Q19",
+              "en": "Are employment practices reviewed for compliance with applicable labor and social insurance requirements?",
+              "ar": "هل ممارسات التوظيف بتتراجع للتأكد إنها متوافقة مع قانون العمل والتأمينات المطلوبة؟",
+              "origin": "F1!B20",
+              "sourceSheet": "F1",
+              "sourceRow": 20
+            },
+            {
+              "id": "F1-Q20",
+              "en": "Are statutory records, contracts, and employee documents complete and valid?",
+              "ar": "هل السجلات والعقود ومستندات الموظفين المطلوبة قانونيًا كاملة وسارية؟",
+              "origin": "F1!B21",
+              "sourceSheet": "F1",
+              "sourceRow": 21
+            },
+            {
+              "id": "F1-Q21",
+              "en": "Are compliance risks identified, documented, and assigned to responsible owners?",
+              "ar": "هل مخاطر الالتزام القانوني متحددة ومتوثقة ومعروف مين مسؤول عن كل خطر؟",
+              "origin": "F1!B22",
+              "sourceSheet": "F1",
+              "sourceRow": 22
+            },
+            {
+              "id": "F1-Q22",
+              "en": "Are payroll, benefits, and employee deductions subject to regular compliance checks?",
+              "ar": "هل المرتبات والمزايا والاستقطاعات بيتم عليها مراجعات التزام بشكل دوري؟",
+              "origin": "F1!B23",
+              "sourceSheet": "F1",
+              "sourceRow": 23
+            },
+            {
+              "id": "F1-Q23",
+              "en": "Is there a process to track regulatory changes and update HR practices accordingly?",
+              "ar": "هل في طريقة لمتابعة أي تغييرات قانونية وتحديث ممارسات الـHR بناءً عليها؟",
+              "origin": "F1!B24",
+              "sourceSheet": "F1",
+              "sourceRow": 24
+            }
+          ]
+        },
+        {
+          "id": "F05",
+          "sheet": "F2",
+          "name": "Talent Acquisition & Onboarding",
+          "descriptionEn": "Assesses recruitment quality, efficiency, selection discipline, and onboarding effectiveness.",
+          "descriptionAr": "بيقيس جودة وكفاءة التوظيف وانضباط الاختيار وفعالية الـOnboarding.",
+          "questions": [
+            {
+              "id": "F2-Q04",
+              "en": "Are job requirements and selection criteria clearly defined before recruitment starts?",
+              "ar": "هل متطلبات الوظيفة ومعايير الاختيار بتكون محددة بوضوح قبل ما التوظيف يبدأ؟",
+              "origin": "F2!B5",
+              "sourceSheet": "F2",
+              "sourceRow": 5
+            },
+            {
+              "id": "F2-Q05",
+              "en": "Are sourcing channels measured for quality, speed, and cost effectiveness?",
+              "ar": "هل قنوات التوظيف بيتقاس عليها جودة المرشحين والسرعة والتكلفة؟",
+              "origin": "F2!B6",
+              "sourceSheet": "F2",
+              "sourceRow": 6
+            },
+            {
+              "id": "F2-Q06",
+              "en": "Is the selection process structured, documented, and consistently applied?",
+              "ar": "هل عملية الاختيار منظمة ومكتوبة وبتتطبق بنفس الشكل على المرشحين؟",
+              "origin": "F2!B7",
+              "sourceSheet": "F2",
+              "sourceRow": 7
+            },
+            {
+              "id": "F2-Q07",
+              "en": "Are recruitment KPIs such as time to hire and quality of hire regularly reviewed?",
+              "ar": "هل مؤشرات زي Time to Hire وQuality of Hire بتتراجع بشكل دوري؟",
+              "origin": "F2!B8",
+              "sourceSheet": "F2",
+              "sourceRow": 8
+            },
+            {
+              "id": "F2-Q08",
+              "en": "Is onboarding structured with clear activities, owners, and early-stage follow-up?",
+              "ar": "هل الـOnboarding منظم وفيه خطوات ومسؤولين ومتابعة واضحة في بداية التعيين؟",
+              "origin": "F2!B9",
+              "sourceSheet": "F2",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "F06",
+          "sheet": "F2",
+          "name": "Performance Management",
+          "descriptionEn": "Assesses goal alignment, KPI quality, review discipline, fairness, and performance consequences.",
+          "descriptionAr": "بيقيس ربط الأهداف وجودة الـKPIs وانتظام المراجعة وعدالة التقييم وربط النتيجة بالإجراءات.",
+          "questions": [
+            {
+              "id": "F2-Q09",
+              "en": "Are individual objectives and KPIs clearly linked to business and departmental goals?",
+              "ar": "هل أهداف وKPIs الموظفين مرتبطة بشكل واضح بأهداف الشركة والإدارة؟",
+              "origin": "F2!B10",
+              "sourceSheet": "F2",
+              "sourceRow": 10
+            },
+            {
+              "id": "F2-Q10",
+              "en": "Are performance expectations measurable, documented, and communicated at the start of the cycle?",
+              "ar": "هل توقعات الأداء قابلة للقياس ومكتوبة وموضحة للموظف من بداية دورة التقييم؟",
+              "origin": "F2!B11",
+              "sourceSheet": "F2",
+              "sourceRow": 11
+            },
+            {
+              "id": "F2-Q11",
+              "en": "Are performance reviews conducted on schedule with documented feedback?",
+              "ar": "هل مراجعات الأداء بتحصل في مواعيدها وفيه Feedback موثق؟",
+              "origin": "F2!B12",
+              "sourceSheet": "F2",
+              "sourceRow": 12
+            },
+            {
+              "id": "F2-Q12",
+              "en": "Is there a calibration process to improve fairness and consistency of ratings?",
+              "ar": "هل في Calibration بين المديرين علشان التقييمات تبقى عادلة ومتسقة؟",
+              "origin": "F2!B13",
+              "sourceSheet": "F2",
+              "sourceRow": 13
+            },
+            {
+              "id": "F2-Q13",
+              "en": "Are performance results linked to development, recognition, reward, or corrective action?",
+              "ar": "هل نتائج الأداء مرتبطة بالتطوير أو التقدير أو المكافآت أو إجراءات التحسين؟",
+              "origin": "F2!B14",
+              "sourceSheet": "F2",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "F07",
+          "sheet": "F2",
+          "name": "Learning & Development",
+          "descriptionEn": "Assesses how learning needs are identified, delivered, measured, and applied on the job.",
+          "descriptionAr": "بيقيس تحديد الاحتياج التدريبي وتنفيذه وقياس فعاليته وتطبيقه في الشغل.",
+          "questions": [
+            {
+              "id": "F2-Q14",
+              "en": "Is training need analysis based on business priorities, performance gaps, and competency gaps?",
+              "ar": "هل تحديد الاحتياجات التدريبية مبني على أولويات البيزنس وفجوات الأداء والكفاءات؟",
+              "origin": "F2!B15",
+              "sourceSheet": "F2",
+              "sourceRow": 15
+            },
+            {
+              "id": "F2-Q15",
+              "en": "Is there an approved annual learning plan with priorities, budget, and target groups?",
+              "ar": "هل في خطة تدريب سنوية معتمدة فيها الأولويات والميزانية والفئات المستهدفة؟",
+              "origin": "F2!B16",
+              "sourceSheet": "F2",
+              "sourceRow": 16
+            },
+            {
+              "id": "F2-Q16",
+              "en": "Are learning programs linked to defined skills or competencies required by the role?",
+              "ar": "هل البرامج التدريبية مرتبطة بمهارات أو Competencies مطلوبة فعلًا في الوظيفة؟",
+              "origin": "F2!B17",
+              "sourceSheet": "F2",
+              "sourceRow": 17
+            },
+            {
+              "id": "F2-Q17",
+              "en": "Is training effectiveness measured beyond attendance and participant satisfaction?",
+              "ar": "هل فعالية التدريب بتتقاس بأكتر من مجرد الحضور ورضا المتدربين؟",
+              "origin": "F2!B18",
+              "sourceSheet": "F2",
+              "sourceRow": 18
+            },
+            {
+              "id": "F2-Q18",
+              "en": "Are development actions followed up to confirm application on the job?",
+              "ar": "هل في متابعة بعد التدريب للتأكد إن اللي اتعلمه الموظف بيتطبق في الشغل؟",
+              "origin": "F2!B19",
+              "sourceSheet": "F2",
+              "sourceRow": 19
+            }
+          ]
+        },
+        {
+          "id": "F08",
+          "sheet": "F2",
+          "name": "Talent Management & Succession",
+          "descriptionEn": "Assesses critical talent identification, succession depth, career development, and retention risk.",
+          "descriptionAr": "بيقيس تحديد المواهب المهمة والبدائل القيادية والتطوير الوظيفي ومخاطر الاحتفاظ.",
+          "questions": [
+            {
+              "id": "F2-Q19",
+              "en": "Are critical roles and key talent segments formally identified?",
+              "ar": "هل الوظائف الحرجة والموظفين أصحاب القيمة العالية متحددِين رسميًا؟",
+              "origin": "F2!B20",
+              "sourceSheet": "F2",
+              "sourceRow": 20
+            },
+            {
+              "id": "F2-Q20",
+              "en": "Are high-potential employees identified through clear and consistent criteria?",
+              "ar": "هل الـHigh Potentials بيتحددوا بمعايير واضحة وثابتة؟",
+              "origin": "F2!B21",
+              "sourceSheet": "F2",
+              "sourceRow": 21
+            },
+            {
+              "id": "F2-Q21",
+              "en": "Are succession plans available for critical positions with identified readiness levels?",
+              "ar": "هل في Succession Plans للوظائف الحرجة ومحدد فيها درجة جاهزية البدائل؟",
+              "origin": "F2!B22",
+              "sourceSheet": "F2",
+              "sourceRow": 22
+            },
+            {
+              "id": "F2-Q22",
+              "en": "Are career paths and development actions defined for priority talent groups?",
+              "ar": "هل في Career Paths وخطط تطوير واضحة للفئات المهمة من المواهب؟",
+              "origin": "F2!B23",
+              "sourceSheet": "F2",
+              "sourceRow": 23
+            },
+            {
+              "id": "F2-Q23",
+              "en": "Are retention risks for critical talent monitored and addressed proactively?",
+              "ar": "هل مخاطر فقدان المواهب المهمة بتتتابع وبيتم التعامل معاها قبل ما تتحول لمشكلة؟",
+              "origin": "F2!B24",
+              "sourceSheet": "F2",
+              "sourceRow": 24
+            }
+          ]
+        },
+        {
+          "id": "F09",
+          "sheet": "F3",
+          "name": "Compensation & Benefits",
+          "descriptionEn": "Assesses salary structure, market competitiveness, pay governance, incentives, and benefit efficiency.",
+          "descriptionAr": "بيقيس هيكل الرواتب والتنافسية مع السوق وضوابط الأجر والحوافز وكفاءة المزايا.",
+          "questions": [
+            {
+              "id": "F3-Q04",
+              "en": "Is there a documented salary structure based on job value and internal equity?",
+              "ar": "هل في Salary Structure مكتوب ومبني على قيمة الوظائف والعدالة الداخلية؟",
+              "origin": "F3!B5",
+              "sourceSheet": "F3",
+              "sourceRow": 5
+            },
+            {
+              "id": "F3-Q05",
+              "en": "Are salaries and benefits periodically benchmarked against the relevant labor market?",
+              "ar": "هل الرواتب والمزايا بتتقارن بشكل دوري بالسوق المناسب للشركة؟",
+              "origin": "F3!B6",
+              "sourceSheet": "F3",
+              "sourceRow": 6
+            },
+            {
+              "id": "F3-Q06",
+              "en": "Are pay decisions governed by clear rules for hiring, increases, promotions, and adjustments?",
+              "ar": "هل قرارات الرواتب في التعيين والزيادات والترقيات والتعديلات ليها قواعد واضحة؟",
+              "origin": "F3!B7",
+              "sourceSheet": "F3",
+              "sourceRow": 7
+            },
+            {
+              "id": "F3-Q07",
+              "en": "Are incentives and variable pay linked to measurable performance or business outcomes?",
+              "ar": "هل الحوافز والـVariable Pay مرتبطة بأداء قابل للقياس أو نتائج بيزنس واضحة؟",
+              "origin": "F3!B8",
+              "sourceSheet": "F3",
+              "sourceRow": 8
+            },
+            {
+              "id": "F3-Q08",
+              "en": "Are compensation costs and benefit utilization regularly monitored?",
+              "ar": "هل تكلفة التعويضات واستخدام المزايا بيتتابعوا بشكل دوري؟",
+              "origin": "F3!B9",
+              "sourceSheet": "F3",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "F10",
+          "sheet": "F3",
+          "name": "Employee Relations & Engagement",
+          "descriptionEn": "Assesses employee relations controls, engagement, communication, and root causes of workforce issues.",
+          "descriptionAr": "بيقيس علاقات الموظفين والرضا والتواصل وتحليل الأسباب الحقيقية لمشاكل القوى العاملة.",
+          "questions": [
+            {
+              "id": "F3-Q09",
+              "en": "Is there a clear process for grievances, complaints, and disciplinary cases?",
+              "ar": "هل في إجراء واضح للشكاوى والتظلمات والحالات التأديبية؟",
+              "origin": "F3!B10",
+              "sourceSheet": "F3",
+              "sourceRow": 10
+            },
+            {
+              "id": "F3-Q10",
+              "en": "Are employee relations cases documented, tracked, and resolved within defined timelines?",
+              "ar": "هل حالات علاقات الموظفين بتتوثق وبتتتابع وبتتقفل في وقت محدد؟",
+              "origin": "F3!B11",
+              "sourceSheet": "F3",
+              "sourceRow": 11
+            },
+            {
+              "id": "F3-Q11",
+              "en": "Is employee engagement or experience measured through a structured mechanism?",
+              "ar": "هل رضا وتجربة الموظفين بيتقاسوا بطريقة منظمة وواضحة؟",
+              "origin": "F3!B12",
+              "sourceSheet": "F3",
+              "sourceRow": 12
+            },
+            {
+              "id": "F3-Q12",
+              "en": "Are turnover, absenteeism, and employee concerns analyzed for root causes?",
+              "ar": "هل الدوران والغياب ومشاكل الموظفين بيتحللوا علشان نعرف السبب الحقيقي؟",
+              "origin": "F3!B13",
+              "sourceSheet": "F3",
+              "sourceRow": 13
+            },
+            {
+              "id": "F3-Q13",
+              "en": "Are employee communication channels active, trusted, and responsive?",
+              "ar": "هل قنوات التواصل مع الموظفين فعالة والموظفين واثقين فيها وبيلاقوا رد؟",
+              "origin": "F3!B14",
+              "sourceSheet": "F3",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "F11",
+          "sheet": "F3",
+          "name": "HRIS, Data & Analytics",
+          "descriptionEn": "Assesses HR data reliability, automation, reporting, analytics, and information security.",
+          "descriptionAr": "بيقيس موثوقية بيانات الـHR والأتمتة والتقارير والتحليلات وأمان المعلومات.",
+          "questions": [
+            {
+              "id": "F3-Q14",
+              "en": "Is there a reliable single source of HR data with defined data ownership?",
+              "ar": "هل في مصدر موحد وموثوق لبيانات الـHR ومعروف مين مسؤول عن كل نوع بيانات؟",
+              "origin": "F3!B15",
+              "sourceSheet": "F3",
+              "sourceRow": 15
+            },
+            {
+              "id": "F3-Q15",
+              "en": "Are employee data records accurate, complete, and regularly validated?",
+              "ar": "هل بيانات الموظفين دقيقة وكاملة وبيتم مراجعتها بشكل دوري؟",
+              "origin": "F3!B16",
+              "sourceSheet": "F3",
+              "sourceRow": 16
+            },
+            {
+              "id": "F3-Q16",
+              "en": "Are key HR processes automated or digitally supported where practical?",
+              "ar": "هل العمليات الأساسية للـHR متأتمتة أو مدعومة رقميًا في الأماكن اللي ينفع فيها؟",
+              "origin": "F3!B17",
+              "sourceSheet": "F3",
+              "sourceRow": 17
+            },
+            {
+              "id": "F3-Q17",
+              "en": "Are HR dashboards and metrics produced consistently and used by management?",
+              "ar": "هل في Dashboards وHR Metrics بتطلع بشكل منتظم والإدارة بتستخدمها؟",
+              "origin": "F3!B18",
+              "sourceSheet": "F3",
+              "sourceRow": 18
+            },
+            {
+              "id": "F3-Q18",
+              "en": "Are access rights, confidentiality, and HR data security adequately controlled?",
+              "ar": "هل صلاحيات الوصول وسرية وأمان بيانات الـHR متحكم فيهم بشكل مناسب؟",
+              "origin": "F3!B19",
+              "sourceSheet": "F3",
+              "sourceRow": 19
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "strategic",
+      "title": "Strategic HR Audit",
+      "ar": "التقييم الاستراتيجي لإدارة الموارد البشرية",
+      "cores": [
+        {
+          "id": "S01",
+          "sheet": "S1",
+          "name": "Business & HR Strategy Alignment",
+          "descriptionEn": "Assesses whether HR priorities and people decisions directly support business strategy.",
+          "descriptionAr": "بيقيس هل أولويات وقرارات الـHR فعلًا بتخدم استراتيجية البيزنس.",
+          "questions": [
+            {
+              "id": "S1-Q04",
+              "en": "Is the HR strategy explicitly derived from the organization’s business strategy and priorities?",
+              "ar": "هل استراتيجية الـHR طالعة بشكل واضح من استراتيجية الشركة وأولوياتها؟",
+              "origin": "S1!B5",
+              "sourceSheet": "S1",
+              "sourceRow": 5
+            },
+            {
+              "id": "S1-Q05",
+              "en": "Are the workforce implications of growth, cost, digital, or market plans clearly defined?",
+              "ar": "هل تأثير خطط النمو والتكلفة والرقمنة والسوق على القوى العاملة محدد بوضوح؟",
+              "origin": "S1!B6",
+              "sourceSheet": "S1",
+              "sourceRow": 6
+            },
+            {
+              "id": "S1-Q06",
+              "en": "Are HR priorities translated into measurable strategic objectives and initiatives?",
+              "ar": "هل أولويات الـHR متحولة لأهداف ومبادرات استراتيجية قابلة للقياس؟",
+              "origin": "S1!B7",
+              "sourceSheet": "S1",
+              "sourceRow": 7
+            },
+            {
+              "id": "S1-Q07",
+              "en": "Are HR leaders involved in strategic business planning and major business decisions?",
+              "ar": "هل قيادة الـHR مشاركة في التخطيط الاستراتيجي وقرارات البيزنس المهمة؟",
+              "origin": "S1!B8",
+              "sourceSheet": "S1",
+              "sourceRow": 8
+            },
+            {
+              "id": "S1-Q08",
+              "en": "Is HR strategy progress reviewed using business-linked outcomes rather than activity measures only?",
+              "ar": "هل تقدم استراتيجية الـHR بيتراجع بنتائج مرتبطة بالبيزنس مش بعدد الأنشطة بس؟",
+              "origin": "S1!B9",
+              "sourceSheet": "S1",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "sheet": "S1",
+          "name": "Organization Design & Structure",
+          "descriptionEn": "Assesses whether structure, accountability, layers, and decision rights support strategy and execution.",
+          "descriptionAr": "بيقيس هل الهيكل والمسؤوليات والمستويات وصلاحيات القرار بيدعموا الاستراتيجية والتنفيذ.",
+          "questions": [
+            {
+              "id": "S1-Q09",
+              "en": "Does the organization structure clearly support the current business model and strategic direction?",
+              "ar": "هل الهيكل التنظيمي الحالي بيدعم نموذج البيزنس واتجاه الشركة الاستراتيجي؟",
+              "origin": "S1!B10",
+              "sourceSheet": "S1",
+              "sourceRow": 10
+            },
+            {
+              "id": "S1-Q10",
+              "en": "Are roles, accountabilities, reporting lines, and decision rights clearly defined?",
+              "ar": "هل الأدوار والمسؤوليات وخطوط التقارير وصلاحيات القرار واضحة؟",
+              "origin": "S1!B11",
+              "sourceSheet": "S1",
+              "sourceRow": 11
+            },
+            {
+              "id": "S1-Q11",
+              "en": "Are management layers and spans of control appropriate for the organization’s size and complexity?",
+              "ar": "هل عدد المستويات الإدارية وSpan of Control مناسبين لحجم الشركة وتعقيدها؟",
+              "origin": "S1!B12",
+              "sourceSheet": "S1",
+              "sourceRow": 12
+            },
+            {
+              "id": "S1-Q12",
+              "en": "Are overlaps, duplicated responsibilities, and structural gaps regularly identified and addressed?",
+              "ar": "هل تداخل المسؤوليات والتكرار والفجوات في الهيكل بيتحددوا وبيتصلحوا بشكل دوري؟",
+              "origin": "S1!B13",
+              "sourceSheet": "S1",
+              "sourceRow": 13
+            },
+            {
+              "id": "S1-Q13",
+              "en": "Is organization design reviewed when strategy, scale, technology, or operating model changes?",
+              "ar": "هل تصميم الهيكل بيتراجع لما الاستراتيجية أو الحجم أو التكنولوجيا أو طريقة التشغيل تتغير؟",
+              "origin": "S1!B14",
+              "sourceSheet": "S1",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "S03",
+          "sheet": "S1",
+          "name": "Workforce Capability",
+          "descriptionEn": "Assesses whether the organization has the capabilities and future skills needed to execute strategy.",
+          "descriptionAr": "بيقيس هل الشركة عندها القدرات والمهارات المستقبلية المطلوبة لتنفيذ الاستراتيجية.",
+          "questions": [
+            {
+              "id": "S1-Q14",
+              "en": "Are the critical capabilities required to execute future business strategy clearly defined?",
+              "ar": "هل القدرات الأساسية المطلوبة لتنفيذ استراتيجية الشركة المستقبلية محددة بوضوح؟",
+              "origin": "S1!B15",
+              "sourceSheet": "S1",
+              "sourceRow": 15
+            },
+            {
+              "id": "S1-Q15",
+              "en": "Is there a current view of skill and competency gaps across critical roles?",
+              "ar": "هل في صورة واضحة ومحدثة لفجوات المهارات والكفاءات في الوظائف الحرجة؟",
+              "origin": "S1!B16",
+              "sourceSheet": "S1",
+              "sourceRow": 16
+            },
+            {
+              "id": "S1-Q16",
+              "en": "Are build, buy, borrow, or automate decisions used to close capability gaps?",
+              "ar": "هل الشركة بتحدد هتطور المهارة داخليًا ولا توظفها ولا تستعين بمصدر خارجي أو تأتمتها؟",
+              "origin": "S1!B17",
+              "sourceSheet": "S1",
+              "sourceRow": 17
+            },
+            {
+              "id": "S1-Q17",
+              "en": "Are future workforce scenarios considered for technology, growth, restructuring, or market change?",
+              "ar": "هل في سيناريوهات مستقبلية للقوى العاملة مع التكنولوجيا والنمو وإعادة الهيكلة وتغير السوق؟",
+              "origin": "S1!B18",
+              "sourceSheet": "S1",
+              "sourceRow": 18
+            },
+            {
+              "id": "S1-Q18",
+              "en": "Are capability investments prioritized based on strategic business value?",
+              "ar": "هل الاستثمار في بناء القدرات بيتحدد حسب أهميته وقيمته للبيزنس؟",
+              "origin": "S1!B19",
+              "sourceSheet": "S1",
+              "sourceRow": 19
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "sheet": "S2",
+          "name": "Leadership & Talent",
+          "descriptionEn": "Assesses leadership quality, pipeline strength, succession depth, and leadership risk.",
+          "descriptionAr": "بيقيس جودة القيادة وقوة الـPipeline والبدائل القيادية ومخاطر القيادة.",
+          "questions": [
+            {
+              "id": "S2-Q04",
+              "en": "Are leadership expectations and required leadership competencies clearly defined?",
+              "ar": "هل توقعات القيادة والـLeadership Competencies المطلوبة محددة بوضوح؟",
+              "origin": "S2!B5",
+              "sourceSheet": "S2",
+              "sourceRow": 5
+            },
+            {
+              "id": "S2-Q05",
+              "en": "Is leadership effectiveness assessed using consistent evidence and business outcomes?",
+              "ar": "هل فعالية القادة بتتقاس بمعايير ثابتة وأدلة ونتائج بيزنس؟",
+              "origin": "S2!B6",
+              "sourceSheet": "S2",
+              "sourceRow": 6
+            },
+            {
+              "id": "S2-Q06",
+              "en": "Is there a visible leadership pipeline for critical management roles?",
+              "ar": "هل في Leadership Pipeline واضح للوظائف الإدارية الحرجة؟",
+              "origin": "S2!B7",
+              "sourceSheet": "S2",
+              "sourceRow": 7
+            },
+            {
+              "id": "S2-Q07",
+              "en": "Are succession and leadership development decisions discussed at senior management level?",
+              "ar": "هل قرارات الـSuccession وتطوير القيادات بتتناقش على مستوى الإدارة العليا؟",
+              "origin": "S2!B8",
+              "sourceSheet": "S2",
+              "sourceRow": 8
+            },
+            {
+              "id": "S2-Q08",
+              "en": "Are leadership risks such as dependency on individuals or weak successors actively managed?",
+              "ar": "هل مخاطر الاعتماد على أشخاص بعينهم أو ضعف البدائل القيادية بيتم إدارتها بجدية؟",
+              "origin": "S2!B9",
+              "sourceSheet": "S2",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "sheet": "S2",
+          "name": "Culture & Organizational Health",
+          "descriptionEn": "Assesses values, leadership behavior, collaboration, accountability, and organizational health.",
+          "descriptionAr": "بيقيس القيم وسلوك القيادة والتعاون والمساءلة والصحة التنظيمية.",
+          "questions": [
+            {
+              "id": "S2-Q09",
+              "en": "Are the desired organizational values and behaviors clearly defined and understood?",
+              "ar": "هل القيم والسلوكيات اللي الشركة عايزة تشوفها محددة وواضحة للناس؟",
+              "origin": "S2!B10",
+              "sourceSheet": "S2",
+              "sourceRow": 10
+            },
+            {
+              "id": "S2-Q10",
+              "en": "Do leadership behaviors consistently reinforce the desired culture?",
+              "ar": "هل تصرفات القيادات فعلًا بتدعم الثقافة اللي الشركة عايزاها؟",
+              "origin": "S2!B11",
+              "sourceSheet": "S2",
+              "sourceRow": 11
+            },
+            {
+              "id": "S2-Q11",
+              "en": "Are accountability, collaboration, and decision-making effectiveness regularly assessed?",
+              "ar": "هل المساءلة والتعاون وفعالية اتخاذ القرار بيتقاسوا بشكل دوري؟",
+              "origin": "S2!B12",
+              "sourceSheet": "S2",
+              "sourceRow": 12
+            },
+            {
+              "id": "S2-Q12",
+              "en": "Are culture or organizational health issues identified through reliable employee and business data?",
+              "ar": "هل مشاكل الثقافة أو الصحة التنظيمية بتتحدد من بيانات موثوقة عن الموظفين والبيزنس؟",
+              "origin": "S2!B13",
+              "sourceSheet": "S2",
+              "sourceRow": 13
+            },
+            {
+              "id": "S2-Q13",
+              "en": "Are cultural gaps addressed through specific leadership, process, or people interventions?",
+              "ar": "هل فجوات الثقافة بيتعمل لها تدخلات محددة في القيادة أو العمليات أو إدارة الناس؟",
+              "origin": "S2!B14",
+              "sourceSheet": "S2",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "S06",
+          "sheet": "S2",
+          "name": "HR Operating Model",
+          "descriptionEn": "Assesses how HR is structured and delivers services, expertise, operations, and strategic support.",
+          "descriptionAr": "بيقيس إزاي الـHR منظم وبيقدم الخدمات والخبرة والتشغيل والدعم الاستراتيجي.",
+          "questions": [
+            {
+              "id": "S2-Q14",
+              "en": "Is the HR operating model clearly defined with appropriate roles for HR leadership, HRBPs, COEs, and operations?",
+              "ar": "هل نموذج تشغيل الـHR واضح وفيه أدوار مناسبة للقيادة وHRBP وCOEs والعمليات؟",
+              "origin": "S2!B15",
+              "sourceSheet": "S2",
+              "sourceRow": 15
+            },
+            {
+              "id": "S2-Q15",
+              "en": "Are HR services designed around clear service ownership, standards, and escalation paths?",
+              "ar": "هل خدمات الـHR ليها مسؤول واضح ومعايير خدمة ومسارات تصعيد محددة؟",
+              "origin": "S2!B16",
+              "sourceSheet": "S2",
+              "sourceRow": 16
+            },
+            {
+              "id": "S2-Q16",
+              "en": "Are HR resources allocated according to business priorities and service demand?",
+              "ar": "هل موارد وفريق الـHR متوزعين حسب أولويات البيزنس وحجم الطلب على الخدمة؟",
+              "origin": "S2!B17",
+              "sourceSheet": "S2",
+              "sourceRow": 17
+            },
+            {
+              "id": "S2-Q17",
+              "en": "Are transactional activities standardized and separated from strategic or advisory work where appropriate?",
+              "ar": "هل الشغل التشغيلي المتكرر منظم ومفصول عن الشغل الاستراتيجي والاستشاري لما يكون ده مناسب؟",
+              "origin": "S2!B18",
+              "sourceSheet": "S2",
+              "sourceRow": 18
+            },
+            {
+              "id": "S2-Q18",
+              "en": "Is HR operating model effectiveness measured through service, cost, quality, and business impact indicators?",
+              "ar": "هل فعالية نموذج تشغيل الـHR بتتقاس بالخدمة والتكلفة والجودة وتأثيره على البيزنس؟",
+              "origin": "S2!B19",
+              "sourceSheet": "S2",
+              "sourceRow": 19
+            }
+          ]
+        },
+        {
+          "id": "S07",
+          "sheet": "S3",
+          "name": "HR Technology & Digital Maturity",
+          "descriptionEn": "Assesses HR technology integration, self-service, automation, AI readiness, and adoption.",
+          "descriptionAr": "بيقيس تكامل تكنولوجيا الـHR والـSelf-Service والأتمتة وجاهزية الـAI وتبني الأنظمة.",
+          "questions": [
+            {
+              "id": "S3-Q04",
+              "en": "Is there a defined HR technology roadmap aligned with business and HR priorities?",
+              "ar": "هل في Roadmap واضحة لتكنولوجيا الـHR مرتبطة بأولويات البيزنس والـHR؟",
+              "origin": "S3!B5",
+              "sourceSheet": "S3",
+              "sourceRow": 5
+            },
+            {
+              "id": "S3-Q05",
+              "en": "Are core HR systems integrated sufficiently to avoid duplicate work and fragmented data?",
+              "ar": "هل أنظمة الـHR الأساسية متكاملة بشكل يقلل تكرار الشغل وتشتت البيانات؟",
+              "origin": "S3!B6",
+              "sourceSheet": "S3",
+              "sourceRow": 6
+            },
+            {
+              "id": "S3-Q06",
+              "en": "Do employees and managers have practical self-service access for relevant HR processes?",
+              "ar": "هل الموظفين والمديرين عندهم Self-Service عملي للعمليات المناسبة؟",
+              "origin": "S3!B7",
+              "sourceSheet": "S3",
+              "sourceRow": 7
+            },
+            {
+              "id": "S3-Q07",
+              "en": "Are automation and AI opportunities prioritized based on value, risk, and process readiness?",
+              "ar": "هل فرص الـAutomation والـAI بتتحدد حسب القيمة والمخاطر وجاهزية العملية؟",
+              "origin": "S3!B8",
+              "sourceSheet": "S3",
+              "sourceRow": 8
+            },
+            {
+              "id": "S3-Q08",
+              "en": "Are digital adoption, user experience, system reliability, and data quality regularly monitored?",
+              "ar": "هل استخدام الأنظمة وتجربة المستخدم واعتمادية النظام وجودة البيانات بيتابعوا بشكل دوري؟",
+              "origin": "S3!B9",
+              "sourceSheet": "S3",
+              "sourceRow": 9
+            }
+          ]
+        },
+        {
+          "id": "S08",
+          "sheet": "S3",
+          "name": "HR Analytics & Business Impact",
+          "descriptionEn": "Assesses whether people data drives decisions and demonstrates measurable business impact.",
+          "descriptionAr": "بيقيس هل بيانات الموظفين بتقود القرارات وبتثبت تأثير واضح على البيزنس.",
+          "questions": [
+            {
+              "id": "S3-Q09",
+              "en": "Are HR metrics selected based on business questions and decision needs?",
+              "ar": "هل الـHR Metrics بتتحدد بناءً على أسئلة وقرارات البيزنس الفعلية؟",
+              "origin": "S3!B10",
+              "sourceSheet": "S3",
+              "sourceRow": 10
+            },
+            {
+              "id": "S3-Q10",
+              "en": "Are workforce trends analyzed to explain causes and predict business or people risks?",
+              "ar": "هل اتجاهات القوى العاملة بتتحلل لفهم الأسباب وتوقع مخاطر البيزنس أو الموظفين؟",
+              "origin": "S3!B11",
+              "sourceSheet": "S3",
+              "sourceRow": 11
+            },
+            {
+              "id": "S3-Q11",
+              "en": "Are key people metrics connected to productivity, cost, customer, quality, or revenue outcomes?",
+              "ar": "هل مؤشرات الموظفين الأساسية مرتبطة بالإنتاجية أو التكلفة أو العميل أو الجودة أو الإيراد؟",
+              "origin": "S3!B12",
+              "sourceSheet": "S3",
+              "sourceRow": 12
+            },
+            {
+              "id": "S3-Q12",
+              "en": "Are HR insights regularly discussed with business leaders and converted into decisions or actions?",
+              "ar": "هل تحليلات الـHR بتتناقش مع قادة البيزنس وبتتحول لقرارات أو Actions؟",
+              "origin": "S3!B13",
+              "sourceSheet": "S3",
+              "sourceRow": 13
+            },
+            {
+              "id": "S3-Q13",
+              "en": "Can HR demonstrate measurable value or ROI from major people initiatives?",
+              "ar": "هل الـHR يقدر يثبت قيمة أو ROI ملموسة من المبادرات الرئيسية الخاصة بالموظفين؟",
+              "origin": "S3!B14",
+              "sourceSheet": "S3",
+              "sourceRow": 14
+            }
+          ]
+        },
+        {
+          "id": "S09",
+          "sheet": "S3",
+          "name": "Change & Transformation Readiness",
+          "descriptionEn": "Assesses the organization's readiness, stakeholder alignment, adoption, and sustainability of change.",
+          "descriptionAr": "بيقيس جاهزية الشركة للتغيير وتوافق أصحاب المصلحة وتبني التغيير واستمراريته.",
+          "questions": [
+            {
+              "id": "S3-Q14",
+              "en": "Is change readiness assessed before major organizational or HR transformation initiatives?",
+              "ar": "هل جاهزية الشركة للتغيير بتتقاس قبل أي Transformation كبير في المنظمة أو الـHR؟",
+              "origin": "S3!B15",
+              "sourceSheet": "S3",
+              "sourceRow": 15
+            },
+            {
+              "id": "S3-Q15",
+              "en": "Are stakeholders, sponsors, resistance risks, and change impacts clearly mapped?",
+              "ar": "هل أصحاب المصلحة والـSponsors ومخاطر المقاومة وتأثير التغيير متعمل لهم Mapping واضح؟",
+              "origin": "S3!B16",
+              "sourceSheet": "S3",
+              "sourceRow": 16
+            },
+            {
+              "id": "S3-Q16",
+              "en": "Is there a structured communication and engagement plan for major change initiatives?",
+              "ar": "هل في خطة منظمة للتواصل وإشراك الناس في مبادرات التغيير الكبيرة؟",
+              "origin": "S3!B17",
+              "sourceSheet": "S3",
+              "sourceRow": 17
+            },
+            {
+              "id": "S3-Q17",
+              "en": "Are managers and employees provided with the capabilities and support needed to adopt the change?",
+              "ar": "هل المديرين والموظفين بياخدوا التدريب والدعم اللي يخليهم يطبقوا التغيير فعلًا؟",
+              "origin": "S3!B18",
+              "sourceSheet": "S3",
+              "sourceRow": 18
+            },
+            {
+              "id": "S3-Q18",
+              "en": "Are adoption, behavior change, and business outcomes measured after implementation?",
+              "ar": "هل تبني التغيير وتغير السلوك ونتائج البيزنس بيتقاسوا بعد التنفيذ؟",
+              "origin": "S3!B19",
+              "sourceSheet": "S3",
+              "sourceRow": 19
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
