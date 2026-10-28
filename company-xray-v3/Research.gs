@@ -3253,7 +3253,7 @@ function testFullCompanyXRay() {
   return result;
 }
 
-/** v3 local self-test. No Serper/Gemini calls, no credentials, no Sheet writes.
+/** v3.1 local self-test. No Serper/Gemini calls, no credentials, no Sheet writes.
  * Run this once in Apps Script editor before redeploying Company X-Ray. */
 function runCompanyXRayV3SelfTest(){
   const q={company:'Vodafone Egypt',country:'Egypt',city:'Cairo',jobTitle:'HR Specialist',experienceLevel:'3-5 years'};
@@ -3262,7 +3262,7 @@ function runCompanyXRayV3SelfTest(){
     const s={evidenceId:id,title:role+' salary '+city+' Egypt',
       snippet:role+' salary '+city+' Egypt EGP '+value+' per month',
       url:'https://'+domain+'/salary/'+id,domain:domain,
-      sourceType:'SALARY_PLATFORM',date:date===undefined?'2026-08-20':date};
+      sourceType:'SALARY_PLATFORM',date:date===undefined?new Date().toISOString().slice(0,10):date};
     const x={evidence_id:id,role_title:role,role_match:'EXACT',seniority_match:'CLOSE',
       company_specific:false,company_name:null,min_salary:value,max_salary:value,
       period:'MONTHLY',currency:'EGP',pay_basis:basis||'GROSS_SALARY',
@@ -3298,7 +3298,30 @@ function runCompanyXRayV3SelfTest(){
   if(empty.confidence_score!==null||empty.overall_signal!=='INSUFFICIENT')failures.push({case:'empty feedback'});
   const noRole=createNotRequestedSalary_();
   if(noRole.diagnostics.marketAdjustmentPercent!==0)failures.push({case:'no role retains legacy discount'});
-  const result={passed:14-failures.length,total:14,ok:!failures.length,failures:failures,
+  // Additional v3.1 regression checks for Egypt Arabic salary normalization
+  // and clear provenance of contextual (non-benchmark) signals.
+  const arabicSingle=extractPeriodBoundSalary_('متوسط الراتب الأساسي ١١٬٥١٧ ج.م. شهريًا');
+  if(!arabicSingle||arabicSingle.min!==11517||arabicSingle.period!=='MONTHLY')
+    failures.push({case:'Arabic-Indic monthly salary'});
+  const arabicRange=extractPeriodBoundSalary_('راتب ١٠٬٠٠٠ إلى ١٤٬٠٠٠ جنيه شهريًا');
+  if(!arabicRange||arabicRange.min!==10000||arabicRange.max!==14000)
+    failures.push({case:'Arabic-Indic salary range'});
+  const ledgerDemo=xrEvidenceAuditSummary_([
+    {evidence_id:1,status:'OBSERVED_CONTEXT_ONLY',reason:'PAY_BASIS_NOT_COMPARABLE',
+     monthly_min:16000,monthly_max:16000,currency:'EGP',pay_basis:'UNKNOWN',
+     url:'https://example.org/payscale',title:'Salary result',publication_date:null,
+     location_verified:true,source_fresh:false,used_in_benchmark:false},
+    {evidence_id:2,status:'EXCLUDED',reason:'SENIORITY_MISMATCH',
+     url:'https://example.org/senior',title:'Senior role'}
+  ]);
+  if(ledgerDemo.observed_count!==1||ledgerDemo.benchmark_count!==0||
+     ledgerDemo.excluded_count!==1||
+     ledgerDemo.reason_counts.SENIORITY_MISMATCH!==1||
+     ledgerDemo.observed_public_signals[0].page_content_verified!==false)
+     failures.push({case:'Audit count and unverified source provenance'});
+  if(xrSourceDate_('2026')!==null||xrSalarySourceFresh_(null))
+    failures.push({case:'Year-only or undated sources cannot imply current publication'});
+  const result={passed:18-failures.length,total:18,ok:!failures.length,failures:failures,
     note:'Synthetic data test only; live search, Gemini and deployment must be checked separately.'};
   console.log(JSON.stringify(result));
   if(!result.ok)throw Error('Company X-Ray v3 self-test failed '+JSON.stringify(failures));
