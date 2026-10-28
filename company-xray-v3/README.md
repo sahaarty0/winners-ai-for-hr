@@ -1,4 +1,4 @@
-# COMPANY X-RAY — Research.gs v3.0
+# COMPANY X-RAY — Research.gs v3.1
 ## Winners Business Consultation & Training Services
 **Safety-first salary research upgrade | 29 October 2026**
 
@@ -23,7 +23,7 @@ This is a full replacement for the **existing Research.gs** business-logic file.
 1. Open the owner account at https://script.google.com/home and select the Company X-Ray project.
 2. Open `Research.gs`; copy its existing content to a safe versioned backup before replacement.
 3. Copy the full content of [Research.gs](./Research.gs) into the existing `Research.gs`. Keep `Config.gs`, `Code.gs`, `Gemini.gs`, `Search.gs`, `Index.html` and Script Properties as they are.
-4. Press **Save**. Select and Run `runCompanyXRayV3SelfTest`. Expected execution log: `{"passed":14,"total":14,"ok":true,"failures":[]}`. If any test fails, DO NOT deploy.
+4. Press **Save**. Select and Run `runCompanyXRayV3SelfTest`. Expected execution log: `{"passed":18,"total":18,"ok":true,"failures":[]}`. If any test fails, DO NOT deploy.
 5. In **Deploy > Manage deployments**, edit the *existing* Web app deployment, choose **New version** and **Deploy**. Using Manage deployments preserves the existing /exec URL; creating a different deployment may not.
 6. Run one **Quick**, one **Professional** and one **Deep Research** end-to-end report, e.g. company: Vodafone Egypt; role: HR Specialist; city: Cairo; level: 3–5 years. Observe whether Serper and Gemini return current, comparable sources.
 7. QA the existing `Index.html` output components: if they previously display `confidence_score` as "80%" or `market_range` as P25–P75, update labels to **Evidence Grade** and **Indicative Public Range**. A null field must be displayed as **Not established** (never 0 EGP). The frontend source is not included with the accessible Research.gs snapshot and therefore its display behavior is **NOT YET VERIFIED**.
@@ -38,7 +38,7 @@ This is a full replacement for the **existing Research.gs** business-logic file.
 
 ### Verification status
 - Local V8 syntax: **PASS**
-- Offline self-tests: **14/14 PASS**
+- Offline self-tests: **18/18 PASS**
 - Full Gemini / Serper live integration: **NOT TESTED**
 - Existing Apps Script deployment update: **NOT PERFORMED**
 - Existing Index.html source/display: **NOT TESTED**
@@ -51,3 +51,18 @@ Egypt's National Wages Council announced a private-sector monthly minimum of **E
 
 ### What is intentionally not claimed
 No real-time 2026 compensation survey was purchased, licensed or ingested. Results cannot become a legitimate independent Salary Survey by changing an AI prompt. Any market data without sufficient traceable evidence remain **INSUFFICIENT_DATA**. This is a deliberate safety and quality improvement.
+
+### v3.1 Production test follow-up — 29 Oct 2026
+A live Apps Script editor run of `testFullCompanyXRay` on Eagle Chemicals Group (HR Specialist, Junior, Cairo) reached `Company X-Ray completed` after a transient Gemini 503 retry. **28 merged salary extraction records**, of which **26 were excluded**, **2 remained contextual public search snippets** and **0 qualified for a comparable benchmark**. This is a valid `INSUFFICIENT_DATA` result, not proof that the Egyptian labor market lacks salary figures.
+
+Changes in v3.1:
+- The execution log distinguishes `observed_snippet_signals`, `benchmark_qualified` and `excluded_extraction_records` instead of misleadingly logging `Salary accepted evidence: 0`.
+- Salary results expose `evidence_audit.reason_counts` and `observed_public_signals`, containing each figure, source, date and **page_content_verified: false**. The app **has NOT validated the source page body**; Google or Serper snippets can differ from the current linked page.
+- `testFullCompanyXRay` now emits a compact diagnostic summary instead of the full 45+ source JSON output (which was truncated in the user's execution log). The complete response is still returned programmatically.
+- Added a targeted Egypt Indeed salary search query in place of one broad multi-provider query, and support for Egyptian Arabic digits, thousands separator, and `ج.م.` in the deterministic salary parser.
+- Company notes no longer repeat unsupported AI claims about a specific branch or city without source-level verification.
+- Local synthetic regression suite expanded to **18 tests**; dates use live current date rather than a fixture that will become stale.
+
+**Important source caveat:** In the observed live run, a Wuzzuf salary snippet showed EGP 20K–25K, but the publicly opened job listing showed no published salary field. That figure must remain **unverified context**, never a confirmed company pay rate. An Indeed Cairo HR Specialist page updated 7 Oct 2026 reported EGP 11,517 per month (14 reported salaries), which is **another context observation with a limited sample**, not a representative independent survey. Different pay bases and datasets must not be averaged without comparability evidence.
+
+After copying this version to the original Apps Script project, run `runCompanyXRayV3SelfTest` (expect **18/18 PASS**) and then `testFullCompanyXRay` (expect a short output with source counts and reason codes). For the web app to reflect the code, update the existing deployment via **Manage deployments → Edit → New version**. Existing `Index.html` may not yet display new fields such as `observed_public_signals`; its presentation requires a separate review of that file. No live App Script code/deployment is modified by the GitHub commit alone.
