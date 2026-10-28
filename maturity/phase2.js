@@ -25,13 +25,13 @@ function saveReview(){
 }
 function progress(){
  if(typeof allQs!=="function")return{done:0,total:100,gaps:[]};
- const qs=allQs(),done=qs.filter(q=>answer(q)!==null).length;
- const gaps=typeof CORES==="undefined"?[]:CORES.map(getCoreResult).filter(x=>x.gaps.length);
+ const qs=scopeQs(),done=qs.filter(q=>answer(q)!==null).length;
+ const gaps=typeof CORES==="undefined"?[]:scopeCores().map(getCoreResult).filter(x=>x.gaps.length);
  return{done,total:qs.length,gaps};
 }
 function suggestions(){
  if(typeof CORES==="undefined"||!CORES.length)return[];
- const a=CORES.map(getCoreResult).filter(x=>x.gaps.length);
+ const a=scopeCores().map(getCoreResult).filter(x=>x.gaps.length);
  return a.sort((x,y)=>{
   const severity=x=>(x.complete?(x.score<.6?3:x.score<.8?2:1):2);
   return severity(y)-severity(x)||y.gaps.length-x.gaps.length
@@ -41,7 +41,7 @@ function modeLabel(){
  const t=mode==="consultant"?"Consultant-led Assessment":"Client Self-Assessment";
  return{title:t,description:mode==="consultant"
  ?"حضرتك أو فريقك بيدخل البيانات ويراجع الأدلة، وبعدها بتقرر بنفسك هل الحالة جاهزة للـHR Consulting Skills."
- :"العميل يجاوب على الـ100 سؤال، ويشوف الـDiagnostic Results والـImprovement Suggestions المبدئية، ثم يصدّر ملف التقييم لإرساله للاستشاري بطريقة آمنة."};
+ :"العميل يجاوب على الأسئلة في النطاق المختار، ويشوف الـDiagnostic Results والـImprovement Suggestions المبدئية، ثم يصدّر ملف التقييم لإرساله للاستشاري بطريقة آمنة."};
 }
 function setMode(val){
  if(!["consultant","client"].includes(val))return;
@@ -71,7 +71,7 @@ function mount(){
  const section=document.createElement("section");
  section.id="phase2-report";
  section.className="panel phase2-report";
- section.innerHTML='<div class="section-head"><div><div class="eyebrow">DIAGNOSTIC OUTPUT · PRELIMINARY</div><h2>Improvement Recommendations & Consultant Gate</h2></div><span class="pill" id="phase2-client-intro"></span></div><p><strong>Important:</strong> نتائج المقياس والأسئلة مصدرها الـMaster Workbook. فرص التحسين اللي تحت استرشادية ومربوطة بالـGaps المُبلّغ عنها، لكنها <b>مش Root Cause Analysis</b> ولا Solution Design نهائي. الاستشاري وحده يقرر الانتقال للمنهجية الكاملة.</p><div class="phase2-stats" id="phase2-stats"></div><div class="phase2-choices" id="phase2-recos"></div><div id="phase2-client-section" class="phase2-gate phase2-hide"><h3>Client Handover · تسليم التقييم للاستشاري</h3><p>حمّل بيانات التقييم وأرسلها للاستشاري عن طريق قناة آمنة. لا تشارك بيانات شخصية أو مستندات سرية باستخدام رابط GitHub العام.</p><div class="p2-actions"><button class="btn gold" type="button" id="p2ClientExport">تحميل إجابات التقييم JSON</button><button class="btn line" type="button" id="p2ClientCsv">تحميل الإجابات CSV</button></div></div><div id="phase2-consultant-section" class="phase2-gate phase2-hide"><h3>Consultant Review & Decision Gate</h3><p>تأكد من البيانات، الأدلة، والسياق التجاري قبل تمرير الحالة إلى Dr. Saied HR Strategic Consulting. اختيارات المراجعة دي مش اعتماد قانوني ولا إثبات مستقل للدقة.</p><label><input id="p2EvidenceReviewed" type="checkbox"> راجعت الأدلة المتاحة وتأكدت من حدود البيانات المبلّغ عنها</label><label><input id="p2DecisionOwned" type="checkbox"> أنا مسؤول عن قرار استكمال الاستشارة واختيار التدخلات النهائية</label><div class="p2-actions"><button class="btn gold" id="p2ExportConsulting" type="button">تصدير HR Consulting Handoff</button><button class="btn line" id="p2CopyBrief" type="button">نسخ Consulting Brief</button></div><div id="p2GateMessage" class="phase2-message">التقرير مبدئي حتى استكمال 100 إجابة والمراجعة. يمكن تجهيز Handoff مبدئي، لكن لا يعتبر موافقة على تنفيذ حلول.</div></div>';
+ section.innerHTML='<div class="section-head"><div><div class="eyebrow">DIAGNOSTIC OUTPUT · PRELIMINARY</div><h2>Improvement Recommendations & Consultant Gate</h2></div><span class="pill" id="phase2-client-intro"></span></div><p><strong>Important:</strong> نتائج المقياس والأسئلة مصدرها الـMaster Workbook. فرص التحسين اللي تحت استرشادية ومربوطة بالـGaps المُبلّغ عنها، لكنها <b>مش Root Cause Analysis</b> ولا Solution Design نهائي. الاستشاري وحده يقرر الانتقال للمنهجية الكاملة.</p><div class="phase2-stats" id="phase2-stats"></div><div class="phase2-choices" id="phase2-recos"></div><div id="phase2-client-section" class="phase2-gate phase2-hide"><h3>Client Handover · تسليم التقييم للاستشاري</h3><p>حمّل بيانات التقييم وأرسلها للاستشاري عن طريق قناة آمنة. لا تشارك بيانات شخصية أو مستندات سرية باستخدام رابط GitHub العام.</p><div class="p2-actions"><button class="btn gold" type="button" id="p2ClientExport">تحميل إجابات التقييم JSON</button><button class="btn line" type="button" id="p2ClientCsv">تحميل الإجابات CSV</button></div></div><div id="phase2-consultant-section" class="phase2-gate phase2-hide"><h3>Consultant Review & Decision Gate</h3><p>تأكد من البيانات، الأدلة، والسياق التجاري قبل تمرير الحالة إلى Dr. Saied HR Strategic Consulting. اختيارات المراجعة دي مش اعتماد قانوني ولا إثبات مستقل للدقة.</p><label><input id="p2EvidenceReviewed" type="checkbox"> راجعت الأدلة المتاحة وتأكدت من حدود البيانات المبلّغ عنها</label><label><input id="p2DecisionOwned" type="checkbox"> أنا مسؤول عن قرار استكمال الاستشارة واختيار التدخلات النهائية</label><div class="p2-actions"><button class="btn gold" id="p2ExportConsulting" type="button">تصدير HR Consulting Handoff</button><button class="btn line" id="p2CopyBrief" type="button">نسخ Consulting Brief</button></div><div id="p2GateMessage" class="phase2-message">التقرير مبدئي حتى استكمال كل أسئلة النطاق المختار والمراجعة. يمكن تجهيز Handoff مبدئي، لكن لا يعتبر موافقة على تنفيذ حلول.</div></div>';
  result.insertBefore(section,result.firstChild);
  section.addEventListener("change",e=>{
   if(e.target.matches("[data-p2review]")){const id=e.target.dataset.p2review;review[id]=review[id]||{};review[id].status=e.target.value;saveReview();updateGate();}
@@ -112,23 +112,23 @@ function updateGate(){
  const msg=$p("p2GateMessage");if(!msg)return;
  const p=progress(),rec=suggestions(),statuses=rec.map(x=>review[x.core.id]?.status||"needs-review");
  const accepted=statuses.filter(x=>x==="accepted").length,unreviewed=statuses.filter(x=>x==="needs-review").length;
- if(p.done!==100){msg.textContent="التقييم غير مكتمل ("+p.done+"/100). Handoff مبدئي فقط؛ استكمال باقي الإجابات مطلوب قبل أي قرار استشاري.";}
- else if(!(review.gate?.evidence&&review.gate?.ownership)){msg.textContent="100/100 مكتملة. مراجعة الأدلة والمسؤولية عن القرار لم يتم تأكيدهما. لا يمكن اعتبارها Diagnostic مُعتمدة.";}
+ if(p.total===0||p.done!==p.total){msg.textContent="التقييم غير مكتمل ("+p.done+"/"+p.total+" من النطاق المختار). Handoff مبدئي فقط؛ استكمال باقي إجابات النطاق مطلوب قبل أي قرار استشاري.";}
+ else if(!(review.gate?.evidence&&review.gate?.ownership)){msg.textContent=scopeLabel()+" · "+p.done+"/"+p.total+" مكتملة ضمن النطاق. مراجعة الأدلة والمسؤولية عن القرار لم يتم تأكيدهما، والنتيجة ليست تقييمًا شاملًا خارج النطاق.";}
  else{msg.textContent="Ready for Consultant-Led Diagnosis: "+accepted+" فرص تحسين مقبولة لمزيد من الفحص، "+unreviewed+" قيد المراجعة. ده لا يغني عن PESTLE / 7S / RCA ولا يمثل اعتماد الحلول.";}
 }
 function buildBrief(){
- const p=progress(),coreData=typeof CORES==="undefined"?[]:CORES.map(getCoreResult);
+ const p=progress(),coreData=typeof CORES==="undefined"?[]:scopeCores().map(getCoreResult);
  const f=coreData.filter(x=>x.track.id==="functional"),s=coreData.filter(x=>x.track.id==="strategic");
  const avg=x=>x.length&&x.every(c=>c.complete)?Math.round(x.reduce((a,b)=>a+b.score,0)/x.length*100)+"%":"Incomplete";
  const lines=[
 "DR. KOLIVERA — HR MATURITY ASSESSMENT · CONSULTING HANDOFF",
 "Created by Dr. Saied El Saharty | Source: HR Maturity Assessment M&D (1).xlsx",
 "Company: "+(STATE.company||"Not specified"),"Assessor: "+(STATE.assessor||"Not specified"),
-"Assessment mode: "+ACTIVE_ROLE[mode],"Coverage: "+p.done+"/"+p.total,
+"Assessment mode: "+ACTIVE_ROLE[mode],"Assessment scope: "+scopeLabel(),"Selected Core Areas: "+scopeCores().map(c=>c.core.name).join("; "),"Coverage: "+p.done+"/"+p.total+" within selected scope",
 "Functional Maturity: "+avg(f),"Strategic Maturity: "+avg(s),
-"Status: "+(p.done===100?"Complete questionnaire; evidence still needs independent review":"PRELIMINARY – answers incomplete"),
+"Status: "+(p.total>0&&p.done===p.total?"Complete within selected scope; evidence still needs independent review":"PRELIMINARY – selected scope incomplete"),
 "",
-"SCOPING WARNING: Answers are respondent-reported. Scores reflect reported checklist status, not verified causes. Suggested improvements are hypotheses for further validation.",
+"SCOPING WARNING: Answers are respondent-reported. Scores cover ONLY the selected scope, not all HR functions. Unselected cores are NOT ASSESSED. Scores do not prove root causes. Suggested improvements are hypotheses for further validation.",
 "",
 "IMPROVEMENT OPPORTUNITIES — REVIEWED BY CONSULTANT IF AVAILABLE:"
  ];
