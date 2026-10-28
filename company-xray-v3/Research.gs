@@ -2,7 +2,7 @@
  * ============================================================
  * COMPANY X-RAY
  * Integrated Research Engine
- * Version 3.2 — observed salary evidence + report presentation
+ * Version 3.3 — identity-safe and self-contained report integration
  * ============================================================
  *
  * Scope:
@@ -2085,14 +2085,33 @@ function normalizeCompanyXRayResult_(
   }
 
   company.confidence_score=null; // No statistical respondent sample supports a percentage.
+  const requestedName=cleanCompanyXRayText_(request.company);
+  const candidateName=cleanCompanyXRayText_(company.canonical_name);
+  const normalizedRequested=normalizeXRayText_(requestedName);
+  const normalizedCandidate=normalizeXRayText_(candidateName);
+  const exactIdentity=Boolean(normalizedRequested&&normalizedRequested===normalizedCandidate);
+  // A bare single-word trade name is NOT sufficient to disambiguate
+  // unrelated enterprises with the same brand token (e.g. Winners vs
+  // Winners Developer). The user-supplied query is display input, not proof.
+  const singleWordQuery=getXRayTokens_(requestedName).length<2;
+  if(!exactIdentity||singleWordQuery){
+    company.identity_status='AMBIGUOUS';
+    company.industry=null;
+    company.company_size_range=null;
+    company.main_location=null;
+    company.official_website=null;
+    company.evidence_ids=[];
+    company.notes='Cannot conclusively match the public search hits to the requested company; provide an exact legal/company name or official domain for verification.';
+  }
+  company.canonical_name=requestedName; // Prevent AI-proposed mismatched identity in UI
   company.aliases=xrSanitizeCompanyAliases_(request.company,company.aliases);
-  if(validCompanySources.length){
+  if(validCompanySources.length&&exactIdentity&&!singleWordQuery){
     // Gemini prose cannot assert a specific office or operating address
     // that is not supported by directly linked company evidence.
     company.notes='Identity inferred from '+validCompanySources.length+
       ' public search-result page(s). Corporate facts need source-page verification.';
   }
-  if(validCompanySources.length){
+  if(validCompanySources.length&&exactIdentity&&!singleWordQuery){
     const hasOfficial=validCompanySources.some(function(x){return x.sourceType==='OFFICIAL';});
     if(!hasOfficial&&company.identity_status==='CONFIRMED')company.identity_status='LIKELY';
     ['company_size_range','main_location','industry'].forEach(function(k){
@@ -3445,7 +3464,23 @@ function runCompanyXRayV3SelfTest(){
     failures.push({case:'Zero salary evidence is explicitly empty'});
   if(xrSanitizeCompanyAliases_('Winners',['Winners Developer','Winners']).join('|')!=='Winners')
     failures.push({case:'Reject off-target company aliases'});
-  const result={passed:22-failures.length,total:22,ok:!failures.length,failures:failures,
+  // An unrelated canonical company claim must never overwrite the requested
+  // business or contribute its real-estate industry to a short trade-name query.
+  const mismatchedCompany=normalizeCompanyXRayResult_(
+    {company:'Winners',country:'Egypt',city:'Cairo',jobTitle:'',experienceLevel:''},
+    {company:{identity_status:'CONFIRMED',canonical_name:'Winners Developer',
+      industry:'Real Estate',official_website:'https://winnersdeveloper.example',
+      aliases:['Winners Developer'],evidence_ids:[1],notes:'Test fixture'}},
+    [{evidenceId:1,url:'https://example.org/winners-developer',title:'Winners Developer — Real Estate Egypt',
+      snippet:'Winners Developer real estate projects Egypt',domain:'example.org',sourceType:'UNKNOWN'}],
+    'UNKNOWN'
+  ).company;
+  if(mismatchedCompany.canonical_name!=='Winners'||
+     mismatchedCompany.industry!==null||
+     mismatchedCompany.identity_status!=='AMBIGUOUS'||
+     mismatchedCompany.aliases.length)
+    failures.push({case:'Prevent Winners versus Winners Developer identity contamination'});
+  const result={passed:23-failures.length,total:23,ok:!failures.length,failures:failures,
     note:'Synthetic data test only; live search, Gemini and deployment must be checked separately.'};
   console.log(JSON.stringify(result));
   if(!result.ok)throw Error('Company X-Ray v3 self-test failed '+JSON.stringify(failures));

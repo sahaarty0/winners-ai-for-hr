@@ -1,6 +1,23 @@
-# COMPANY X-RAY — Research.gs v3.2 (Observed Salaries UI Fix)
+# COMPANY X-RAY — Research.gs v3.3 (Self-contained Report Repair)
 
-## Company X-Ray v3.2 — source figures visible when survey conditions fail
+## PRIORITY FIX — Company X-Ray v3.3 (29 Oct 2026)
+
+**User report:** After deploying v3.2, the public report still displays Winners Developer (Real Estate) instead of Winners, 0%-Low confidence, and no published-salary observation panel.
+
+**Root cause and fix:** The source identity validator previously sanitized aliases but did not block AI from setting the canonical company name to a different entity. A single-word trade-name search is ambiguous. The previous UI patch was dependent on a separate ReportUIFix.html function and callback.
+
+**ONE-PASTE immediate user action:** In the existing `Index.html`, replace the original complete `google.script.run.withSuccessHandler(...).withFailureHandler(...).runCompanyXRay(request);` chain with the entire text of **`SuccessHandlerReplacement.js`**. Keep all other functions (`renderResult`, `stopLoading`, `showError`) as they are. No separate `ReportUIFix.html` invocation is required; the replacement fixes the displayed company name, null confidence, and renders a clearly labelled individual observed salaries panel or explicit no-usable-sources message. Back up Index.html first. Use **Deploy → Manage deployments → Edit → New version**, preserving original app URL.
+
+**Backend permanent fix:** The complete `Research.gs` v3.3 additionally rejects AI company identity contamination at the source. To apply the backend fix, replace the previous full Research.gs with v3.3 and redeploy the same existing deployment. The single self-contained handler above also safely handles a v3.1/v3.2 salary evidence ledger, so the immediate visible UI repair does not depend on replacing Research.gs a second time.
+
+**Preserve approved branding:** The self-contained script only adds a sober source-evidence panel to the existing salary card, and never replaces the current report renderer or CSS. It cannot turn missing evidence into statistically valid salary data; Most Probable Offer remains unavailable without verified company-offer evidence.
+
+**Pre-release QA:** `runCompanyXRayV3SelfTest` 23/23 synthetic PASS; mocked fallback Serper/Gemini-pipeline scenarios including two unknown-basis salaries, three independently sourced gross salaries, one publisher, wrong city, mixed bases, zero sources, wrong profession; UI callback mocked with DOM and confirmed (a) invalid canonical Winners Developer changes to Winners and Real Estate is cleared, (b) individual EGP 16K/20K–25K source figures appear, (c) null Confidence 0%-Low becomes Not assessed and (d) zero salary records show an explicit explanation. These are synthetic fixtures and do not prove current public salary numbers.
+
+**Not deployed by ChatGPT:** The GitHub merge has no access to the authenticated original Apps Script project. Actual public deployment and real browser page QA must still happen in that owner project. An older `ReportUIFix.html` already pasted into Index.html can remain but is no longer required or invoked by the replacement success handler.
+
+---
+## Legacy v3.2: source figures visible when survey conditions fail
 
 **Problem addressed:** The public UI displayed "Insufficient data" and "0% - Low" even when the backend located numerical salary observations. v3.1 rightly blocked unsupported market ranges and company offers, but the frontend hid the available source numbers.
 
