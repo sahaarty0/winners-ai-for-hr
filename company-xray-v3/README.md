@@ -1,4 +1,33 @@
-# COMPANY X-RAY — Research.gs v3.1
+# COMPANY X-RAY — Research.gs v3.2 (Observed Salaries UI Fix)
+
+## Company X-Ray v3.2 — source figures visible when survey conditions fail
+
+**Problem addressed:** The public UI displayed "Insufficient data" and "0% - Low" even when the backend located numerical salary observations. v3.1 rightly blocked unsupported market ranges and company offers, but the frontend hid the available source numbers.
+
+**Files:**
+- **Research.gs** is the complete replacement for the existing Apps Script Research.gs. Its new salary.presentation.published_salary_mentions displays one numeric source observation per row, with pay basis, URL, date and an explicit source-page-verification flag. Verified benchmarks remain separate and strict. Includes explicit Tech Recruiter / Technical Recruiter / IT Recruiter role-title aliases, and rejects unrelated company-name aliases such as Winners Developer.
+- **ReportUIFix.html** is a *small additive UI snippet*, not a replacement for the approved current Index.html. It displays the new figures and changes the misleading 0%-Low confidence text to Not assessed when the backend returned null.
+
+**Installation — preserve existing design and URL:**
+1. Back up current Apps Script Research.gs and Index.html. Replace full Research.gs with the GitHub file; leave Code.gs, API handlers and other modules untouched.
+2. Paste the entire ReportUIFix.html code immediately before the closing body tag in the existing Index.html. Do NOT replace the existing Index.html.
+3. Locate the existing successful backend response callback (after google.script.run.withSuccessHandler). Immediately AFTER its original report-render call, insert this one line:
+
+    if (window.xrayEnhanceReportV32) window.xrayEnhanceReportV32(result);
+
+   Use the callback's actual result parameter name if different; do not change the original render function. The existing code and layout remain intact.
+4. Apps Script function runCompanyXRayV3SelfTest returns **22/22 PASS** on the updated code. testFullCompanyXRay performs real Serper/Gemini research and prints short QA diagnostics.
+5. Deploy > Manage deployments > Edit existing deployment > New version > Deploy. Do not use New deployment; the public /exec URL should stay unchanged.
+
+**QA already performed before delivery:**
+- Syntax PASS and 22/22 synthetic self-tests.
+- Mocked full search/response cases with two non-comparable salary sources (shown individually), 3 gross-pay independent publisher sources (sample-only indicative market band), mixed pay basis, wrong location and a single publisher (all correctly blocked from a benchmark).
+- UI adapter tested against a simulated DOM: showed 16,000 EGP and 20,000–25,000 EGP separately with verification warnings and changed null confidence from 0%-Low to Not assessed. These are artificial fixtures, not verified Winners compensation figures.
+- No actual public web app deployment or browser API completion of v3.2 was performed. The actual live Apps Script Index.html file was not accessible through connected code/Drive tools; the adapter is an additive patch tested in isolation, not yet integrated with that live file.
+
+**Safety:** Search snippets are unverified source excerpts and may be stale, lack pay basis, or differ from source pages. Do not treat them as verified payroll, a market salary survey, or a factual employer offer. Market-range percentiles and employer-offer figures remain null without independently documented representative evidence.
+
+
 ## Winners Business Consultation & Training Services
 **Safety-first salary research upgrade | 29 October 2026**
 
