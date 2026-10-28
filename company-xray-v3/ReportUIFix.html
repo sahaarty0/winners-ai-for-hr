@@ -1,0 +1,119 @@
+<!-- COMPANY X-RAY v3.2: additive report fix. Does not replace approved Winners HTML/CSS. -->
+<style>
+  #xray-v32-public-salary{margin:20px 0 8px;border:1px solid #dce2ed;border-radius:14px;background:#f8fafc;padding:16px;box-sizing:border-box;color:#162744;font-size:13px}
+  #xray-v32-public-salary .xray-v32-header{font-size:15px;font-weight:800;color:#14254b;margin-bottom:6px}
+  #xray-v32-public-salary .xray-v32-intro{line-height:1.65;color:#54617b;margin-bottom:12px}
+  #xray-v32-public-salary .xray-v32-rows{display:grid;gap:9px}
+  #xray-v32-public-salary .xray-v32-row{background:#fff;border:1px solid #e1e6ef;border-radius:10px;padding:12px}
+  #xray-v32-public-salary .xray-v32-pay{font-weight:850;color:#14254b;font-size:18px;font-variant-numeric:tabular-nums}
+  #xray-v32-public-salary .xray-v32-meta{font-size:11px;color:#65738a;margin:4px 0 6px;line-height:1.6}
+  #xray-v32-public-salary a{color:#1b457f;font-weight:650;text-decoration:underline;overflow-wrap:anywhere}
+  #xray-v32-public-salary .xray-v32-warning{padding-top:9px;color:#8a5c00;font-size:11px;line-height:1.6}
+  #xray-v32-public-salary .xray-v32-empty{color:#6f7785;font-style:italic}
+  @media (max-width:700px){#xray-v32-public-salary{padding:12px}#xray-v32-public-salary .xray-v32-pay{font-size:16px}}
+</style>
+<script>
+(function(){
+  'use strict';
+  function el(tag,cls,text){
+    var n=document.createElement(tag);
+    if(cls)n.className=cls;
+    if(text!==undefined&&text!==null)n.textContent=String(text);
+    return n;
+  }
+  function money(n,currency){
+    var num=Number(n);
+    if(!Number.isFinite(num)||num<=0)return 'Not available';
+    return new Intl.NumberFormat('en-EG',{maximumFractionDigits:0}).format(num)+' '+(currency||'EGP');
+  }
+  function salaryTitle(item){
+    var lo=Number(item.monthly_min),hi=Number(item.monthly_max);
+    if(!Number.isFinite(lo)||!Number.isFinite(hi))return 'No numeric figure';
+    return money(lo,item.currency)+(hi>lo?' – '+money(hi,item.currency):'')+' / month';
+  }
+  function findSalaryPanel(){
+    var all=document.querySelectorAll('h1,h2,h3,h4,h5,div,span,strong');
+    for(var i=0;i<all.length;i++){
+      var n=all[i],t=String(n.textContent||'').trim();
+      if(t!=='Salary Intelligence')continue;
+      // A small heading node avoids selecting a whole page-container.
+      if(n.children.length>1)continue;
+      var p=n;
+      while(p&&p!==document.body){
+        if(p.classList&&(p.classList.contains('card')||
+          p.classList.contains('panel')||p.classList.contains('salary-panel')||
+          p.classList.contains('salary-card')))return p;
+        if(['SECTION','ARTICLE'].indexOf(p.tagName)>=0)return p;
+        p=p.parentElement;
+      }
+      return n.parentElement&&n.parentElement.parentElement||n.parentElement;
+    }
+    return null;
+  }
+  function fixNullConfidence(root,result){
+    if(!result)return;
+    var labels=[
+      {name:'Company Match Confidence',score:result.company&&result.company.confidence_score},
+      {name:'Feedback Confidence',score:result.feedback&&result.feedback.confidence_score}
+    ];
+    labels.forEach(function(entry){
+      if(entry.score!==null&&entry.score!==undefined)return;
+      var nodes=root.querySelectorAll('span,div,small,p,strong');
+      for(var i=0;i<nodes.length;i++){
+        if(String(nodes[i].textContent||'').trim()!==entry.name)continue;
+        var area=nodes[i].parentElement;
+        if(!area)continue;
+        var leaves=area.querySelectorAll('span,small,strong,p');
+        for(var j=0;j<leaves.length;j++){
+          var v=leaves[j];
+          if(v.children.length)continue;
+          if(/^0%\s*(?:[-•·]\s*Low)?$/i.test(String(v.textContent||'').trim()))
+            v.textContent='Not assessed';
+        }
+      }
+    });
+  }
+  // Call exactly once at the end of the existing successful report-render callback:
+  // xrayEnhanceReportV32(result);
+  window.xrayEnhanceReportV32=function(result){
+    if(!result||!result.salary)return false;
+    var salary=result.salary;
+    var p=salary.presentation||{};
+    var items=Array.isArray(p.published_salary_mentions)?p.published_salary_mentions:[];
+    function render(){
+      var card=findSalaryPanel();if(!card)return false;
+      var panel=document.getElementById('xray-v32-public-salary');
+      if(!panel){panel=el('div');panel.id='xray-v32-public-salary';card.appendChild(panel);}
+      while(panel.firstChild)panel.removeChild(panel.firstChild);
+      panel.appendChild(el('div','xray-v32-header','Published Salary Mentions — source by source'));
+      panel.appendChild(el('div','xray-v32-intro',
+        'Numbers below come from search excerpts, not a verified payroll survey. They are shown individually and are NOT combined into an employer offer.'));
+      var list=el('div','xray-v32-rows');panel.appendChild(list);
+      if(!items.length){
+        list.appendChild(el('div','xray-v32-empty','No valid numeric salary mentions were extracted for this role and city.'));
+      } else items.forEach(function(x){
+        var row=el('div','xray-v32-row');
+        row.appendChild(el('div','xray-v32-pay',salaryTitle(x)));
+        var basis=x.pay_basis&&x.pay_basis!=='UNKNOWN'?x.pay_basis.replace(/_/g,' '):'Pay basis not disclosed';
+        var dt=x.publication_date||'Publication date unverified';
+        row.appendChild(el('div','xray-v32-meta',basis+' • '+dt+' • '+(x.current_source_page_verified?'Source page checked':'Source page NOT independently checked')));
+        var url=String(x.source_url||'');
+        if(/^https:\/\//i.test(url)){
+          var link=el('a','',x.source_title||url);
+          link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+          row.appendChild(link);
+        } else row.appendChild(el('div','xray-v32-meta',x.source_title||'Source unavailable'));
+        list.appendChild(row);
+      });
+      panel.appendChild(el('div','xray-v32-warning',
+        'Indicative public mentions only. Missing pay basis, dates, or source-page verification prevents a reliable Market Benchmark. No Most Probable Offer is calculated without comparable evidence.'));
+      fixNullConfidence(document,result);
+      return true;
+    }
+    if(render())return true;
+    // Existing renderer may update DOM asynchronously. Retry briefly without changing existing flow.
+    var tries=0,handle=setInterval(function(){tries++;if(render()||tries>=12)clearInterval(handle);},100);
+    return true;
+  };
+})();
+</script>
