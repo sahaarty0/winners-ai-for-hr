@@ -134,8 +134,8 @@ function setupChallenge() {
     }
     var prop=PropertiesService.getScriptProperties();
     if(!prop.getProperty("DATABASE_ID")) prop.setProperty("DATABASE_ID",JOB_DB_ID);
-    var triggers=ScriptApp.getProjectTriggers().filter(function(t){return t.getHandlerFunction()==="processPendingGrades";});
-    if(!triggers.length)ScriptApp.newTrigger("processPendingGrades").timeBased().everyMinutes(15).create();
+    var triggers=ScriptApp.getProjectTriggers().filter(function(t){return t.getHandlerFunction()==="processPendingGrades_";});
+    if(!triggers.length)ScriptApp.newTrigger("processPendingGrades_").timeBased().everyMinutes(15).create();
     jobSetConfig_("BACKEND_STATUS","SCRIPT_INITIALIZED");
     jobAudit_("SETUP","INITIALIZED","","",generated.join("; ")||"Already initialized");
     Logger.log("Setup successful. Retrieve teacher and group access codes in PRIVATE Guide tab, rows 10-14.");
@@ -263,7 +263,7 @@ function teacherApprove(code, submissionId, score, reviewer) {
 }
 function teacherRetryPending(code) {
   jobTeacher_(code);
-  var ret=processPendingGrades();
+  var ret=processPendingGrades_();
   var snapshot=teacherSnapshot(code);
   snapshot.retry=ret;return snapshot;
 }
@@ -375,7 +375,7 @@ function jobGradeById_(id) {
     return {status:"REVIEW_REQUIRED"};
   } finally{lock.releaseLock();}
 }
-function processPendingGrades() {
+function processPendingGrades_() {
   if(!PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"))return {skipped:true,reason:"API key missing"};
   var submissions=jobReadSubmissions_(),existing={};
   jobGradeRows_().forEach(function(x){existing[x.submissionId]=true;});
