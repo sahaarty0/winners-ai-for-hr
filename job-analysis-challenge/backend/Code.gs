@@ -14,7 +14,7 @@
 const JOB_DB_ID = "10kRmWXTpNcVMo0sx3IJb73WrZr4gLe_3RJk7CE0Qg1M";
 const JOB_REPO_RAW = "https://raw.githubusercontent.com/sahaarty0/winners-ai-for-hr/main/job-analysis-challenge/";
 const JOB_REPO_PUBLIC = "https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/";
-const JOB_VERSION = "2.3.0";
+const JOB_VERSION = "2.3.1";
 
 const JOB_RUBRICS = {
   1: [
@@ -153,13 +153,17 @@ function setupChallenge() {
 function jobReadSite_(name) {
   var allowed={"index.html":1,"arena.html":1,"group.html":1,"game.css":1,"case-bank.js":1,"game.js":1};
   if(!allowed[name])throw new Error("Unknown site asset");
-  var cache=CacheService.getScriptCache(), key="jobsite_v2_"+name, hit=cache.get(key);
+  // Do not serve stale HTML/JS from a previous training deployment.
+  // CSS and case bank may be cached briefly; any page or program logic is fetched fresh.
+  var cache=CacheService.getScriptCache(), key="jobsite_"+JOB_VERSION+"_"+name;
+  var cacheable=(name==="game.css"||name==="case-bank.js");
+  var hit=cacheable?cache.get(key):null;
   if(hit!==null) return hit;
   var res=UrlFetchApp.fetch(JOB_REPO_RAW+name+"?v="+JOB_VERSION,{muteHttpExceptions:true,followRedirects:true});
   if(res.getResponseCode()!==200)throw new Error("Website resource unavailable: "+name+" ("+res.getResponseCode()+")");
   var body=res.getContentText("UTF-8");
   if(body.length<10)throw new Error("Empty site resource: "+name);
-  if(body.length<100000)cache.put(key,body,600);
+  if(cacheable&&body.length<100000)cache.put(key,body,60);
   return body;
 }
 function jobServePage_(view, params) {
