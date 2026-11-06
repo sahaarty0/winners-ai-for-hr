@@ -1,79 +1,47 @@
-# WINNERS — Job Architecture Challenge (Front-End V1)
+# Winners Job Architecture Challenge — V2
 
-Standalone white / Navy / Dark Yellow training game for four groups and four HR cases. This project is separate from the existing Winners AI Arena.
+### Live pages
+- [Instructor Control](https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/) — rounds, group links, display-score preview
+- [Game Arena](https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/arena.html) — clean projector display, four cards only
+- Group page: `group.html?group=1&round=pre` (groups 1–4; `round=post` for Post)
 
-Live path: https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/
+### Classroom workflow
+1. Open Instructor Control on the presenter browser and choose PRE.
+2. Open Game Arena in another tab/window on **the same browser origin**. LocalStorage synchronizes rounds and demo scores between tabs.
+3. Send each group its own generated challenge link, where case evidence/questions and practical work appear. Answers are kept locally and exported to JSON, not sent anywhere until backend integration.
+4. Select POST at the correct stage and distribute updated links.
+5. After developing a secure Google Apps Script backend with Gemini and instructor approval, replace demo score input with authoritative results.
 
-## Structure
+### Four Cases
+1. Job Analysis — undefined Sales Executive role
+2. Role Clarification — HR Generalist / Personnel conflict
+3. Job Re-Design — Recruitment with ATS and AI
+4. Job Description — flawed Team Lead JD
 
-| Group | Case | Practical deliverable |
-|---|---|---|
-| 01 | Job Analysis — Undefined Sales Executive | Job Analysis Plan + Task Inventory |
-| 02 | Role Clarification — HR Generalist vs Personnel | Responsibility Map + Mini RACI |
-| 03 | Job Re-Design — Recruitment after ATS and AI | AS-IS / TO-BE + redesigned role and KPIs |
-| 04 | Job Description — Broken JD | JD Audit + revised JD |
+### Display score bands (illustrative)
+- 0–49: red / needs development
+- 50–69: yellow / foundation
+- 70–84: blue / good
+- 85–100: green / advanced
 
-Each group runs PRE and POST against its own case. Each round has 3 open-ended reasoning challenges plus an external practical deliverable. The exported JSON file is a local artifact; it is NOT sent to a backend.
+### Critical boundaries
+- **No live grading** and **no backend submission** are deployed yet.
+- Instructor controls and preview scores are **not authenticated** and must **not** be treated as secure production administration.
+- LocalStorage only synchronizes tabs under the **same origin/browser profile**, not learners on different devices. Group links include an explicit round parameter to lock the URL to PRE or POST.
+- The simulated score card appears only when the presenter enables score-preview reveal and enters a demo score.
+- Each group has one separate case, with the same case repeated PRE/POST. Compare improvement **within** a group, not raw scores across unlike cases.
+- Gemini API key must only be stored in server-side Script Properties; the score must be reviewed by a human instructor before release.
+- Keep instructor model solutions outside this public GitHub repository.
 
-## Current frontend status
+### Files
+- `index.html` — instructor screen
+- `arena.html` — four-card arena
+- `group.html` — challenge form
+- `game.js` — round control, previews and local answer exports
+- `game.css` — white/Navy/Gold responsive UI
+- `case-bank.js` — four fictional public case briefs
+- `logo.png` — official Winners logo, extracted from the existing Arena
+- `app.js`, `style.css` — unreferenced V1 files retained for rollback
 
-- Four real interactive case cards and corresponding details
-- PRE / POST round switch
-- On-device local draft saving and local JSON answer export
-- Practical assignment instructions with link field
-- Rubric-weight display, each out of 100
-- Score cards pending until a real trusted grading backend provides trainer-approved scores
-- An explicitly labeled Design Preview slider to demonstrate score-dependent coloring
-- Reused official Winners logo from public Arena
-- Responsive mobile layout, Arabic Egyptian phrasing, separate readable English HR terminology
-
-## Color scale — classroom design thresholds, not standardized grades
-
-0–49: red / needs development
-50–69: amber / acceptable foundation
-70–84: blue / good
-85–100: green / advanced
-
-## Backend plan (not yet built)
-
-1. Teacher creates a training session and group registration credentials; one case is assigned to each of the four groups.
-2. Google Apps Script validates group, case, round, revision, payload length, and submission token server-side.
-3. Persist complete submission to Google Sheets first; only then run Gemini rubric grading.
-4. Gemini returns a structured JSON proposed score per criterion, reasons, cited submission evidence, uncertainty flags and missing information.
-5. Instructor reviews and explicitly approves scores. Never auto-publish raw Gemini grades.
-6. A release switch controls which approved Pre/Post scores are visible. Public results must never include names, personal information, or complete answers.
-7. Store GEMINI_API_KEY only in Apps Script Script Properties, never in GitHub.
-8. Rate-limit requests, retry transient model failures with backoff, preserve submissions when quotas fail, and offer a manual instructor grading path.
-9. External document URLs must be verified and their content retrieved with appropriate permission; a bare URL is not sufficient evidence for Gemini.
-10. GitHub Pages to Google Apps Script requires a separately tested cross-origin submission and acknowledgement bridge; ordinary fetch POST JSON may fail due to Apps Script CORS behavior.
-
-### Offline payload schema
-
-schemaVersion = winners-job-architecture-submission-v1
-appVersion = 1.0.0
-rubricVersion = 1.0
-groupId = group-01...group-04
-caseId = 1...4
-phase = pre / post
-leaderName = string
-responses = Q1...Q3 with answer text
-practicalSummary = text
-practicalDocumentUrl = URL or null
-exportedAt = ISO timestamp
-submissionStatus = NOT_SENT_TO_BACKEND
-
-### Proposed backend tabs
-
-Sessions: sessionId, status, pre window, post window
-Groups: groupId, caseId, leader alias, token hash
-Submissions: submissionId, groupId, caseId, phase, answersJson, summary, documentUrl, receivedAt, revision
-Grades: submissionId, modelId, rubricVersion, criterionScoresJson, proposedTotal, reviewerAdjustments, approvedTotal, revealStatus
-Audit: timestamp, actor role, action, entity, previous / new status
-
-## Evaluation boundaries
-
-- Group-level pre/post delta is the main skill measure; direct ranking between different cases is not automatically equivalent.
-- Case-specific rubrics all total 100 points.
-- Gemini grading is an instructor decision-support tool, not verified truth.
-- Synthetic scenarios only; do not paste real candidate CVs or sensitive personnel data.
-- The private instructor answer key must NOT be published to this repository.
+### Backend next phase
+Use Google Sheets for submissions/grades, Google Apps Script for validation and server-side Gemini requests, and human approval before score release. First verify GitHub Pages-to-Apps Script cross-origin submission and authentication; do not assume public JavaScript can safely call an unrestricted grading endpoint.
