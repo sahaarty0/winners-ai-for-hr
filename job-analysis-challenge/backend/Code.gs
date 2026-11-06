@@ -117,6 +117,10 @@ function setupChallenge() {
     var cfg=jobConfig_(), groups=jobGroups_();
     if(groups.length!==4)throw new Error("Expected four seeded groups in Groups tab.");
     var guide=jobTab_("Guide");
+    if(cfg.TEACHER_CODE_HASH && groups.every(function(g){return !!g.hash;})) {
+      Logger.log("Challenge already initialized; codes are unchanged. See private Guide!B10:B14.");
+      return {ok:true,alreadyInitialized:true,created:[],databaseUrl:"https://docs.google.com/spreadsheets/d/"+JOB_DB_ID+"/edit"};
+    }
     var generated=[];
     if(!cfg.TEACHER_CODE_HASH) {
       var t=jobRandom_(26);
