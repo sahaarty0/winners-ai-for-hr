@@ -15,4 +15,9 @@
 <section class="section" id="reviewSection" hidden><div class="section-head"><div><span class="eyebrow en">GEMINI + INSTRUCTOR REVIEW</span><h2>تقييمات الجروبات واعتماد النتائج</h2><p>Gemini بيقترح درجات وفق Rubric كل حالة. إنت اللي بتعتمد الدرجة النهائية.</p></div><div class="form-actions" style="align-items:center"><label class="switch-control"><input type="checkbox" id="liveRevealScores"><span>إظهار النتائج المعتمدة على شاشة اللعبة</span></label><button type="button" class="btn subtle" id="retryGrades">إعادة محاولة تقييم المعلّق</button></div></div><div id="progressSummary" class="score-input-grid" style="margin-bottom:15px"></div><div id="reviewList" class="review-list"></div></section>
 <section class="section" id="previewSection"><div class="section-head"><div><span class="eyebrow en">SCORE DISPLAY CONTROL</span><h2>معاينة تغيير لون الكارت</h2><p>الدرجات هنا تجريبية لتجهيز العرض؛ مش نتيجة Gemini ولا تقييم معتمد.</p></div><label class="switch-control"><input id="revealScores" type="checkbox"><span>عرض درجات المعاينة</span></label></div><div class="panel"><div id="trainerScores" class="score-input-grid"></div><div class="panel-footer"><button id="clearScores" type="button" class="btn subtle">مسح درجات المعاينة</button><span class="hint">0–49 أحمر · 50–69 أصفر · 70–84 أزرق · 85–100 أخضر</span></div></div></section>
 <div class="security-note"><b>تنبيه:</b> واجهة GitHub Pages للمعاينة فقط. تشغيل المحاضر الآمن وعرض نتائج Gemini المعتمدة هيتم على رابط Google Apps Script بعد نشره.</div>
-</main><footer>WINNERS BUSINESS CONSULTATION & TRAINING SERVICES · JOB ARCHITECTURE CHALLENGE</footer></div></body></html>
+</main><footer>WINNERS BUSINESS CONSULTATION & TRAINING SERVICES · JOB ARCHITECTURE CHALLENGE</footer></div><script>
+/* GitHub Pages is a launcher. Apps Script renders the same file server-side and is not redirected. */
+if (location.hostname === "sahaarty0.github.io" && new URLSearchParams(location.search).get("preview") !== "1") {
+  location.replace("https://script.google.com/macros/s/AKfycbxJJTGpWTjiSrIYy7VygAREF3VR72Ts2wDtXjhigSC0_I_MdO7IDqaCzRB7e3u9RquHtw/exec");
+}
+</script></body></html>
