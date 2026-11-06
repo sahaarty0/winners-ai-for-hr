@@ -66,3 +66,179 @@ $("formMessage").textContent="تم تصدير إجابة الجروب على ا�
 }
 function init(){const view=document.body.dataset.view;if(view==="trainer")renderTrainer();if(view==="arena"){renderArena();window.addEventListener("storage",e=>{if(e.key===KEY){state=loadState();renderArena();}});}if(view==="group")renderGroup();}
 document.addEventListener("DOMContentLoaded",init);
+
+/* ==== LIVE BACKEND ADAPTER (HTMLService + google.script.run) ====
+   Connected only when this UI is served by its official Apps Script Web App.
+   No public Github source contains a backend secret or Gemini API key.
+*/
+const WINNERS_LIVE = !!(window.WINNERS_LIVE_MODE && typeof google!=="undefined" && google.script && google.script.run);
+const LIVE_STORE="winners_job_teacher_session_v2";
+let liveTeacherCode="",liveTeacherConnected=false,liveBusy=false;
+function liveFail(err){return String(err&&err.message||err||"خطأ غير معروف");}
+function liveReadState(){
+  if(!WINNERS_LIVE)return;
+  google.script.run.withSuccessHandler((data)=>{
+    if(!data||!data.mode)return;
+    state.round=data.round;
+    state.reveal=!!data.reveal;
+    state.scores=data.scores||{pre:{},post:{}};
+    renderArena();
+    $("arenaState").textContent=data.reveal?"نتائج معتمدة من المحاضر":"الدرجات في انتظار اعتماد المحاضر وإظهارها";
+  }).withFailureHandler(err=>{$("arenaState").textContent="تعذّر تحديث البيانات: "+liveFail(err);}).getPublicState();
+}
+function liveApplyTeacher(data){
+  if(!data||!data.ok)return;
+  liveTeacherConnected=true;
+  state.round=data.round;
+  state.reveal=!!data.reveal;
+  state.scores={pre:{},post:{}};
+  renderTrainer();
+  $("teacherConnectionMsg").textContent="متصل بقاعدة البيانات · "+(data.geminiConfigured?"Gemini API جاهز":"مفتاح Gemini لسه مش مضاف")+" · "+(data.submissions||[]).length+" تسليم";
+  $("teacherConnectionMsg").style.color="#1d754d";
+  $("teacherRefresh").hidden=false;
+  $("reviewSection").hidden=false;
+  $("previewSection").hidden=true;
+  const reveal=$("revealScores");reveal.checked=!!data.reveal;
+  const r=document.querySelector(".switch-control");if(r)r.style.opacity="1";
+  const cases=CASES;
+  const list=$("reviewList");list.replaceChildren();
+  const items=(data.submissions||[]).slice().reverse();
+  if(!items.length){const p=document.createElement("div");p.className="panel";p.textContent="لسه مفيش تسليمات من الجروبات. افتح الجولة وشارك روابط الحالات.";list.append(p);}
+  items.forEach(sub=>{
+    const card=document.createElement("article");card.className="panel";
+    card.style.marginBottom="13px";
+    const header=document.createElement("div");header.className="panel-head";
+    header.textContent=sub.groupId.toUpperCase()+" · "+(sub.round==="pre"?"قبل التدريب":"بعد التدريب")+" · "+sub.leader;
+    card.append(header);
+    const meta=document.createElement("p");meta.className="hint";meta.textContent="التقييم: "+sub.gradeStatus+" · Gemini: "+(sub.proposed===null?"بانتظار النتيجة":sub.proposed+"/100")+
+        " · المعتمد: "+(sub.approved===null?"—":sub.approved+"/100");
+    card.append(meta);
+    if(sub.criteria){
+      try{
+        const criteria=JSON.parse(sub.criteria);
+        const details=document.createElement("details");
+        const summary=document.createElement("summary");summary.textContent="تفاصيل Rubric واقتراح Gemini";
+        details.append(summary);
+        criteria.forEach(c=>{const p=document.createElement("p");p.className="hint";
+          p.textContent=c.label+" — "+c.score+"/"+c.max+" | الدليل: "+c.evidence+" | التحسين: "+c.improvement;details.append(p);});
+        if(sub.feedback){const f=document.createElement("p");f.className="hint";f.textContent=sub.feedback;details.append(f);}
+        card.append(details);
+      }catch(e){}
+    }
+    const controls=document.createElement("div");controls.className="form-actions";controls.style.alignItems="end";
+    const label=document.createElement("label");label.className="field";label.textContent="الدرجة النهائية";
+    const input=document.createElement("input");input.type="number";input.min="0";input.max="100";input.step="1";
+    input.value=sub.approved!==null?sub.approved:(sub.proposed!==null?sub.proposed:"");
+    input.style.width="115px";label.append(input);
+    const button=document.createElement("button");button.className="btn primary";button.type="button";
+    button.textContent=sub.approval==="APPROVED"?"تعديل الدرجة المعتمدة":"اعتماد الدرجة";
+    button.onclick=()=>{
+      const score=Number(input.value);
+      if(input.value===""||!Number.isFinite(score)||score<0||score>100){alert("اختار درجة من 0 إلى 100.");return;}
+      button.disabled=true;button.textContent="جاري الاعتماد...";
+      google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{button.disabled=false;button.textContent="اعتماد الدرجة";alert(liveFail(err));})
+        .teacherApprove(liveTeacherCode,sub.id,score,"Instructor");
+    };
+    controls.append(label,button);card.append(controls);list.append(card);
+  });
+  // Re-bind privileged controls AFTER demo render reset.
+  document.querySelectorAll("[data-round]").forEach(button=>{
+    button.onclick=()=>{
+      if(!liveTeacherCode)return alert("ادخل كود المحاضر الأول.");
+      const next=button.dataset.round;
+      button.disabled=true;
+      google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{button.disabled=false;alert(liveFail(err));})
+      .teacherSetRound(liveTeacherCode,next);
+    };
+  });
+  $("revealScores").onchange=e=>{
+    const next=!!e.target.checked;
+    google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{$("revealScores").checked=!next;alert(liveFail(err));})
+      .teacherSetReveal(liveTeacherCode,next);
+  };
+}
+function liveConnectTeacher(){
+  const code=$("teacherCode").value.trim();
+  if(!code){$("teacherConnectionMsg").textContent="اكتب كود المحاضر من شيت Guide.";return;}
+  const btn=$("teacherConnect");btn.disabled=true;
+  $("teacherConnectionMsg").textContent="جاري الاتصال بقاعدة البيانات...";
+  google.script.run.withSuccessHandler((data)=>{
+    btn.disabled=false;liveTeacherCode=code;
+    try{sessionStorage.setItem(LIVE_STORE,code);}catch(e){}
+    liveApplyTeacher(data);
+  }).withFailureHandler(err=>{btn.disabled=false;liveTeacherConnected=false;$("teacherConnectionMsg").textContent=liveFail(err);})
+   .teacherSnapshot(code);
+}
+function liveTrainerSetup(){
+  const connect=$("teacherConnect");
+  try{$("teacherCode").value=sessionStorage.getItem(LIVE_STORE)||"";}catch(e){}
+  connect.addEventListener("click",liveConnectTeacher);
+  $("teacherRefresh").addEventListener("click",()=>{
+    if(!liveTeacherCode)return;
+    google.script.run.withSuccessHandler(liveApplyTeacher)
+    .withFailureHandler(err=>alert(liveFail(err))).teacherSnapshot(liveTeacherCode);
+  });
+  $("retryGrades").addEventListener("click",()=>{
+    if(!liveTeacherCode)return;
+    const btn=$("retryGrades");btn.disabled=true;btn.textContent="جاري التقييم...";
+    google.script.run.withSuccessHandler(data=>{btn.disabled=false;btn.textContent="إعادة محاولة تقييم المعلّق";liveApplyTeacher(data);})
+      .withFailureHandler(err=>{btn.disabled=false;btn.textContent="إعادة محاولة تقييم المعلّق";alert(liveFail(err));})
+      .teacherRetryPending(liveTeacherCode);
+  });
+  const preview=$("previewSection");if(preview)preview.style.opacity=".45";
+  $("revealScores").disabled=true;
+  // Force the user to connect first, so demo changes never get mistaken for real scoring.
+  document.querySelectorAll("[data-round]").forEach(button=>{
+    button.onclick=()=>alert("اتصل بكود المحاضر الأول علشان تغيّر الجولة الحقيقية.");
+  });
+  const launch=$("launchArena");
+  if(launch && window.WINNERS_WEBAPP_URL){launch.href=window.WINNERS_WEBAPP_URL+"?view=arena";launch.target="_blank";}
+}
+function liveGroupSubmit(e){
+  e.preventDefault();e.stopImmediatePropagation();
+  if(liveBusy)return;
+  const qs=new URLSearchParams(location.search),id=Number(qs.get("group")),c=CASES.find(x=>x.id===id);
+  if(!c)return;
+  const round=qs.get("round")==="post"?"post":"pre";
+  const code=$("groupCode").value.trim();
+  if(!code){$("formMessage").textContent="اكتب كود الجروب اللي استلمتوه من المحاضر.";return;}
+  const data={groupId:"group-"+String(id).padStart(2,"0"),round:round,accessCode:code,leaderName:$("leaderName").value.trim(),
+    answers:c.questions.map((_,i)=>$("q"+i).value.trim()),practicalSummary:$("summary").value.trim(),
+    practicalDocumentUrl:$("documentLink").value.trim()};
+  if(data.leaderName.length<3||data.answers.some(x=>x.length<25)||data.practicalSummary.length<50){
+    $("formMessage").textContent="راجعوا اسم القائد، إجابات الأسئلة الثلاثة وملخص الحل الأول.";return;
+  }
+  liveBusy=true;
+  const submit=$("groupForm").querySelector("button[type=submit]");submit.disabled=true;
+  $("formMessage").textContent="جاري تسجيل الحل في Google Sheets…";
+  google.script.run.withSuccessHandler(result=>{
+    liveBusy=false;
+    $("formMessage").textContent="تم استلام وتسـجيل الحل ✅ رقم التسليم: "+result.submissionId+" · "+result.message;
+    submit.textContent="تم التسليم";submit.disabled=true;
+    document.querySelectorAll("#groupForm input, #groupForm textarea").forEach(el=>{if(el.id!=="groupCode")el.readOnly=true;});
+    try{sessionStorage.setItem("winners_receipt_"+id+"_"+round,result.submissionId);}catch(e){}
+  }).withFailureHandler(err=>{
+    liveBusy=false;submit.disabled=false;
+    $("formMessage").textContent="تعذّر التسليم: "+liveFail(err)+" · مسودتكم لسه محفوظة على الجهاز.";
+  }).submitGroup(data);
+}
+function liveGroupSetup(){
+  const qs=new URLSearchParams(location.search),id=Number(qs.get("group"));
+  $("groupCodeField").hidden=false;
+  const submit=$("groupForm").querySelector("button[type=submit]");
+  if(submit)submit.textContent="سلّموا الحل للتقييم ↗";
+  $("groupForm").addEventListener("submit",liveGroupSubmit,true);
+  const round=qs.get("round")==="post"?"post":"pre";
+  try{
+    const saved=sessionStorage.getItem("winners_receipt_"+id+"_"+round);
+    if(saved){submit.disabled=true;submit.textContent="تم التسليم";$("formMessage").textContent="تم تسليم الإجابة سابقًا. رقم التسليم: "+saved;}
+  }catch(e){}
+}
+function liveSetup(){
+  if(!WINNERS_LIVE)return;
+  const view=document.body.dataset.view;
+  if(view==="arena"){liveReadState();setInterval(liveReadState,8000);}
+  if(view==="trainer")liveTrainerSetup();
+  if(view==="group")liveGroupSetup();
+}
+document.addEventListener("DOMContentLoaded",liveSetup);
