@@ -14,7 +14,7 @@
 const JOB_DB_ID = "10kRmWXTpNcVMo0sx3IJb73WrZr4gLe_3RJk7CE0Qg1M";
 const JOB_REPO_RAW = "https://raw.githubusercontent.com/sahaarty0/winners-ai-for-hr/main/job-analysis-challenge/";
 const JOB_REPO_PUBLIC = "https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/";
-const JOB_VERSION = "2.2.0";
+const JOB_VERSION = "2.3.0";
 
 const JOB_RUBRICS = {
   1: [
@@ -331,12 +331,12 @@ function submitGroup(payload) {
   if(!jobFlag_(config.ACCESS_OPEN))throw new Error("المحاضر قفل استقبال الإجابات حاليًا.");
   var leader=jobSafe_(p.leaderName,100),summary=jobSafe_(p.practicalSummary,5000),link=jobSafe_(p.practicalDocumentUrl,1500);
   if(leader.length<3)throw new Error("اكتبوا اسم قائد الجروب.");
-  if(summary.length<50)throw new Error("ملخص الحل محتاج تفاصيل أكتر.");
+  // Practical summary optional when testing partial answers.
   if(link && !/^https:\/\/\S+$/i.test(link))throw new Error("لينك الملف لازم يكون HTTPS.");
   var answers=Array.isArray(p.answers)?p.answers:[];
   if(answers.length!==3)throw new Error("جاوبوا على التحديات الثلاثة.");
   answers=answers.map(function(x){return jobSafe_(x,3500);});
-  if(answers.some(function(x){return x.length<25;}))throw new Error("كل تحدّي محتاج شرح 25 حرف على الأقل.");
+  if(!answers.some(function(x){return x.length>=10;}))throw new Error("جاوب سؤالًا واحدًا على الأقل.");
   var lock=LockService.getScriptLock();lock.waitLock(30000);
   var submissionId;
   try{
