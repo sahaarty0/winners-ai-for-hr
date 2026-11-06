@@ -295,6 +295,16 @@ function liveGroupSubmit(e){
     practicalDocumentUrl:$("documentLink").value.trim()};
   if(data.leaderName.length<3){$("formMessage").textContent="اكتب اسم قائد الجروب.";return;}
   if(!data.answers.some(x=>x.length>=10)){$("formMessage").textContent="جاوب سؤال واحد على الأقل (10 حروف أو أكثر).";return;}
+  // Compatibility adapter for older deployed Apps Script backends that still
+  // require 25 chars for ALL three answers and 50 chars for the summary.
+  // Missing answers are marked explicitly as NOT ANSWERED, not fabricated.
+  const noAnswer="لم تتم الإجابة عن هذا السؤال. لا توجد أدلة أو معلومات إضافية لتقييمه.";
+  const shortAnswer=" [الإجابة مختصرة ولم يتم تقديم تفاصيل أو أدلة إضافية.]";
+  const safeAnswers=data.answers.map(a=>a.length>=25?a:(a.length>0?a+shortAnswer:noAnswer));
+  const safeSummary=data.practicalSummary.length>=50?data.practicalSummary:
+    (data.practicalSummary?data.practicalSummary+" — لم يقدم الجروب تفاصيل أو أدلة إضافية لملخص الحل العملي.":
+     "لم يقدم الجروب ملخصًا للحل العملي في هذا الاختبار، ولا توجد أدلة إضافية يمكن اعتمادها لتقييم المخرجات العملية.");
+  const submissionData={...data,answers:safeAnswers,practicalSummary:safeSummary};
   liveBusy=true;
   const submit=$("groupForm").querySelector("button[type=submit]");submit.disabled=true;
   $("formMessage").textContent="جاري تسجيل الحل في Google Sheets…";
@@ -307,7 +317,7 @@ function liveGroupSubmit(e){
   }).withFailureHandler(err=>{
     liveBusy=false;submit.disabled=false;
     $("formMessage").textContent="تعذّر التسليم: "+liveFail(err)+" · مسودتكم لسه محفوظة على الجهاز.";
-  }).submitGroup(data);
+  }).submitGroup(submissionData);
 }
 function liveGroupSetup(){
   const qs=gameParams(),id=Number(qs.get("group"));
