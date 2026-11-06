@@ -57,8 +57,8 @@ $("saveDraft").onclick=()=>{$("formMessage").textContent=saveDraft(k,extract())?
 $("groupForm").addEventListener("input",()=>saveDraft(k,extract()));
 $("groupForm").addEventListener("submit",e=>{e.preventDefault();const d=extract();
 if(d.leader.length<3){$("formMessage").textContent="اكتبوا اسم قائد الجروب.";return;}
-if(d.answers.some(x=>x.length<25)){$("formMessage").textContent="كل تحدّي محتاج شرح 25 حرف على الأقل.";return;}
-if(d.summary.length<50){$("formMessage").textContent="ملخص الحل محتاج شرح 50 حرف على الأقل.";return;}
+if(!d.answers.some(x=>x.length>=10)){$("formMessage").textContent="اكتب إجابة واحدة على الأقل.";return;}
+
 if(d.link && !/^https:\/\/\S+\.\S+/i.test(d.link)){$("formMessage").textContent="لينك الملف لازم يبدأ بـ https:// أو سيبوه فاضي.";return;}
 saveDraft(k,d);
 download({schemaVersion:"winners-job-architecture-submission-v1",groupId:"group-"+String(id).padStart(2,"0"),caseId:id,caseName:c.name,phase:round,leaderName:d.leader,responses:c.questions.map((prompt,i)=>({questionId:"Q"+(i+1),prompt,answer:d.answers[i]})),practicalSummary:d.summary,practicalDocumentUrl:d.link||null,exportedAt:new Date().toISOString(),submissionStatus:"NOT_SENT_TO_BACKEND",gradingStatus:"PENDING_GEMINI_AND_INSTRUCTOR_APPROVAL"},"Winners_Group_"+id+"_"+round+".json");
@@ -293,9 +293,8 @@ function liveGroupSubmit(e){
   const data={groupId:"group-"+String(id).padStart(2,"0"),round:round,accessCode:code,leaderName:$("leaderName").value.trim(),
     answers:c.questions.map((_,i)=>$("q"+i).value.trim()),practicalSummary:$("summary").value.trim(),
     practicalDocumentUrl:$("documentLink").value.trim()};
-  if(data.leaderName.length<3||data.answers.some(x=>x.length<25)||data.practicalSummary.length<50){
-    $("formMessage").textContent="راجعوا اسم القائد، إجابات الأسئلة الثلاثة وملخص الحل الأول.";return;
-  }
+  if(data.leaderName.length<3){$("formMessage").textContent="اكتب اسم قائد الجروب.";return;}
+  if(!data.answers.some(x=>x.length>=10)){$("formMessage").textContent="جاوب سؤال واحد على الأقل (10 حروف أو أكثر).";return;}
   liveBusy=true;
   const submit=$("groupForm").querySelector("button[type=submit]");submit.disabled=true;
   $("formMessage").textContent="جاري تسجيل الحل في Google Sheets…";
