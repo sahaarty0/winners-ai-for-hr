@@ -150,12 +150,12 @@ function jobReadSite_(name) {
   if(body.length<100000)cache.put(key,body,600);
   return body;
 }
-function jobServePage_(view) {
+function jobServePage_(view, params) {
   var file = view==="arena" ? "arena.html" : view==="group" ? "group.html" : "index.html";
   var html=jobReadSite_(file);
   var css=jobReadSite_("game.css"),bank=jobReadSite_("case-bank.js"),js=jobReadSite_("game.js");
   var url=ScriptApp.getService().getUrl();
-  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";</script>";
+  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";window.WINNERS_ROUTE_PARAMS="+JSON.stringify({group:String((params||{}).group||""),round:String((params||{}).round||"")})+";</script>";
   html=html.replace('<link rel="stylesheet" href="game.css">',"<style>"+css+"</style>");
   html=html.replace('<script defer src="case-bank.js"></script>',"<script>"+bank+"</script>");
   html=html.replace('<script defer src="game.js"></script>',settings+"<script>"+js+"</script>");
@@ -167,7 +167,7 @@ function doGet(e) {
   var p=(e && e.parameter)||{};
   var view=String(p.view||"trainer");
   if(["trainer","arena","group"].indexOf(view)<0)view="trainer";
-  return jobServePage_(view);
+  return jobServePage_(view,p);
 }
 
 /** Public only: no names, no access codes, no trainee answers or feedback. */
@@ -321,7 +321,7 @@ function jobGeminiResult_(s) {
   ].join("\n\n");
   var body={
     contents:[{role:"user",parts:[{text:prompt}]}],
-    generationConfig:{temperature:0.1,responseMimeType:"application/json",maxOutputTokens:1800}
+    generationConfig:{temperature:0.1,responseMimeType:"application/json",maxOutputTokens:3300}
   };
   var response=UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{
     method:"post",

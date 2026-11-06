@@ -12,7 +12,8 @@ const roundAr=()=>state.round==="pre"?"قبل التدريب":"بعد التدر
 const grade=n=>!valid(n)?"pending":n<=49?"red":n<=69?"amber":n<=84?"blue":"green";
 const levelName=l=>({pending:"بانتظار التقييم",red:"يحتاج تطوير",amber:"أساس مقبول",blue:"أداء جيد",green:"متقدم"}[l]||"بانتظار التقييم");
 const scoreFor=id=>{const n=state.scores?.[state.round]?.[id];return n===null||n===undefined||n===""?null:valid(Number(n))?Number(n):null};
-function groupUrl(id){return "group.html?group="+id+"&round="+state.round;}
+function groupUrl(id){return (window.WINNERS_LIVE_MODE&&window.WINNERS_WEBAPP_URL?window.WINNERS_WEBAPP_URL+"?view=group&group="+id:"group.html?group="+id)+"&round="+state.round;}
+function gameParams(){return window.WINNERS_LIVE_MODE&&window.WINNERS_ROUTE_PARAMS?new URLSearchParams(window.WINNERS_ROUTE_PARAMS):new URLSearchParams(location.search);}
 function renderTrainer(){
 document.querySelectorAll("[data-round]").forEach(b=>{b.classList.toggle("active",b.dataset.round===state.round);b.setAttribute("aria-pressed",String(b.dataset.round===state.round));b.onclick=()=>{state.round=b.dataset.round;saveState();renderTrainer();};});
 $("revealScores").checked=!!state.reveal;$("revealScores").onchange=e=>{state.reveal=e.target.checked;saveState();};
@@ -39,7 +40,7 @@ function loadDraft(k){try{return JSON.parse(localStorage.getItem(k)||"null")||{}
 function saveDraft(k,data){try{localStorage.setItem(k,JSON.stringify(data));return true;}catch(e){return false;}}
 function download(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 function renderGroup(){
-const qs=new URLSearchParams(location.search),id=Number(qs.get("group"));const c=CASES.find(x=>x.id===id);
+const qs=gameParams(),id=Number(qs.get("group"));const c=CASES.find(x=>x.id===id);
 const round=qs.get("round")==="post"?"post":qs.get("round")==="pre"?"pre":state.round;
 $("groupRound").textContent=round.toUpperCase();if(!c){$("groupNotFound").hidden=false;return;}
 $("groupContent").hidden=false;$("groupLabel").textContent="GROUP "+String(id).padStart(2,"0")+" / "+round.toUpperCase();
@@ -99,6 +100,7 @@ function liveApplyTeacher(data){
   $("reviewSection").hidden=false;
   $("previewSection").hidden=true;
   const reveal=$("revealScores");reveal.checked=!!data.reveal;
+  if($("liveRevealScores"))$("liveRevealScores").checked=!!data.reveal;
   const r=document.querySelector(".switch-control");if(r)r.style.opacity="1";
   const cases=CASES;
   const list=$("reviewList");list.replaceChildren();
@@ -151,11 +153,13 @@ function liveApplyTeacher(data){
       .teacherSetRound(liveTeacherCode,next);
     };
   });
-  $("revealScores").onchange=e=>{
+  const changeReveal=e=>{
     const next=!!e.target.checked;
-    google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{$("revealScores").checked=!next;alert(liveFail(err));})
+    google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{e.target.checked=!next;alert(liveFail(err));})
       .teacherSetReveal(liveTeacherCode,next);
   };
+  $("revealScores").onchange=changeReveal;
+  if($("liveRevealScores"))$("liveRevealScores").onchange=changeReveal;
 }
 function liveConnectTeacher(){
   const code=$("teacherCode").value.trim();
@@ -197,7 +201,7 @@ function liveTrainerSetup(){
 function liveGroupSubmit(e){
   e.preventDefault();e.stopImmediatePropagation();
   if(liveBusy)return;
-  const qs=new URLSearchParams(location.search),id=Number(qs.get("group")),c=CASES.find(x=>x.id===id);
+  const qs=gameParams(),id=Number(qs.get("group")),c=CASES.find(x=>x.id===id);
   if(!c)return;
   const round=qs.get("round")==="post"?"post":"pre";
   const code=$("groupCode").value.trim();
@@ -223,7 +227,7 @@ function liveGroupSubmit(e){
   }).submitGroup(data);
 }
 function liveGroupSetup(){
-  const qs=new URLSearchParams(location.search),id=Number(qs.get("group"));
+  const qs=gameParams(),id=Number(qs.get("group"));
   $("groupCodeField").hidden=false;
   const submit=$("groupForm").querySelector("button[type=submit]");
   if(submit)submit.textContent="سلّموا الحل للتقييم ↗";
