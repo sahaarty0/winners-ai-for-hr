@@ -214,6 +214,7 @@ function teacherSnapshot(code) {
     submissions:submissions.map(function(s){
       var grade=gradeById[s.id]||{};
       return {id:s.id,groupId:s.groupId,round:s.round,leader:s.leader,createdAt:s.createdAt,gradeStatus:s.gradeStatus,
+        answersJson:s.answersJson,practicalSummary:s.summary,documentUrl:s.documentUrl,
         proposed:grade.proposed==null?null:grade.proposed,approved:grade.approved==null?null:grade.approved,approval:grade.status||"PENDING",
         model:grade.model||"",feedback:grade.feedback||"",criteria:grade.criteria||""};
     })};

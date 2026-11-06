@@ -103,6 +103,22 @@ function liveApplyTeacher(data){
   if($("liveRevealScores"))$("liveRevealScores").checked=!!data.reveal;
   const r=document.querySelector(".switch-control");if(r)r.style.opacity="1";
   const cases=CASES;
+  const progress=$("progressSummary");if(progress){
+    progress.replaceChildren();
+    cases.forEach(c=>{
+      const pre=(data.submissions||[]).find(s=>s.groupId==="group-"+String(c.id).padStart(2,"0")&&s.round==="pre"&&s.approved!==null);
+      const post=(data.submissions||[]).find(s=>s.groupId==="group-"+String(c.id).padStart(2,"0")&&s.round==="post"&&s.approved!==null);
+      const block=document.createElement("div");block.className="score-input";
+      const heading=document.createElement("span");heading.textContent="GROUP "+String(c.id).padStart(2,"0");
+      const label=document.createElement("div");label.style.fontSize="11px";label.textContent=c.name;
+      const values=document.createElement("strong");values.style.display="block";values.style.fontSize="12px";
+      values.textContent="PRE "+(pre?pre.approved:"—")+" / POST "+(post?post.approved:"—");
+      const improvement=document.createElement("div");improvement.style.fontSize="12px";improvement.style.fontWeight="900";
+      improvement.style.color="#a07517";
+      improvement.textContent=pre&&post?"التطور: "+((post.approved-pre.approved)>=0?"+":"")+(post.approved-pre.approved)+" نقطة":"التطور: بعد اعتماد المرحلتين";
+      block.append(heading,label,values,improvement);progress.append(block);
+    });
+  }
   const list=$("reviewList");list.replaceChildren();
   const items=(data.submissions||[]).slice().reverse();
   if(!items.length){const p=document.createElement("div");p.className="panel";p.textContent="لسه مفيش تسليمات من الجروبات. افتح الجولة وشارك روابط الحالات.";list.append(p);}
@@ -115,6 +131,17 @@ function liveApplyTeacher(data){
     const meta=document.createElement("p");meta.className="hint";meta.textContent="التقييم: "+sub.gradeStatus+" · Gemini: "+(sub.proposed===null?"بانتظار النتيجة":sub.proposed+"/100")+
         " · المعتمد: "+(sub.approved===null?"—":sub.approved+"/100");
     card.append(meta);
+    if(sub.answersJson){
+      try{
+        const d=document.createElement("details");const s=document.createElement("summary");s.textContent="راجع إجابات الجروب والحل العملي";
+        d.append(s);
+        JSON.parse(sub.answersJson).forEach((answer,i)=>{const p=document.createElement("p");p.className="hint";
+          p.textContent="سؤال "+(i+1)+": "+answer;d.append(p);});
+        const p=document.createElement("p");p.className="hint";p.textContent="ملخص المخرج العملي: "+sub.practicalSummary;d.append(p);
+        if(sub.documentUrl){const link=document.createElement("a");link.textContent="افتح الملف العملي ↗";link.href=sub.documentUrl;link.rel="noopener noreferrer";link.target="_blank";d.append(link);}
+        card.append(d);
+      }catch(e){}
+    }
     if(sub.criteria){
       try{
         const criteria=JSON.parse(sub.criteria);
@@ -123,7 +150,9 @@ function liveApplyTeacher(data){
         details.append(summary);
         criteria.forEach(c=>{const p=document.createElement("p");p.className="hint";
           p.textContent=c.label+" — "+c.score+"/"+c.max+" | الدليل: "+c.evidence+" | التحسين: "+c.improvement;details.append(p);});
-        if(sub.feedback){const f=document.createElement("p");f.className="hint";f.textContent=sub.feedback;details.append(f);}
+        if(sub.feedback){const f=document.createElement("p");f.className="hint";let obj;
+          try{obj=JSON.parse(sub.feedback);}catch(e){obj=null;}
+          f.textContent=obj?(obj.summary+" · "+obj.limitations):sub.feedback;details.append(f);}
         card.append(details);
       }catch(e){}
     }
