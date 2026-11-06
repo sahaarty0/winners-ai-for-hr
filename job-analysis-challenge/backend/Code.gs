@@ -295,6 +295,23 @@ function teacherApprove(code, submissionId, score, reviewer) {
     return teacherSnapshot(code);
   }finally{lock.releaseLock();}
 }
+function teacherTestGemini(code) {
+  jobTeacher_(code);
+  var sample = {
+    caseId:1,round:jobConfig_().ROUND,
+    answersJson:JSON.stringify([
+      "Interview the Sales Manager, Customer Service Manager and relevant role incumbents. Review CRM workflows and observe real tasks. Record each fact and source; targets and manager approval are missing.",
+      "Arrange a cross-functional HR workshop, identify conflicting complaint handling responsibilities, build a Task Inventory with owner, evidence and status. Treat disputed decisions as pending approval; do not invent RACI authority.",
+      "Deliver a documented data-collection plan, Confirmed/Proposed/Disputed task inventory, provisional Job Purpose and proposed reporting line. Confirm customer complaints boundary, vacancies, CRM access and KPIs before final JD."
+    ]),
+    summary:"Controlled instructor Gemini API test only. The proposed Sales Executive role focuses on prospecting and documented CRM updates, with Customer Service escalation pending management validation. No invented numerical KPIs, headcount, reporting authority, or final JD approval.",
+    documentUrl:""
+  };
+  var result=jobGeminiResult_(sample);
+  jobAudit_("TRAINER","GEMINI_HEALTH_TEST","","","model="+result.model+" proposed="+result.total);
+  return {ok:true,model:result.model,total:result.total,criteria:result.criteria,feedback:JSON.parse(result.feedback),
+    note:"TEST ONLY. No Group submission and no Grades row created."};
+}
 function teacherRetryPending(code) {
   jobTeacher_(code);
   var ret=processPendingGrades_();

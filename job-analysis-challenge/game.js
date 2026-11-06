@@ -242,6 +242,27 @@ function liveTrainerSetup(){
     google.script.run.withSuccessHandler(liveApplyTeacher)
     .withFailureHandler(err=>alert(liveFail(err))).teacherSnapshot(liveTeacherCode);
   });
+  $("testGemini").addEventListener("click",()=>{
+    if(!liveTeacherCode)return;
+    const btn=$("testGemini"),out=$("geminiTestResult");
+    btn.disabled=true;out.hidden=false;out.textContent="جاري اختبار Gemini على إجابة تدريبية بدون تسجيل أي تسليم...";
+    google.script.run.withSuccessHandler(data=>{
+      btn.disabled=false;
+      out.replaceChildren();
+      const head=document.createElement("strong");head.textContent="✅ Gemini اتصل وقيّم الإجابة الافتراضية: "+data.total+"/100 · "+data.model;
+      const notice=document.createElement("p");notice.className="hint";notice.textContent="اختبار فقط — لا يُنشئ تسليمًا أو درجة لجروب حقيقي.";
+      out.append(head,notice);
+      (data.criteria||[]).forEach(c=>{
+        const p=document.createElement("p");p.className="hint";
+        p.textContent=c.label+": "+c.score+"/"+c.max+" · "+c.reason+" · التحسين: "+c.improvement;
+        out.append(p);
+      });
+      if(data.feedback&&data.feedback.summary){const p=document.createElement("p");p.className="hint";p.textContent="ملخص Gemini: "+data.feedback.summary;out.append(p);}
+    }).withFailureHandler(err=>{
+      btn.disabled=false;out.replaceChildren();
+      const p=document.createElement("p");p.textContent="تعذّر اختبار Gemini: "+liveFail(err);out.append(p);
+    }).teacherTestGemini(liveTeacherCode);
+  });
   $("retryGrades").addEventListener("click",()=>{
     if(!liveTeacherCode)return;
     const btn=$("retryGrades");btn.disabled=true;btn.textContent="جاري التقييم...";
