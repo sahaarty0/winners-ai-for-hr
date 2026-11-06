@@ -18,7 +18,7 @@ function renderTrainer(){
 document.querySelectorAll("[data-round]").forEach(b=>{b.classList.toggle("active",b.dataset.round===state.round);b.setAttribute("aria-pressed",String(b.dataset.round===state.round));b.onclick=()=>{state.round=b.dataset.round;saveState();renderTrainer();};});
 $("revealScores").checked=!!state.reveal;$("revealScores").onchange=e=>{state.reveal=e.target.checked;saveState();};
 $("trainerGroups").innerHTML="";
-CASES.forEach(c=>{const a=document.createElement("a");a.className="group-link";a.href=groupUrl(c.id);a.target="_blank";a.rel="noopener";const no=document.createElement("span");no.className="label";no.textContent="GROUP "+String(c.id).padStart(2,"0");const title=document.createElement("strong");title.textContent=c.title;const en=document.createElement("small");en.textContent=c.name;const go=document.createElement("span");go.className="go";go.textContent="افتح رابط الجروب ↗";a.append(no,title,en,go);$("trainerGroups").append(a);});
+CASES.forEach(c=>{const a=document.createElement("a");a.className="group-link";a.dataset.group=String(c.id);a.href=groupUrl(c.id);a.target="_blank";a.rel="noopener";const no=document.createElement("span");no.className="label";no.textContent="GROUP "+String(c.id).padStart(2,"0");const title=document.createElement("strong");title.textContent=c.title;const en=document.createElement("small");en.textContent=c.name;const go=document.createElement("span");go.className="go";go.textContent="افتح رابط الجروب ↗";a.append(no,title,en,go);$("trainerGroups").append(a);});
 $("trainerScores").innerHTML="";
 CASES.forEach(c=>{const box=document.createElement("div");box.className="score-input";const lab=document.createElement("label");lab.htmlFor="score"+c.id;lab.textContent=c.name;const t=document.createElement("span");t.textContent="GROUP "+String(c.id).padStart(2,"0");const input=document.createElement("input");input.type="number";input.min=0;input.max=100;input.step=1;input.id="score"+c.id;input.placeholder="—";input.value=scoreFor(c.id)??"";input.onchange=()=>{const v=input.value.trim();if(v==="" ){delete state.scores[state.round][c.id];saveState();return;}const n=Number(v);if(!valid(n)){input.value="";delete state.scores[state.round][c.id];}else{state.scores[state.round][c.id]=n;}saveState();};box.append(t,lab,input);$("trainerScores").append(box);});
 $("clearScores").onclick=()=>{state.scores[state.round]={};state.reveal=false;saveState();renderTrainer();};
@@ -98,6 +98,37 @@ function liveApplyTeacher(data){
   $("teacherConnectionMsg").style.color="#1d754d";
   $("teacherRefresh").hidden=false;
   $("reviewSection").hidden=false;
+  if($("liveAccessPanel"))$("liveAccessPanel").hidden=false;
+  const accessBtn=$("accessToggle"),opened=!!data.accessOpen;
+  if(accessBtn){
+    accessBtn.textContent=opened?"اقفل استقبال الإجابات":"افتح استقبال إجابات الجروبات";
+    accessBtn.disabled=false;
+    accessBtn.onclick=()=>{
+      if(!liveTeacherCode)return;
+      accessBtn.disabled=true;
+      google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{accessBtn.disabled=false;alert(liveFail(err));})
+        .teacherSetAccess(liveTeacherCode,!opened);
+    };
+  }
+  if($("accessLabel"))$("accessLabel").textContent=opened?"التحدّي مفتوح — "+(data.round==="post"?"POST":"PRE"):"التحدّي مغلق";
+  // Return private links only to an authenticated trainer, not to unauthenticated site visitors.
+  (data.groups||[]).forEach(g=>{
+    const a=document.querySelector('#trainerGroups a[data-group="'+g.caseId+'"]');
+    if(!a)return;
+    a.href=g.link||"#";
+    a.onclick=e=>{if(!g.link){e.preventDefault();alert("رابط الجروب غير مهيأ؛ شغّل setupChallenge.");}};
+    const copy=document.createElement("button");copy.type="button";copy.className="btn subtle";
+    copy.textContent="نسخ رابط الجروب";copy.style.minHeight="36px";copy.style.padding="5px 10px";
+    copy.addEventListener("click",ev=>{
+      ev.preventDefault();ev.stopPropagation();
+      if(!g.link)return;
+      if(navigator.clipboard&&navigator.clipboard.writeText)
+        navigator.clipboard.writeText(g.link).then(()=>{copy.textContent="تم النسخ ✓";}).catch(()=>{window.prompt("انسخ الرابط ده:",g.link);});
+      else window.prompt("انسخ الرابط ده:",g.link);
+    });
+    a.append(copy);
+  });
+
   $("previewSection").hidden=true;
   const reveal=$("revealScores");reveal.checked=!!data.reveal;
   if($("liveRevealScores"))$("liveRevealScores").checked=!!data.reveal;
@@ -224,6 +255,9 @@ function liveTrainerSetup(){
   document.querySelectorAll("[data-round]").forEach(button=>{
     button.onclick=()=>alert("اتصل بكود المحاضر الأول علشان تغيّر الجولة الحقيقية.");
   });
+  document.querySelectorAll("#trainerGroups a").forEach(a=>{
+    a.href="#";a.onclick=e=>{e.preventDefault();alert("اتصل بكود المحاضر الأول علشان يظهر الرابط الخاص بكل جروب.");};
+  });
   const launch=$("launchArena");
   if(launch && window.WINNERS_WEBAPP_URL){launch.href=window.WINNERS_WEBAPP_URL+"?view=arena";launch.target="_blank";}
 }
@@ -233,8 +267,8 @@ function liveGroupSubmit(e){
   const qs=gameParams(),id=Number(qs.get("group")),c=CASES.find(x=>x.id===id);
   if(!c)return;
   const round=qs.get("round")==="post"?"post":"pre";
-  const code=$("groupCode").value.trim();
-  if(!code){$("formMessage").textContent="اكتب كود الجروب اللي استلمتوه من المحاضر.";return;}
+  const code=qs.get("token")||"";
+  if(!code){$("formMessage").textContent="رابط الجروب غير صحيح. افتحوا الرابط اللي المحاضر بعته.";return;}
   const data={groupId:"group-"+String(id).padStart(2,"0"),round:round,accessCode:code,leaderName:$("leaderName").value.trim(),
     answers:c.questions.map((_,i)=>$("q"+i).value.trim()),practicalSummary:$("summary").value.trim(),
     practicalDocumentUrl:$("documentLink").value.trim()};
@@ -257,8 +291,12 @@ function liveGroupSubmit(e){
 }
 function liveGroupSetup(){
   const qs=gameParams(),id=Number(qs.get("group"));
-  $("groupCodeField").hidden=false;
+  $("groupCodeField").hidden=true;
   const submit=$("groupForm").querySelector("button[type=submit]");
+  if(!qs.get("token")){
+    submit.disabled=true;
+    $("formMessage").textContent="الرابط اللي فتحته مش رابط الجروب المخصص؛ اطلب الرابط من المحاضر.";
+  }
   if(submit)submit.textContent="سلّموا الحل للتقييم ↗";
   $("groupForm").addEventListener("submit",liveGroupSubmit,true);
   const round=qs.get("round")==="post"?"post":"pre";

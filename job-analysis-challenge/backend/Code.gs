@@ -14,7 +14,7 @@
 const JOB_DB_ID = "10kRmWXTpNcVMo0sx3IJb73WrZr4gLe_3RJk7CE0Qg1M";
 const JOB_REPO_RAW = "https://raw.githubusercontent.com/sahaarty0/winners-ai-for-hr/main/job-analysis-challenge/";
 const JOB_REPO_PUBLIC = "https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/";
-const JOB_VERSION = "2.0.0";
+const JOB_VERSION = "2.1.0";
 
 const JOB_RUBRICS = {
   1: [
@@ -166,7 +166,7 @@ function jobServePage_(view, params) {
   var html=jobReadSite_(file);
   var css=jobReadSite_("game.css"),bank=jobReadSite_("case-bank.js"),js=jobReadSite_("game.js");
   var url=ScriptApp.getService().getUrl();
-  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";window.WINNERS_ROUTE_PARAMS="+JSON.stringify({group:String((params||{}).group||""),round:String((params||{}).round||"")})+";</script>";
+  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";window.WINNERS_ROUTE_PARAMS="+JSON.stringify({group:String((params||{}).group||""),round:jobConfig_().ROUND==="post"?"post":"pre",token:String((params||{}).token||"")})+";</script>";
   html=html.replace('<link rel="stylesheet" href="game.css">',"<style>"+css+"</style>");
   html=html.replace('<script defer src="case-bank.js"></script>',"<script>"+bank+"</script>");
   html=html.replace('<script defer src="game.js"></script>',settings+"<script>"+js+"</script>");
@@ -174,10 +174,21 @@ function jobServePage_(view, params) {
   html=html.replace('id="launchArena" href="./arena.html"','id="launchArena" href="'+url+'?view=arena" target="_blank" rel="noopener"');
   return HtmlService.createHtmlOutput(html).setTitle("Winners | Job Architecture Challenge");
 }
+function jobAccessPage_(validLink) {
+  var content=validLink?"التحدي مقفول حاليًا":"رابط الجروب غير صالح";
+  var explanation=validLink?"المحاضر لسه ما فتحش استقبال الإجابات، أو قفل الجولة. افتح نفس الرابط بعد إعلان فتح التحدي.":"خد رابط الجروب الصحيح من المحاضر.";
+  return HtmlService.createHtmlOutput('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Winners — Access</title></head><body style="margin:0;font-family:Tahoma,Arial;background:#fff;color:#0a1f44;display:grid;place-items:center;min-height:90vh"><main style="max-width:530px;border:1px solid #e0e6ed;border-top:6px solid #b18225;border-radius:18px;padding:35px;text-align:center;box-shadow:0 15px 40px #102d4a14"><h1 style="font-size:24px">'+content+'</h1><p>'+explanation+'</p></main></body></html>').setTitle("Winners — Access");
+}
 function doGet(e) {
   var p=(e && e.parameter)||{};
   var view=String(p.view||"trainer");
   if(["trainer","arena","group"].indexOf(view)<0)view="trainer";
+  if(view==="group") {
+    var id=String(p.group||""),group=jobGroup_("group-0"+id);
+    if(!group||!group.active||!group.hash||jobHash_(String(p.token||""))!==group.hash)
+      return jobAccessPage_(false);
+    if(jobConfig_().ACCESS_OPEN!=="TRUE")return jobAccessPage_(true);
+  }
   return jobServePage_(view,p);
 }
 
@@ -219,9 +230,17 @@ function teacherSnapshot(code) {
   jobTeacher_(code);
   var cfg=jobConfig_(), grades=jobGradeRows_(), submissions=jobReadSubmissions_();
   var gradeById={};grades.forEach(function(g){gradeById[g.submissionId]=g;});
+  var rows=jobTab_("Guide").getRange("A11:B14").getValues(),groupCodes={};
+  rows.forEach(function(r){var match=String(r[0]||"").match(/^GROUP_([1-4])_CODE$/);if(match)groupCodes[Number(match[1])]=String(r[1]||"");});
+  var base=ScriptApp.getService().getUrl();
   return {ok:true,round:cfg.ROUND==="post"?"post":"pre",reveal:cfg.REVEAL_SCORES==="TRUE",
+    accessOpen:cfg.ACCESS_OPEN==="TRUE",
     geminiConfigured:!!PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"),
-    groups:jobGroups_().map(function(g){return {id:g.id,caseId:g.caseId,name:g.caseName,leader:g.leader};}),
+    groups:jobGroups_().map(function(g){
+      var token=groupCodes[g.caseId]||"",verified=!!token&&jobHash_(token)===g.hash;
+      return {id:g.id,caseId:g.caseId,name:g.caseName,leader:g.leader,
+        link:verified?base+"?view=group&group="+g.caseId+"&token="+encodeURIComponent(token):null};
+    }),
     submissions:submissions.map(function(s){
       var grade=gradeById[s.id]||{};
       return {id:s.id,groupId:s.groupId,round:s.round,leader:s.leader,createdAt:s.createdAt,gradeStatus:s.gradeStatus,
@@ -235,10 +254,20 @@ function teacherSetRound(code, round) {
   var lock=LockService.getScriptLock();lock.waitLock(10000);
   try{
     jobSetConfig_("ROUND",round);
+    jobSetConfig_("ACCESS_OPEN","FALSE");
     jobSetConfig_("REVEAL_SCORES","FALSE");
     jobAudit_("TRAINER","SET_ROUND","","","round="+round);
     return teacherSnapshot(code);
   }finally{lock.releaseLock();}
+}
+function teacherSetAccess(code, open) {
+  jobTeacher_(code);
+  var lock=LockService.getScriptLock();lock.waitLock(10000);
+  try {
+    jobSetConfig_("ACCESS_OPEN",open===true?"TRUE":"FALSE");
+    jobAudit_("TRAINER",open===true?"OPEN_ACCESS":"CLOSE_ACCESS","","","round="+jobConfig_().ROUND);
+    return teacherSnapshot(code);
+  } finally {lock.releaseLock();}
 }
 function teacherSetReveal(code, reveal) {
   jobTeacher_(code);
@@ -279,7 +308,9 @@ function submitGroup(payload) {
   if(!group||!group.active||!group.hash||jobHash_(p.accessCode||"")!==group.hash)throw new Error("كود الجروب غير صحيح.");
   var round=String(p.round||"");
   if(round!=="pre"&&round!=="post")throw new Error("الجولة غير صحيحة.");
-  if(jobConfig_().ROUND!==round)throw new Error("الجولة دي مش مفتوحة حاليًا. راجع المحاضر.");
+  var config=jobConfig_();
+  if(config.ROUND!==round)throw new Error("الجولة دي مش مفتوحة حاليًا. راجع المحاضر.");
+  if(config.ACCESS_OPEN!=="TRUE")throw new Error("المحاضر قفل استقبال الإجابات حاليًا.");
   var leader=jobSafe_(p.leaderName,100),summary=jobSafe_(p.practicalSummary,5000),link=jobSafe_(p.practicalDocumentUrl,1500);
   if(leader.length<3)throw new Error("اكتبوا اسم قائد الجروب.");
   if(summary.length<50)throw new Error("ملخص الحل محتاج تفاصيل أكتر.");
@@ -291,6 +322,8 @@ function submitGroup(payload) {
   var lock=LockService.getScriptLock();lock.waitLock(30000);
   var submissionId;
   try{
+    var control=jobConfig_();
+    if(control.ACCESS_OPEN!=="TRUE"||control.ROUND!==round)throw new Error("المحاضر قفل استقبال الإجابات أو غيّر الجولة.");
     var current=jobReadSubmissions_();
     if(current.some(function(s){return s.groupId===id&&s.round===round;}))
       throw new Error("الجروب سلّم إجابة الجولة دي بالفعل. لو محتاجين تعديل ارجعوا للمحاضر.");
