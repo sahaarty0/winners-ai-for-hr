@@ -297,7 +297,7 @@ function liveGroupSubmit(e){
   if(!data.answers.some(x=>x.length>=10)){$("formMessage").textContent="جاوب سؤال واحد على الأقل (10 حروف أو أكثر).";return;}
   // Compatibility adapter for older deployed Apps Script backends that still
   // require 25 chars for ALL three answers and 50 chars for the summary.
-  // Missing answers are marked explicitly as NOT ANSWERED, not fabricated.
+  // Missing answers are marked explicitly as NOT ANSWERED, not fabricated. The final backend strips these markers before grading.
   const noAnswer="لم تتم الإجابة عن هذا السؤال. لا توجد أدلة أو معلومات إضافية لتقييمه.";
   const shortAnswer=" [الإجابة مختصرة ولم يتم تقديم تفاصيل أو أدلة إضافية.]";
   const safeAnswers=data.answers.map(a=>a.length>=25?a:(a.length>0?a+shortAnswer:noAnswer));
