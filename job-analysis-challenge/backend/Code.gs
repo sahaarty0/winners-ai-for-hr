@@ -14,7 +14,7 @@
 const JOB_DB_ID = "10kRmWXTpNcVMo0sx3IJb73WrZr4gLe_3RJk7CE0Qg1M";
 const JOB_REPO_RAW = "https://raw.githubusercontent.com/sahaarty0/winners-ai-for-hr/main/job-analysis-challenge/";
 const JOB_REPO_PUBLIC = "https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/";
-const JOB_VERSION = "2.1.0";
+const JOB_VERSION = "2.2.0";
 
 const JOB_RUBRICS = {
   1: [
