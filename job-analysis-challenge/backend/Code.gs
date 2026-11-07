@@ -467,7 +467,10 @@ function submitGroup(payload) {
 function jobGeminiResult_(s) {
   var key=PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
   if(!key)throw new Error("GEMINI_API_KEY not configured in Script Properties.");
-  var model=PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL")||"gemini-2.5-flash";
+  var requestedModel=PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL")||"gemini-3.8-flash";
+   // Existing owner accounts may be blocked from Gemini 2.5 Flash with HTTP 404.
+   // Use the current stable Flash model instead, without changing any private key.
+   var model=requestedModel==="gemini-2.5-flash"?"gemini-3.8-flash":requestedModel;
   if(!/^[A-Za-z0-9._-]{5,90}$/.test(model))throw new Error("Invalid Gemini model name");
   var rubric=JOB_RUBRICS[s.caseId];
   if(!rubric)throw new Error("Case rubric not found.");
@@ -491,7 +494,7 @@ function jobGeminiResult_(s) {
   ].join("\n\n");
   var body={
     contents:[{role:"user",parts:[{text:prompt}]}],
-    generationConfig:{temperature:0.1,responseMimeType:"application/json",maxOutputTokens:3300}
+    generationConfig:{responseMimeType:"application/json",maxOutputTokens:8192}
   };
   var response=UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{
     method:"post",
