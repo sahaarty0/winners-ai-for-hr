@@ -15,6 +15,16 @@
 <button id="accessToggle" class="btn primary" type="button">افتح استقبال إجابات الجروبات</button>
 <span id="accessLabel" class="top-pill">التحدّي مغلق</span>
 </div><p class="hint">كل جروب يستلم رابط واحد فقط، من غير كود منفصل. المحاضر يتحكم في الدخول والتسليم، والجولة الجديدة تبدأ مقفولة.</p></section>
+<section class="panel" id="liveSessionPanel" hidden style="margin-bottom:18px;border-top:4px solid #aa7c28">
+<div class="panel-head"><span class="step en">04</span><strong>إدارة الجلسة بالكامل</strong></div>
+<div class="form-actions" style="align-items:center;gap:12px;flex-wrap:wrap">
+<span class="top-pill" id="sessionLabel">الجلسة الحالية</span>
+<button id="endSession" class="btn subtle" type="button">إنهاء الجلسة بالكامل</button>
+<button id="newSession" class="btn primary" type="button" hidden>بدء جلسة جديدة من الصفر</button>
+</div>
+<p class="hint" id="sessionHint">إنهاء الجلسة يقفل دخول الجروبات وتسليم الإجابات وإظهار النتائج، لكنه لا يمسح أي بيانات. «بدء جلسة جديدة» بيؤرشف التسليمات والدرجات أولًا ثم يرجع PRE مقفولة؛ افتح استقبال الإجابات وقت ما تحب. نفس روابط الجروبات تفضل صالحة.</p>
+<p class="hint" id="sessionActionMsg" role="status" aria-live="polite"></p>
+</section>
 <section class="control-grid"><article class="panel accent"><div class="panel-head"><span class="step en">01</span><strong>الجولة الحالية</strong></div><div class="round-control"><button type="button" data-round="pre" class="round-btn">قبل التدريب <small class="en">PRE</small></button><button type="button" data-round="post" class="round-btn">بعد التدريب <small class="en">POST</small></button></div><p class="hint">الجولة اللي بتحددها هنا بتتحفظ على نفس المتصفح؛ روابط الجروبات بتتكوّن بالجولة المختارة.</p></article>
 <article class="panel accent"><div class="panel-head"><span class="step en">02</span><strong>شاشة اللعبة</strong></div><div class="launch-area"><a class="btn primary wide" id="launchArena" href="./arena.html">ابدأ التحدّي — افتح شاشة اللعبة <span>←</span></a><p class="hint">شاشة عرض نظيفة فيها الكروت الأربعة والدرجات فقط، وبتفتح في نفس التبويب من غير نافذة جديدة.</p></div></article></section>
 <section class="section"><div class="section-head"><div><span class="eyebrow en">GROUP ACCESS</span><h2>روابط الجروبات</h2><p>كل جروب ليه رابط ثابت تقدر تنسخه مرة واحدة. من غير أكواد منفصلة للمتدربين.</p></div></div><div class="links-grid" id="trainerGroups"></div></section>
