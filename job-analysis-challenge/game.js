@@ -49,7 +49,15 @@ $("caseIntro").textContent=c.intro;$("caseGoal").textContent=c.objective;
 c.facts.forEach(t=>{const li=document.createElement("li");li.textContent=t;$("caseFacts").append(li);});
 c.deliverables.forEach(t=>{const li=document.createElement("li");li.textContent=t;$("caseDeliverables").append(li);});
 c.questions.forEach((q,i)=>{const wrap=document.createElement("div");wrap.className="question";const tag=document.createElement("div");tag.className="index";tag.textContent="CHALLENGE "+String(i+1).padStart(2,"0");const title=document.createElement("strong");title.textContent=q;const input=document.createElement("textarea");input.id="q"+i;input.rows=4;input.maxLength=3500;input.placeholder="اكتبوا القرار والمبررات والأدلة…";input.setAttribute("aria-label","إجابة التحدي "+(i+1));wrap.append(tag,title,input);$("caseQuestions").append(wrap);});
-const k=DRAFT+"_g"+id+"_"+round,prior=loadDraft(k),pre=loadDraft(DRAFT+"_g"+id+"_pre");
+const currentSession=qs.get("sessionId")||"preview";
+const k=DRAFT+"_s"+currentSession+"_g"+id+"_"+round;
+let prior=loadDraft(k),pre=loadDraft(DRAFT+"_s"+currentSession+"_g"+id+"_pre");
+// One-time migration for the active session when this upgrade first deploys.
+// Never import an old draft into a genuinely new session.
+if(currentSession==="WINNERS-JOB-02" && !prior.savedAt && !prior.leader && !prior.answers){
+  prior=loadDraft(DRAFT+"_g"+id+"_"+round);
+  if(!pre.leader)pre=loadDraft(DRAFT+"_g"+id+"_pre");
+}
 $("leaderName").value=prior.leader||pre.leader||"";$("summary").value=prior.summary||"";$("documentLink").value=prior.link||"";
 c.questions.forEach((_,i)=>{$("q"+i).value=prior.answers?.[i]||"";});
 const extract=()=>({leader:$("leaderName").value.trim(),summary:$("summary").value.trim(),link:$("documentLink").value.trim(),answers:c.questions.map((_,i)=>$("q"+i).value.trim()),savedAt:new Date().toISOString()});
@@ -84,7 +92,7 @@ function liveReadState(){
     state.reveal=!!data.reveal;
     state.scores=data.scores||{pre:{},post:{}};
     renderArena();
-    $("arenaState").textContent=data.reveal?"نتائج معتمدة من المحاضر":"الدرجات في انتظار اعتماد المحاضر وإظهارها";
+    $("arenaState").textContent=data.sessionClosed?"تم إنهاء الجلسة بواسطة المحاضر":(data.reveal?"نتائج معتمدة من المحاضر":"الدرجات في انتظار اعتماد المحاضر وإظهارها");
   }).withFailureHandler(err=>{$("arenaState").textContent="تعذّر تحديث البيانات: "+liveFail(err);}).getPublicState();
 }
 function liveApplyTeacher(data){
@@ -99,10 +107,39 @@ function liveApplyTeacher(data){
   $("teacherRefresh").hidden=false;
   $("reviewSection").hidden=false;
   if($("liveAccessPanel"))$("liveAccessPanel").hidden=false;
+  if($("liveSessionPanel"))$("liveSessionPanel").hidden=false;
+  const closed=!!data.sessionClosed,sessionId=data.sessionId||"";
+  if($("sessionLabel"))$("sessionLabel").textContent=sessionId+" · "+(closed?"منتهية":"قيد التشغيل");
+  if($("sessionHint"))$("sessionHint").style.opacity="1";
+  const actionMsg=$("sessionActionMsg");
+  if(actionMsg)actionMsg.textContent="";
+  const endBtn=$("endSession"),startBtn=$("newSession");
+  if(endBtn){
+    endBtn.hidden=closed;endBtn.disabled=closed;
+    endBtn.onclick=()=>{
+      if(!liveTeacherCode||!window.confirm("إنهاء الجلسة "+sessionId+"؟ هيتقفل دخول الجروبات وتسليم الإجابات فورًا، من غير حذف البيانات."))return;
+      endBtn.disabled=true;
+      if(actionMsg)actionMsg.textContent="جاري إنهاء الجلسة...";
+      google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{
+        endBtn.disabled=false;if(actionMsg)actionMsg.textContent="تعذّر الإنهاء: "+liveFail(err);
+      }).teacherEndSession(liveTeacherCode);
+    };
+  }
+  if(startBtn){
+    startBtn.hidden=!closed;startBtn.disabled=!closed;
+    startBtn.onclick=()=>{
+      if(!liveTeacherCode||!window.confirm("بدء جلسة جديدة؟ هيتم أرشفة التسليمات والدرجات السابقة في شيتات منفصلة، ثم تصفير الجولة وبدء PRE مقفولة."))return;
+      startBtn.disabled=true;
+      if(actionMsg)actionMsg.textContent="جاري أرشفة الجلسة وتجهيز جلسة جديدة...";
+      google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{
+        startBtn.disabled=false;if(actionMsg)actionMsg.textContent="تعذّر بدء الجلسة: "+liveFail(err);
+      }).teacherStartNewSession(liveTeacherCode);
+    };
+  }
   const accessBtn=$("accessToggle"),opened=!!data.accessOpen;
   if(accessBtn){
-    accessBtn.textContent=opened?"اقفل استقبال الإجابات":"افتح استقبال إجابات الجروبات";
-    accessBtn.disabled=false;
+    accessBtn.textContent=closed?"الجلسة منتهية — ابدأ جلسة جديدة":(opened?"اقفل استقبال الإجابات":"افتح استقبال إجابات الجروبات");
+    accessBtn.disabled=closed;
     accessBtn.onclick=()=>{
       if(!liveTeacherCode)return;
       accessBtn.disabled=true;
@@ -110,7 +147,7 @@ function liveApplyTeacher(data){
         .teacherSetAccess(liveTeacherCode,!opened);
     };
   }
-  if($("accessLabel"))$("accessLabel").textContent=opened?"التحدّي مفتوح — "+(data.round==="post"?"POST":"PRE"):"التحدّي مغلق";
+  if($("accessLabel"))$("accessLabel").textContent=closed?"الجلسة منتهية":(opened?"التحدّي مفتوح — "+(data.round==="post"?"POST":"PRE"):"التحدّي مغلق");
   // Return private links only to an authenticated trainer, not to unauthenticated site visitors.
   (data.groups||[]).forEach(g=>{
     const a=document.querySelector('#trainerGroups a[data-group="'+g.caseId+'"]');
@@ -207,6 +244,7 @@ function liveApplyTeacher(data){
   document.querySelectorAll("[data-round]").forEach(button=>{
     button.onclick=()=>{
       if(!liveTeacherCode)return alert("ادخل كود المحاضر الأول.");
+      if(closed)return alert("الجلسة منتهية. ابدأ جلسة جديدة أولًا.");
       const next=button.dataset.round;
       button.disabled=true;
       google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{button.disabled=false;alert(liveFail(err));})
@@ -214,6 +252,7 @@ function liveApplyTeacher(data){
     };
   });
   const changeReveal=e=>{
+    if(closed){e.target.checked=false;return alert("الجلسة منتهية. ابدأ جلسة جديدة أولًا.");}
     const next=!!e.target.checked;
     google.script.run.withSuccessHandler(liveApplyTeacher).withFailureHandler(err=>{e.target.checked=!next;alert(liveFail(err));})
       .teacherSetReveal(liveTeacherCode,next);
@@ -292,7 +331,7 @@ function liveGroupSubmit(e){
   if(!code){$("formMessage").textContent="رابط الجروب غير صحيح. افتحوا الرابط اللي المحاضر بعته.";return;}
   const data={groupId:"group-"+String(id).padStart(2,"0"),round:round,accessCode:code,leaderName:$("leaderName").value.trim(),
     answers:c.questions.map((_,i)=>$("q"+i).value.trim()),practicalSummary:$("summary").value.trim(),
-    practicalDocumentUrl:$("documentLink").value.trim()};
+    practicalDocumentUrl:$("documentLink").value.trim(),sessionId:qs.get("sessionId")||""};
   if(data.leaderName.length<3){$("formMessage").textContent="اكتب اسم قائد الجروب.";return;}
   if(!data.answers.some(x=>x.length>=10)){$("formMessage").textContent="جاوب سؤال واحد على الأقل (10 حروف أو أكثر).";return;}
   // Compatibility adapter for older deployed Apps Script backends that still
@@ -313,10 +352,21 @@ function liveGroupSubmit(e){
     $("formMessage").textContent="تم استلام وتسـجيل الحل ✅ رقم التسليم: "+result.submissionId+" · "+result.message;
     submit.textContent="تم التسليم";submit.disabled=true;
     document.querySelectorAll("#groupForm input, #groupForm textarea").forEach(el=>{if(el.id!=="groupCode")el.readOnly=true;});
-    try{sessionStorage.setItem("winners_receipt_"+id+"_"+round,result.submissionId);}catch(e){}
+    try{sessionStorage.setItem("winners_receipt_"+(qs.get("sessionId")||"legacy")+"_"+id+"_"+round,result.submissionId);}catch(e){}
   }).withFailureHandler(err=>{
     liveBusy=false;submit.disabled=false;
-    $("formMessage").textContent="تعذّر التسليم: "+liveFail(err)+" · مسودتكم لسه محفوظة على الجهاز.";
+    $("formMessage").textContent="تعذّر التأكيد: "+liveFail(err)+" · جاري التحقق هل الإجابة اتحفظت بالفعل...";
+    google.script.run.withSuccessHandler(receipt=>{
+      if(receipt&&receipt.submitted){
+        submit.disabled=true;submit.textContent="تم التسليم";
+        $("formMessage").textContent="الإجابة محفوظة بالفعل ✅ رقم التسليم: "+receipt.submissionId;
+        try{sessionStorage.setItem("winners_receipt_"+(qs.get("sessionId")||"legacy")+"_"+id+"_"+round,receipt.submissionId);}catch(e){}
+      }else{
+        $("formMessage").textContent=receipt&&receipt.sessionChanged?"الجلسة اتغيرت. افتح رابط الجروب من جديد.":"تعذّر التسليم: "+liveFail(err)+" · مسودتكم محفوظة على الجهاز.";
+      }
+    }).withFailureHandler(_=>{
+      $("formMessage").textContent="تعذّر التسليم: "+liveFail(err)+" · مسودتكم محفوظة على الجهاز.";
+    }).groupSubmissionStatus({groupId:submissionData.groupId,round:round,accessCode:code,sessionId:qs.get("sessionId")||""});
   }).submitGroup(submissionData);
 }
 function liveGroupSetup(){
@@ -331,9 +381,26 @@ function liveGroupSetup(){
   $("groupForm").addEventListener("submit",liveGroupSubmit,true);
   const round=qs.get("round")==="post"?"post":"pre";
   try{
-    const saved=sessionStorage.getItem("winners_receipt_"+id+"_"+round);
+    const saved=sessionStorage.getItem("winners_receipt_"+(qs.get("sessionId")||"legacy")+"_"+id+"_"+round);
     if(saved){submit.disabled=true;submit.textContent="تم التسليم";$("formMessage").textContent="تم تسليم الإجابة سابقًا. رقم التسليم: "+saved;}
   }catch(e){}
+  if(qs.get("token")){
+    google.script.run.withSuccessHandler(receipt=>{
+      if(!receipt)return;
+      if(receipt.sessionChanged){
+        submit.disabled=true;$("formMessage").textContent="بدأت جلسة جديدة. افتح رابط الجروب من جديد.";return;
+      }
+      if(receipt.submitted){
+        submit.disabled=true;submit.textContent="تم التسليم";
+        $("formMessage").textContent="تم حفظ الإجابة بالفعل ✅ رقم التسليم: "+receipt.submissionId;
+        try{sessionStorage.setItem("winners_receipt_"+(qs.get("sessionId")||"legacy")+"_"+id+"_"+round,receipt.submissionId);}catch(e){}
+      }else if(receipt.sessionClosed){
+        submit.disabled=true;$("formMessage").textContent="المحاضر أنهى الجلسة؛ لا يمكن التسليم حاليًا.";
+      }
+    }).withFailureHandler(_=>{}).groupSubmissionStatus({
+      groupId:"group-"+String(id).padStart(2,"0"),round:round,accessCode:qs.get("token"),sessionId:qs.get("sessionId")||""
+    });
+  }
 }
 function liveSetup(){
   if(!WINNERS_LIVE)return;
