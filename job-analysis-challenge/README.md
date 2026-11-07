@@ -1,6 +1,16 @@
 # WINNERS — Job Architecture Challenge
 
-**Status 6 Nov 2026:** Full frontend and server backend source are implemented. A native Google Sheets database, including a PRIVATE AnswerKey, has been created. The Google Apps Script Web App has **not** been deployed or authorized yet; Gemini API key has **not** been added.
+**Status 7 Nov 2026:** The Google Apps Script Web App is deployed. Latest GitHub source is **v2.5.0**; the instructor must replace Code.gs and deploy a **New version** to activate the latest functionality. Group submissions persist in Google Sheets even if Gemini cannot grade them.
+
+
+## Session control & fast receipts — v2.5.0
+
+- **End Session** is available only after signing in to the instructor panel. It closes group access, blocks submissions, and hides published scores. Existing rows remain available for instructor review.
+- **Start New Session** is available only after ending the old one. It archives Submissions, Grades, Groups, and Audit into hidden `ARC_<SESSION_ID>_*` tabs in the same private spreadsheet before clearing the current session; the new session opens in PRE with student access **closed**. Group links and secret tokens stay unchanged.
+- Session IDs increment. Trainee local drafts and receipts are scoped by session, so a new session does not inherit the previous session's "already submitted" message. Existing open tabs from an older session are rejected.
+- New submissions return a receipt after **saving to Google Sheets**, without waiting for a Gemini request. An existing 15-minute time-driven trigger or the instructor Retry button handles grading separately; an unavailable Gemini model does not block submissions.
+- Backend selects `gemini-3.8-flash` as a default or when `GEMINI_MODEL` still specifies the unavailable `gemini-2.5-flash`. Model access still depends on your key and quotas. The model was verified in official Google documentation, not end-to-end with this user's key.
+- **Required activation**: update the existing Apps Script `Code.gs` from [this source](backend/Code.gs), save, then **Deploy → Manage deployments → Edit → New version → Deploy**. This keeps the current Web App URL and private Script Properties unchanged.
 
 ## Links
 
