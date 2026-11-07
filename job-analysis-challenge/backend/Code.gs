@@ -14,7 +14,7 @@
 const JOB_DB_ID = "10kRmWXTpNcVMo0sx3IJb73WrZr4gLe_3RJk7CE0Qg1M";
 const JOB_REPO_RAW = "https://raw.githubusercontent.com/sahaarty0/winners-ai-for-hr/main/job-analysis-challenge/";
 const JOB_REPO_PUBLIC = "https://sahaarty0.github.io/winners-ai-for-hr/job-analysis-challenge/";
-const JOB_VERSION = "2.4.0";
+const JOB_VERSION = "2.5.0";
 
 const JOB_RUBRICS = {
   1: [
@@ -185,7 +185,7 @@ function jobServePage_(view, params) {
   var html=jobReadSite_(file);
   var css=jobReadSite_("game.css"),bank=jobReadSite_("case-bank.js"),js=jobReadSite_("game.js");
   var url=ScriptApp.getService().getUrl();
-  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";window.WINNERS_ROUTE_PARAMS="+JSON.stringify({group:String((params||{}).group||""),round:jobConfig_().ROUND==="post"?"post":"pre",token:String((params||{}).token||"")})+";</script>";
+  var settings="<script>window.WINNERS_LIVE_MODE=true;window.WINNERS_WEBAPP_URL="+JSON.stringify(url)+";window.WINNERS_ROUTE_PARAMS="+JSON.stringify({group:String((params||{}).group||""),round:jobConfig_().ROUND==="post"?"post":"pre",token:String((params||{}).token||""),sessionId:String(jobConfig_().SESSION_ID||"WINNERS-JOB-01")})+";</script>";
   html=html.replace('<link rel="stylesheet" href="game.css">',"<style>"+css+"</style>");
   html=html.replace('<script defer src="case-bank.js"></script>',"<script>"+bank+"</script>");
   html=html.replace('<script defer src="game.js"></script>',settings+"<script>"+js+"</script>");
@@ -215,7 +215,7 @@ function doGet(e) {
 function getPublicState() {
   var cfg=jobConfig_(), round=cfg.ROUND==="post"?"post":"pre";
   var reveal=jobFlag_(cfg.REVEAL_SCORES);
-  var status={round:round,reveal:reveal,scores:{pre:{},post:{}},updatedAt:new Date().toISOString(),mode:"LIVE_APPROVED"};
+  var status={round:round,reveal:reveal,sessionClosed:jobFlag_(cfg.SESSION_CLOSED),scores:{pre:{},post:{}},updatedAt:new Date().toISOString(),mode:"LIVE_APPROVED"};
   if(!reveal)return status;
   var rows=jobTab_("Grades").getDataRange().getValues();
   for(var i=1;i<rows.length;i++) {
@@ -252,7 +252,7 @@ function teacherSnapshot(code) {
   var rows=jobTab_("Guide").getRange("A11:B14").getValues(),groupCodes={};
   rows.forEach(function(r){var match=String(r[0]||"").match(/^GROUP_([1-4])_CODE$/);if(match)groupCodes[Number(match[1])]=String(r[1]||"");});
   var base=ScriptApp.getService().getUrl();
-  return {ok:true,round:cfg.ROUND==="post"?"post":"pre",reveal:jobFlag_(cfg.REVEAL_SCORES),
+  return {ok:true,sessionId:String(cfg.SESSION_ID||"WINNERS-JOB-01"),sessionClosed:jobFlag_(cfg.SESSION_CLOSED),round:cfg.ROUND==="post"?"post":"pre",reveal:jobFlag_(cfg.REVEAL_SCORES),
     accessOpen:jobFlag_(cfg.ACCESS_OPEN),
     geminiConfigured:!!PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"),
     groups:jobGroups_().map(function(g){
@@ -269,7 +269,8 @@ function teacherSnapshot(code) {
     })};
 }
 function teacherSetRound(code, round) {
-  jobTeacher_(code); if(round!=="pre"&&round!=="post")throw new Error("Invalid round.");
+  jobTeacher_(code); if(jobFlag_(jobConfig_().SESSION_CLOSED))throw new Error("الجلسة منتهية. ابدأ جلسة جديدة أولاً.");
+  if(round!=="pre"&&round!=="post")throw new Error("Invalid round.");
   var lock=LockService.getScriptLock();lock.waitLock(10000);
   try{
     jobSetConfig_("ROUND",round);
@@ -281,6 +282,7 @@ function teacherSetRound(code, round) {
 }
 function teacherSetAccess(code, open) {
   jobTeacher_(code);
+  if(open===true&&jobFlag_(jobConfig_().SESSION_CLOSED))throw new Error("الجلسة منتهية. ابدأ جلسة جديدة قبل فتح استقبال الإجابات.");
   var lock=LockService.getScriptLock();lock.waitLock(10000);
   try {
     jobSetConfig_("ACCESS_OPEN",open===true?"TRUE":"FALSE");
@@ -290,6 +292,7 @@ function teacherSetAccess(code, open) {
 }
 function teacherSetReveal(code, reveal) {
   jobTeacher_(code);
+  if(reveal===true&&jobFlag_(jobConfig_().SESSION_CLOSED))throw new Error("الجلسة منتهية. لا يمكن إظهار النتائج قبل بدء جلسة جديدة.");
   jobSetConfig_("REVEAL_SCORES",reveal===true?"TRUE":"FALSE");
   jobAudit_("TRAINER","SET_REVEAL","","","reveal="+String(reveal===true));
   return teacherSnapshot(code);
@@ -312,6 +315,78 @@ function teacherApprove(code, submissionId, score, reviewer) {
     jobAudit_("TRAINER","APPROVE",sub.groupId,sub.id,"approvedScore="+n);
     return teacherSnapshot(code);
   }finally{lock.releaseLock();}
+}
+/**
+ * Trainer-owned session lifecycle:
+ * END shuts every group entry point immediately while keeping scores and
+ * submissions readable to the instructor; NEW archives all active session
+ * evidence to named tabs, clears only current-session data and starts PRE closed.
+ */
+function teacherEndSession(code) {
+  jobTeacher_(code);
+  var lock=LockService.getScriptLock();lock.waitLock(20000);
+  try {
+    if(!jobFlag_(jobConfig_().SESSION_CLOSED)) {
+      jobSetConfig_("ACCESS_OPEN","FALSE");
+      jobSetConfig_("REVEAL_SCORES","FALSE");
+      jobSetConfig_("SESSION_CLOSED","TRUE");
+      jobAuditSafe_("TRAINER","END_SESSION","","","session="+(jobConfig_().SESSION_ID||""));
+    }
+  } finally {lock.releaseLock();}
+  return teacherSnapshot(code);
+}
+function jobNextSessionId_(id) {
+  var match=String(id||"WINNERS-JOB-01").match(/^WINNERS-JOB-(\d+)$/);
+  var number=match?Number(match[1]):1;
+  if(number>=9999)throw new Error("Session number limit reached.");
+  return "WINNERS-JOB-"+String(number+1).padStart(2,"0");
+}
+function teacherStartNewSession(code) {
+  jobTeacher_(code);
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {
+    var cfg=jobConfig_();
+    if(!jobFlag_(cfg.SESSION_CLOSED))throw new Error("أنهِ الجلسة الحالية أولاً، ثم ابدأ جلسة جديدة.");
+    if(jobFlag_(cfg.ACCESS_OPEN))throw new Error("اقفل استقبال الإجابات أولاً.");
+    var db=jobDb_(),oldId=String(cfg.SESSION_ID||"WINNERS-JOB-01");
+    var nextId=jobNextSessionId_(oldId);
+    var prefix="ARC_"+oldId.replace(/[^a-zA-Z0-9]/g,"_")+"_";
+    ["Submissions","Grades","Groups","Audit"].forEach(function(name) {
+      var archiveName=prefix+name;
+      if(!db.getSheetByName(archiveName)){
+        var backup=jobTab_(name).copyTo(db);
+        backup.setName(archiveName);
+        backup.hideSheet();
+      }
+    });
+    // Archives exist before modifying any live records.
+    ["Submissions","Grades","Audit"].forEach(function(name) {
+      var sheet=jobTab_(name),last=sheet.getLastRow();
+      if(last>1)sheet.getRange(2,1,last-1,sheet.getLastColumn()).clearContent();
+    });
+    var groups=jobTab_("Groups"),groupLast=groups.getLastRow();
+    if(groupLast>1) {
+      groups.getRange(2,4,groupLast-1,1).clearContent();
+      groups.getRange(2,7,groupLast-1,1).clearContent();
+    }
+    jobSetConfig_("ROUND","pre");
+    jobSetConfig_("REVEAL_SCORES","FALSE");
+    jobSetConfig_("ACCESS_OPEN","FALSE");
+    jobSetConfig_("SESSION_ID",nextId);
+    jobSetConfig_("SESSION_CLOSED","FALSE");
+    jobAuditSafe_("TRAINER","NEW_SESSION","","","previous="+oldId+" new="+nextId);
+  }finally{lock.releaseLock();}
+  return teacherSnapshot(code);
+}
+function groupSubmissionStatus(payload) {
+  var p=payload||{},id=String(p.groupId||""),round=String(p.round||"");
+  if(!/^group-0[1-4]$/.test(id)||["pre","post"].indexOf(round)<0)throw new Error("بيانات الجروب غير صحيحة.");
+  var group=jobGroup_(id),cfg=jobConfig_();
+  if(!group||!group.active||jobHash_(p.accessCode||"")!==group.hash)throw new Error("رابط الجروب غير صالح.");
+  if(p.sessionId&&String(p.sessionId)!==String(cfg.SESSION_ID))return {ok:false,sessionChanged:true,message:"الجلسة تغيرت. افتح رابط الجروب من جديد."};
+  var existing=jobReadSubmissions_().filter(function(x){return x.groupId===id&&x.round===round;})[0];
+  return {ok:true,sessionId:String(cfg.SESSION_ID||""),sessionClosed:jobFlag_(cfg.SESSION_CLOSED),
+    submitted:!!existing,submissionId:existing?existing.id:null,gradeStatus:existing?existing.gradeStatus:null};
 }
 function teacherTestGemini(code) {
   jobTeacher_(code);
@@ -345,6 +420,8 @@ function submitGroup(payload) {
   var round=String(p.round||"");
   if(round!=="pre"&&round!=="post")throw new Error("الجولة غير صحيحة.");
   var config=jobConfig_();
+  if(p.sessionId&&String(p.sessionId)!==String(config.SESSION_ID))throw new Error("الجلسة اتغيرت؛ افتح رابط الجروب من جديد.");
+  if(jobFlag_(config.SESSION_CLOSED))throw new Error("الجلسة انتهت. ابدأ في الجلسة الجديدة بعد فتحها.");
   if(config.ROUND!==round)throw new Error("الجولة دي مش مفتوحة حاليًا. راجع المحاضر.");
   if(!jobFlag_(config.ACCESS_OPEN))throw new Error("المحاضر قفل استقبال الإجابات حاليًا.");
   var leader=jobSafe_(p.leaderName,100),summary=jobCleanSummary_(p.practicalSummary),link=jobSafe_(p.practicalDocumentUrl,1500);
@@ -359,7 +436,8 @@ function submitGroup(payload) {
   var submissionId;
   try{
     var control=jobConfig_();
-    if(!jobFlag_(control.ACCESS_OPEN)||control.ROUND!==round)throw new Error("المحاضر قفل استقبال الإجابات أو غيّر الجولة.");
+    if(jobFlag_(control.SESSION_CLOSED)||!jobFlag_(control.ACCESS_OPEN)||control.ROUND!==round||
+       (p.sessionId&&String(p.sessionId)!==String(control.SESSION_ID)))throw new Error("الجلسة مقفولة أو اتغيرت؛ افتح رابط الجروب من جديد.");
     var current=jobReadSubmissions_();
     var existing=current.filter(function(s){return s.groupId===id&&s.round===round;})[0];
     if(existing){
@@ -380,11 +458,11 @@ function submitGroup(payload) {
     } catch(ex) { Logger.log("Non-critical group update failed: "+String(ex)); }
     jobAuditSafe_(id,"SUBMIT",id,submissionId,"Stored before Gemini call");
   }finally{lock.releaseLock();}
-  var gradeResult;
-  try{gradeResult=jobGradeById_(submissionId);}
-  catch(ex){jobAuditSafe_("SYSTEM","GEMINI_DEFERRED",id,submissionId,String(ex.message||ex).slice(0,250));gradeResult={status:"PENDING_GEMINI",info:"Gemini unavailable or not configured"};}
-  return {ok:true,submissionId:submissionId,stored:true,gradeStatus:gradeResult.status,
-    message:"تم تسجيل حل الجروب في قاعدة البيانات. التقييم لا يظهر إلا بعد مراجعة المحاضر."};
+  // IMPORTANT: Never wait for Gemini in a trainee submit request.
+  // The existing time-driven processPendingGrades_ trigger handles grading,
+  // and the instructor can manually retry from their console.
+  return {ok:true,submissionId:submissionId,stored:true,gradeStatus:"PENDING_GEMINI",
+    message:"تم الحفظ بنجاح. تقييم Gemini هيتم لاحقًا ويحتاج اعتماد المحاضر."};
 }
 function jobGeminiResult_(s) {
   var key=PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
@@ -451,9 +529,11 @@ function jobGradeById_(id) {
   var lock=LockService.getScriptLock();lock.waitLock(15000);
   try{
     if(jobGradeRows_().some(function(x){return x.submissionId===id;}))return {status:"ALREADY_GRADED"};
+    var stillCurrent=jobReadSubmissions_().filter(function(x){return x.id===id;})[0];
+    if(!stillCurrent)return {status:"SESSION_ARCHIVED"};
     jobTab_("Grades").appendRow([id,s.groupId,s.round,result.model,"1.0",JSON.stringify(result.criteria),
       result.feedback,result.total,"","REVIEW_REQUIRED","",""]);
-    jobTab_("Submissions").getRange(s.row,11).setValue("REVIEW_REQUIRED");
+    jobTab_("Submissions").getRange(stillCurrent.row,11).setValue("REVIEW_REQUIRED");
     jobAudit_("GEMINI","PROPOSED_SCORE",s.groupId,id,"proposed="+result.total);
     return {status:"REVIEW_REQUIRED"};
   } finally{lock.releaseLock();}
