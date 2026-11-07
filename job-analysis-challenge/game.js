@@ -102,7 +102,7 @@ function liveApplyTeacher(data){
   state.reveal=!!data.reveal;
   state.scores={pre:{},post:{}};
   renderTrainer();
-  $("teacherConnectionMsg").textContent="متصل بقاعدة البيانات · "+(data.geminiConfigured?"Gemini API جاهز":"مفتاح Gemini لسه مش مضاف")+" · "+(data.submissions||[]).length+" تسليم";
+  $("teacherConnectionMsg").textContent="متصل بقاعدة البيانات · "+(data.geminiConfigured?"مفتاح Gemini موجود — اختبر التقييم من زر Gemini":"مفتاح Gemini لسه مش مضاف")+" · "+(data.submissions||[]).length+" تسليم";
   $("teacherConnectionMsg").style.color="#1d754d";
   $("teacherRefresh").hidden=false;
   $("reviewSection").hidden=false;
