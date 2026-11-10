@@ -28,7 +28,7 @@ function getBackendStatus() {
   return {
     edition: SCA_CONFIG.EDITION,
     hasKey: k.length > 15,
-    model: (p.getProperty('GEMINI_MODEL') || 'gemini-3.5-flash').trim(),
+    model: (p.getProperty('GEMINI_MODEL') || 'gemini-3.8-flash').trim(),
     researchContextEnabled: p.getProperty('ALLOW_SCA_RESEARCH_CONTEXT') === 'true',
     authentication: 'Private Apps Script deployment: Only myself',
     databaseWrite: false,
@@ -154,7 +154,7 @@ function apiKey_() {
 }
 
 function selectedModel_() {
-  const name=(PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL') || 'gemini-3.5-flash').trim();
+  const name=(PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL') || 'gemini-3.8-flash').trim();
   if (!/^[a-zA-Z0-9._-]{3,90}$/.test(name)) throw new Error('Invalid GEMINI_MODEL Script Property.');
   return name;
 }
