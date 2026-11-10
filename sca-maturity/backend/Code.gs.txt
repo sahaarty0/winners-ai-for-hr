@@ -49,6 +49,11 @@ function testGeminiConnection() {
   };
 }
 
+function testGeminiGeneration() {
+  const result=callGemini_('Respond with exactly the letters: OK', 80);
+  return {ok:!!result, model:selectedModel_(), result:result.slice(0,120)};
+}
+
 function listGeminiModels() {
   const key = apiKey_();
   const url = 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=500';
@@ -164,30 +169,47 @@ function selectedModel_() {
 }
 
 function callGemini_(prompt, maxTokens) {
-  const model=selectedModel_();
-  const generationConfig={maxOutputTokens:maxTokens};
-  // Gemini 3.8 Flash does not support deprecated temperature parameter.
-  // LOW thinking avoids needless latency for this advisory workflow.
+  const model = selectedModel_();
+  const generationConfig = {maxOutputTokens:maxTokens};
   if (/^gemini-3\./.test(model)) generationConfig.thinkingConfig={thinkingLevel:'LOW'};
-  const payload={
+  const payload = {
     contents:[{role:'user',parts:[{text:prompt}]}],
     generationConfig:generationConfig
   };
-  const response=UrlFetchApp.fetch(SCA_CONFIG.GEMINI_BASE + encodeURIComponent(model) + ':generateContent', {
+  const request = {
     method:'post', contentType:'application/json',
     headers:{'x-goog-api-key':apiKey_()},
-    payload:JSON.stringify(payload),muteHttpExceptions:true
-  });
-  if (response.getResponseCode() !== 200) {
-    // The response may mention account/model details; do not echo raw API payloads or secrets.
-    throw new Error('Gemini request failed (HTTP ' + response.getResponseCode() +
-      '). Check GEMINI_MODEL, API project quota, and enabled billing/access.');
+    payload:JSON.stringify(payload), muteHttpExceptions:true
+  };
+  const endpoint = SCA_CONFIG.GEMINI_BASE + encodeURIComponent(model) + ':generateContent';
+  const maxAttempts = 3;
+  let response, status;
+  for (let attempt=1; attempt<=maxAttempts; attempt++) {
+    try {
+      response=UrlFetchApp.fetch(endpoint,request);
+      status=response.getResponseCode();
+    } catch(e) {
+      // Never log keys or input payloads. A network failure does not prove the key is invalid.
+      throw new Error('تعذر الوصول إلى Gemini API من Apps Script. راجع Apps Script > Executions واتصال الخدمة ثم أعد المحاولة.');
+    }
+    if (status===200) break;
+    // HTTP 503 is a capacity problem, unlike a 429 rate-limit error.
+    if ((status===503 || status===500 || status===502 || status===504) && attempt<maxAttempts) {
+      Utilities.sleep(attempt===1 ? 1200 : 3500);
+      continue;
+    }
+    if (status===503) throw new Error('HTTP 503: خدمة Gemini مشغولة حاليًا. تم تنفيذ 3 محاولات (محاولتان لإعادة الطلب). جرّب نموذجًا آخر من قائمة النماذج المتاحة داخل GEMINI_MODEL، مثل gemini-3.5-flash-lite إذا كان متاحًا لمفتاحك.');
+    if (status===429) throw new Error('HTTP 429: حدود طلبات أو رصيد API. افتح Google AI Studio > Rate limits / Billing لمعرفة السبب.');
+    if (status===400) throw new Error('HTTP 400: Gemini رفض إعدادات الطلب. افحص اسم النموذج ومعاملات التوليد.');
+    if (status===401 || status===403) throw new Error('HTTP '+status+': تحقق من صلاحيات Gemini API والمشروع المرتبط بالمفتاح.');
+    if (status===404) throw new Error('HTTP 404: النموذج المحدد غير متاح لهذه الواجهة أو لمفتاحك. اعرض النماذج المتاحة ثم عدّل GEMINI_MODEL.');
+    throw new Error('فشل طلب Gemini HTTP '+status+'. راجع Apps Script > Executions قبل إعادة المحاولة.');
   }
   const body=JSON.parse(response.getContentText());
-  const text=(body.candidates || []).reduce((a,c)=>a.concat((c.content && c.content.parts || [])
-    .map(p=>p.text || '').filter(Boolean)),[]).join('\n').trim();
-  if (!text) throw new Error('Gemini returned no text. Check safety filters and model availability.');
-  return text;
+  const result=(body.candidates||[]).reduce((a,c)=>a.concat((c.content&&c.content.parts||[])
+    .map(p=>p.text||'').filter(Boolean)),[]).join('\n').trim();
+  if (!result) throw new Error('لم يرجع Gemini نصًا قابلًا للعرض. راجع النموذج ومرشحات الأمان وطول المخرجات.');
+  return result;
 }
 
 function getBank_() {
