@@ -1,0 +1,37 @@
+
+/* PHASE 2 — ASSESSMENT MODE + CONSULTANT DECISION GATE */
+.phase2-mode-panel{margin:18px 0 2px;background:#fff;border:1px solid #d7e2ea;border-right:5px solid #aa7b2c;border-radius:14px;padding:16px;box-shadow:0 6px 16px #0b2b4910}
+.phase2-mode-panel .p2-title{font-weight:900;color:#092944;font-size:15px}
+.phase2-mode-panel .p2-subtitle{color:#486179;font-size:12px;line-height:1.85;margin:4px 0 12px}
+.phase2-mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.phase2-mode{border:1px solid #b4c3d2;background:#fff;border-radius:12px;padding:12px;text-align:center;color:#123450;font-weight:800;font-size:13px;cursor:pointer;transition:all .15s}
+.phase2-mode[aria-pressed=true]{background:#092f53;color:#fff;border-color:#0d3d65;box-shadow:0 5px 12px #0b2b4928}
+.phase2-mode:hover{border-color:#bc8b37}
+.phase2-explain{font-size:11px;color:#657487;line-height:1.9;margin-top:11px}
+.phase2-report{background:#fff!important;border:1px solid #cddce8!important;padding:24px;margin:17px 0;border-top:5px solid #a87929!important}
+.phase2-report h2{margin:0;color:#092b49;font-size:21px}
+.phase2-report h3{color:#0b3353;margin:18px 0 8px;font-size:15px}
+.phase2-report p{color:#4b6074;line-height:1.9;font-size:12px}
+.phase2-stats{display:flex;flex-wrap:wrap;gap:10px;margin:15px 0}
+.phase2-chip{background:#092e52;color:white;border:1px solid #0a2d52;border-radius:10px;padding:10px 13px;font-size:12px}
+.phase2-chip.gold{background:#be8e3c;color:#092944;border-color:#be8e3c}
+.phase2-choices{display:grid;gap:10px}
+.phase2-item{border:1px solid #d7e3ed;border-radius:12px;padding:13px;background:#fafdff}
+.phase2-item-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.phase2-item-title{font-size:13px;font-weight:900;color:#0c3152}
+.phase2-item small{font-size:11px;color:#677b8b}
+.phase2-item p{margin:7px 0;color:#193e5f}
+.phase2-item select,.phase2-item textarea{border:1px solid #bdcedc;background:#fff;color:#0b3150;border-radius:9px;padding:9px;font:600 12px Cairo,Arial,sans-serif;max-width:100%}
+.phase2-item textarea{width:100%;min-height:48px;margin-top:8px;resize:vertical;font-weight:400}
+.phase2-item select{min-width:190px}
+.phase2-gate{border:1px solid #b79551;background:#fff9ee;border-radius:13px;padding:17px;margin-top:18px}
+.phase2-gate h3{margin:0 0 7px;color:#765016}
+.phase2-gate label{display:flex;align-items:flex-start;gap:10px;font-weight:700;color:#254462;font-size:12px;line-height:1.9;margin:8px 0}
+.phase2-gate input{width:17px;height:17px;flex-shrink:0;margin-top:3px}
+.phase2-gate .p2-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.phase2-gate .p2-actions button{border-radius:10px;font-size:12px;padding:10px 16px}
+.phase2-message{font-size:12px;padding:12px;border-radius:10px;background:#eff5fa;color:#123c60;margin:9px 0;line-height:1.8}
+.phase2-hide{display:none!important}
+.phase2-disclaimer{color:#715316;font-size:11px;line-height:1.8;background:#fff8e9;padding:11px;border:1px solid #e1c388;border-radius:9px;margin:10px 0}
+@media(max-width:650px){.phase2-mode-buttons{grid-template-columns:1fr}.phase2-report{padding:15px}.phase2-item select{width:100%}}
+@media print{.phase2-mode-panel,.phase2-gate,.phase2-item select,.phase2-item textarea,.phase2-report .p2-actions{display:none!important}.phase2-report{break-inside:avoid}.phase2-item{break-inside:avoid}}
