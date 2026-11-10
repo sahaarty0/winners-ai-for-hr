@@ -46,15 +46,51 @@ a{color:#a6dcff}
 <p>من <a href="https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/" target="_blank" rel="noopener noreferrer">أداة SCA Maturity Assessment</a> اختر «نسخة احتياطية»، ثم حمّل ملف JSON هنا. يُرسل إلى Gemini فقط نطاق الأسئلة وإجابات Yes/No وأرقام مراجع البحث؛ <strong>لا تُرسل الأسماء أو التعليقات أو بيانات العاملين</strong>.</p>
 <input id="file" type="file" accept="application/json,.json" aria-label="SCA Assessment backup JSON">
 <label><input id="approval" type="checkbox"> أؤكد أن الملف يحتوي على تقييم بحثي غير سري وأوافق على معالجة الإجابات بواسطة Gemini؛ لا يحتوي على بيانات شخصية أو مستندات داخلية.</label>
-<div class="actions"><button id="analyzeBtn" type="button" disabled>تحليل الإجابات باستخدام Gemini</button><button id="saveBtn" class="secondary" type="button" disabled>حفظ التحليل TXT</button></div>
+<div class="actions"><button id="offlineBtn" class="secondary" type="button" disabled>عرض تقرير فوري بدون Gemini</button><button id="analyzeBtn" type="button" disabled>إضافة تحليل Gemini (اختياري)</button><button id="saveBtn" class="secondary" type="button" disabled>حفظ التحليل TXT</button></div>
 <div class="tip">التحليل استرشادي ويخضع لمراجعة الاستشاري والإدارة القانونية عند الحاجة. لا يغيّر درجات النضج الأصلية. استرجاع نصوص الأبحاث من Drive <strong>معطّل افتراضيًا</strong> حتى السماح به صراحة في Script Properties.</div>
-<h2 style="margin-top:25px">نتيجة التحليل</h2><pre id="result">لم يُجرَ تحليل بعد.</pre>
+<h2 style="margin-top:25px">التقرير الفوري والتحليل الاختياري</h2><pre id="result">لم يُجرَ تحليل بعد.</pre>
 </div>
 </main>
 <script>
 'use strict';
 const el=id=>document.getElementById(id);
-let assessmentText='', lastReport='';
+let assessmentText='', lastReport='', parsedAssessment=null;
+const CORE_NAMES={"F01":"HR Governance & Policies","F02":"Workforce Planning & Manpower","F03":"Personnel & HR Operations","F04":"Compliance & HR Risk","F05":"Talent Acquisition & Onboarding","F06":"Performance Management","F07":"Learning & Development","F08":"Talent Management & Succession","F09":"Compensation & Benefits","F10":"Employee Relations & Engagement","F11":"HRIS, Data & Analytics","S01":"Business & HR Strategy Alignment","S02":"Organization Design & Structure","S03":"Workforce Capability","S04":"Leadership & Talent","S05":"Culture & Organizational Health","S06":"HR Operating Model","S07":"HR Technology & Digital Maturity","S08":"HR Analytics & Business Impact","S09":"Change & Transformation Readiness"};
+function localReport(a) {
+ const scope=a.scope||{mode:'full'},vals=a.answers||{};
+ const ids=Object.keys(CORE_NAMES);
+ const chosen=scope.mode==='functional'?ids.filter(x=>x.startsWith('F')):scope.mode==='focused'?
+   (Array.isArray(scope.selected)?scope.selected.filter(x=>ids.includes(x)):[]):ids;
+ const summary=chosen.map(id=>{
+   const keys=Object.keys(vals).filter(k=>k.startsWith('SCA-'+id+'-Q'));
+   const yes=keys.filter(k=>vals[k]&&vals[k].value===1).length;
+   const no=keys.filter(k=>vals[k]&&vals[k].value===0).length;
+   return{id,yes,no,complete:yes+no,name:CORE_NAMES[id]};
+ });
+ const answered=summary.reduce((n,c)=>n+c.complete,0),no=summary.reduce((n,c)=>n+c.no,0);
+ const lines=[
+ 'WINNERS × SCA — تقرير مبدئي فوري (بدون Gemini)',
+ 'هذه نتائج أولية مبنية على إجابات المُقيّم؛ لا تثبت التطبيق أو القصور ولا تُعد رأيًا قانونيًا.',
+ 'النطاق: '+(scope.mode||'full')+' | المحاور: '+summary.length+' | الإجابات: '+answered+' | لا: '+no,
+ '',
+ 'أولًا: ملخص إجابات المحاور'
+ ];
+ summary.forEach(c=>lines.push('• '+c.id+' '+c.name+': نعم '+c.yes+' / لا '+c.no+' / بدون إجابة '+(5-c.complete)));
+ lines.push('','ثانيًا: أولويات التحقق (ليست فجوات مثبتة)');
+ const gaps=summary.filter(c=>c.no>0).sort((a,b)=>b.no-a.no);
+ if(gaps.length)gaps.forEach(c=>lines.push('• '+c.id+' '+c.name+' — يلزم التحقق من الأدلة المعتمدة قبل الحكم ('+c.no+' إجابات لا).'));
+ else lines.push('• لا توجد إجابات «لا» مرصودة بالنطاق الحالي، لكن لا تُعد هذه شهادة امتثال.');
+ lines.push('','ثالثًا: خارطة تحقق استرشادية 30 / 60 / 90 يومًا',
+ '30 يوم: مراجعة المستندات السارية والتفويضات والنطاق والمسؤوليات.',
+ '60 يوم: التحقق الميداني من الإجراءات والأدلة وإثبات الفجوات الفعلية عند وجودها.',
+ '90 يوم: وضع إجراءات تحسين معتمدة وإعادة القياس بمؤشرات موثقة.',
+ '','رابعًا: ضوابط الاستخدام',
+ 'هذا التقرير مبني على قواعد ثابتة وليس من إنتاج الذكاء الاصطناعي.',
+ 'لا يحتسب السؤال غير المُجاب أو المحور خارج النطاق صفرًا.',
+ 'لا تتغير درجات SCA Maturity الأصلية، وتظل النتائج خاضعة لمراجعة الاستشاري.');
+ return lines.join('\n');
+}
+
 function msg(s,error){el('message').textContent=s;el('message').classList.toggle('error',!!error);}
 function busy(v){el('testBtn').disabled=v;el('modelsBtn').disabled=v;el('generationBtn').disabled=v;el('analyzeBtn').disabled=v||!assessmentText||!el('approval').checked;}
 function init(){google.script.run.withSuccessHandler(s=>{
@@ -63,16 +99,22 @@ function init(){google.script.run.withSuccessHandler(s=>{
   el('researchStatus').textContent=s.researchContextEnabled?'مفعّل بإذن المالك':'مُعطّل (آمن)';
 }).withFailureHandler(e=>msg(e.message,true)).getBackendStatus();}
 el('file').addEventListener('change',async e=>{
- const f=e.target.files[0];assessmentText='';el('analyzeBtn').disabled=true;
+ const f=e.target.files[0];assessmentText='';parsedAssessment=null;el('analyzeBtn').disabled=true;el('offlineBtn').disabled=true;
  if(!f)return;
  if(f.size>120000){msg('الملف أكبر من الحد المسموح (120 KB).',true);return;}
  assessmentText=await f.text();
- try{const obj=JSON.parse(assessmentText);if(obj.assessmentEdition!=='SCA-2026-11-10')throw Error('not SCA');
+ try{const obj=JSON.parse(assessmentText);if(obj.schemaVersion!==1||obj.assessmentEdition!=='SCA-2026-11-10'||!obj.answers||typeof obj.answers!=='object')throw Error('not SCA');parsedAssessment=obj;
  msg('تم تحميل ملف SCA. لم يتم إرسال بيانات إلى Gemini بعد.');
  }catch(err){assessmentText='';msg('الملف ليس نسخة احتياطية صحيحة من SCA Maturity.',true);}
- el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;
+ el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;el('offlineBtn').disabled=!assessmentText;
 });
 el('approval').onchange=()=>{el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;};
+el('offlineBtn').onclick=()=>{
+ if(!parsedAssessment)return;
+ lastReport=localReport(parsedAssessment);
+ el('result').textContent=lastReport;el('saveBtn').disabled=false;
+ msg('تم إعداد التقرير الأولي على الجهاز دون إرسال طلب إلى Gemini.');
+};
 el('testBtn').onclick=()=>{
  busy(true);msg('جاري فحص صلاحية المفتاح وقائمة نماذج Gemini (بدون توليد نص)...');
  let pending=true;
@@ -108,14 +150,29 @@ el('generationBtn').onclick=()=>{
  }).testGeminiGeneration();
 };
 el('analyzeBtn').onclick=()=>{
- if(!assessmentText||!el('approval').checked)return;
- busy(true);msg('جاري تحليل الإجابات. إذا كانت خدمة Gemini مشغولة، سيحاول المحرك مرتين إضافيتين قبل إظهار التشخيص.');
+ if(!parsedAssessment||!assessmentText||!el('approval').checked)return;
+ lastReport=localReport(parsedAssessment);
+ el('result').textContent=lastReport;el('saveBtn').disabled=false;
+ busy(true);
+ msg('التقرير الفوري جاهز للحفظ. جاري طلب تحليل Gemini الاختياري، بمحاولتين كحد أقصى و14 ثانية لكل نموذج.');
+ let active=true;
+ const warning=setTimeout(()=>{
+   if(active)msg('Gemini ما زال يتأخر؛ التقرير الفوري موجود ويمكن حفظه. لا تضغط طلبًا جديدًا.',true);
+ },32000);
  google.script.run.withSuccessHandler(r=>{
-  busy(false);lastReport='SCA Maturity Gemini Analysis\nModel: '+r.model+'\nAnswered: '+r.answeredQuestions+'/'+r.assessedQuestions+'\nReported gaps: '+r.reportedGaps+
-  '\nResearch: '+r.researchStatus+'\n\n'+r.analysis+'\n\n'+r.note;
-  el('result').textContent=lastReport;el('saveBtn').disabled=false;
-  msg('تم التحليل. النتائج استرشادية ولم تتغير درجات التقييم.');
- }).withFailureHandler(e=>{busy(false);msg(e.message,true);}).analyzeScaAssessment(assessmentText);
+   if(!active)return;
+   active=false;clearTimeout(warning);busy(false);
+   lastReport+='\n\n======= GEMINI AI ANALYSIS =======\nModel: '+r.model+
+     '\nAnswered: '+r.answeredQuestions+'/'+r.assessedQuestions+
+     '\nReported NO responses: '+r.reportedGaps+
+     '\nResearch: '+r.researchStatus+'\n\n'+r.analysis+'\n\n'+r.note;
+   el('result').textContent=lastReport;el('saveBtn').disabled=false;
+   msg('تم إضافة التحليل الذكي إلى التقرير الفوري. لم تتغير درجات التقييم.');
+ }).withFailureHandler(e=>{
+   if(!active)return;
+   active=false;clearTimeout(warning);busy(false);
+   msg('تعذر Gemini: '+(e&&e.message?e.message:String(e))+' — التقرير الفوري جاهز ولم يتأثر.',true);
+ }).analyzeScaAssessment(assessmentText);
 };
 el('saveBtn').onclick=()=>{
  const blob=new Blob(['\uFEFF'+lastReport],{type:'text/plain;charset=utf-8'});
