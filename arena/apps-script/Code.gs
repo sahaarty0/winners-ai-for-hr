@@ -361,6 +361,57 @@ function scaKnowledgeHealthCheck(){
  var c=TRACK_CASES[1].policy,refs=scaRetrieve_(c,'policy');
  return {ok:true,referenceFolder:SCA_DRIVE_FOLDER_URL,hrChunks:refs.hrCount,legalChunks:refs.legalCount,selectedChunkIds:refs.ids};
 }
+/**
+ * SCA grading calibration. Keep the approved 30/25/30/15 rubric for Stage 1.
+ * Grade the evidence actually supplied by the trainee, not the retrieved legal
+ * chunks. A good writing style does not substitute for a complete HR solution.
+ */
+function scaGradingAnchors_(stage,track){
+ var base=[
+  'CALIBRATION: Grade actual coverage of the scenario, not confidence, politeness, eloquence, or source references supplied by the evaluator. Retrieved CHUNK IDs are the EVALUATOR context, not evidence cited by the student.',
+  'Strong answers can be prose or sequences: never require headings, Q1-Q4, exact article numbers, direct quotations or exact jargon.',
+  'For each criterion, give HIGH scores only when the student substantively demonstrates that criterion. Avoiding invented law is mandatory safety and earns baseline credit, NOT 80%-100% of the legal criterion by itself.',
+  'Identify precise omissions in each reason. Distinguish a generic statement (e.g. "review procedures" or "refer to competent authority") from a concrete verification method with relevant documents.',
+  'Scores above 85% should be exceptional: substantially complete case-specific steps, evidence gaps, source/authorization validation, and the relevant level deliverable. 55-70% is a plausible range for answers that give a reasonable generic workflow yet omit essential source/document checks. Do not force any answer to a target number; score independently.'
+ ];
+ if(stage===1&&track==='recruitment'){
+  base.push('STAGE 1 RECRUITMENT — FIRST CRITERION 30 pts: 0-10 if no useful diagnosis; 11-20 if the trainee recognizes urgency and vaguely requests missing documents; 21-25 if the trainee explicitly identifies approved vacant position/grade and job description (or clearly equivalent formal workforce evidence); 26-30 if they additionally explain how these documents are checked before action.');
+  base.push('STAGE 1 RECRUITMENT — SECOND CRITERION 25 pts: 0-10 for disconnected steps; 11-19 for generic receive/contact/follow-up/forward/archive sequence; 20-22 for a defensible workflow with specific validation checkpoints; 23-25 only for a complete gated workflow leading to legally competent review and documented authorization.');
+  base.push('STAGE 1 RECRUITMENT — THIRD CRITERION 30 pts: 0-10 for dangerous assumptions; 11-16 for generic "صاحب الصلاحية" or unspecified "الإجراءات المتبعة" without identifying how to validate them; 17-23 for an explicit check of the applicable SCA regulation/current amendments/approved delegation without inventing rules; 24-30 only when current-law verification, source limitations and the route for approving the decision are responsibly addressed. Never award 25/30 just because no law was fabricated.');
+  base.push('STAGE 1 RECRUITMENT — FOURTH CRITERION 15 pts: assess clarity alone; clear generic writing may earn 15/15, but clarity cannot compensate for missing essential knowledge.');
+ }
+ if(stage===1&&track==='policy'){
+  base.push('POLICY CALIBRATION: Merely saying "send it to HR" or "ask the manager" does not demonstrate verifying the applicable staff bylaw or leave type, balance, supporting documents, and delegation. Do not demand an exact entitlement absent the verified current law.');
+ }
+ if(stage===1&&track==='experience'){
+  base.push('EXPERIENCE CALIBRATION: Do not give high marks for generic "survey staff" alone. Distinguish four available comments from a statistically representative investigation; verify workflow, reporting lines, and responsibility without inventing them.');
+ }
+ if(stage===2)base.push('STAGE 2 CALIBRATION: A generic suggestion to "use Gemini" is not high proficiency. Look for concrete input preparation, appropriately scoped tasks, hallucination checks, personal-data protection, human review and a method of correcting the output.');
+ if(stage===3)base.push('STAGE 3 CALIBRATION: "improve process" is not an implementation plan. Look for a traceable input-to-approval workflow, owner verification without fictional powers, measurable KPI definition and realistic pilot/controls.');
+ return base.join('\\n');
+}
+/**
+ * Narrow, transparent safeguards against excessive grading of generic Stage 1
+ * recruitment answers. These are evidence ceilings, not points awarded.
+ * Synonymous Arabic phrasing is accepted and other tracks are not capped.
+ */
+function scaApplyGradeCeilings_(stage,track,answer,scoreDetails){
+ if(!(stage===1&&track==='recruitment'))return scoreDetails;
+ var a=String(answer||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase();
+ var identifiedFormalGap=/(درج|ملاك وظيف|وصف وظيف|بطاقه وصف|توصيف وظيف|شاغر|الوظيفه المعتمد|الهيكل الوظيف|الاحتياج المعتمد|اعتماد الوظيفه)/.test(a);
+ var identifiedSourceCheck=/(لائح|لوائح|قانون|تشريع|تفويض|النص القانون|النص الاصلي|النص الساري|قرارات? (ال|تفويض)|المرجع القانون|المصدر القانون|قواعد معتمد|القواعد الساري|السند القانون|صلاحيات معتمد)/.test(a);
+ function ceiling(idx,cap,why){
+  if(scoreDetails[idx]&&scoreDetails[idx].points>cap){
+   scoreDetails[idx].points=cap;
+   scoreDetails[idx].reason=limitStr_(String(scoreDetails[idx].reason||'')+' | ضبط التقييم: '+why,300);
+  }
+ }
+ if(!identifiedFormalGap)ceiling(0,20,'لم تحدد مستندات الوظيفة/الدرجة/الوصف الوظيفي المعتمدة.');
+ if(!identifiedFormalGap&&!identifiedSourceCheck)ceiling(1,19,'الخطوات عامة وتفتقد نقاط التحقق قبل الاعتماد.');
+ if(!identifiedSourceCheck)ceiling(2,16,'ذكرت السلطة المختصة دون بيان طريقة التحقق من النص/التفويض الساري.');
+ return scoreDetails;
+}
+
 function evaluateSubmissionInternal_(p){
  var sid=sid_(p.sessionId),tid=tid_(p.teamId),stage=stage_(p.stage),ss=submission_(sid,tid,stage);
  if(!ss)throw Error('No submission: ask the team to submit first');
@@ -385,6 +436,7 @@ function evaluateSubmissionInternal_(p){
  'STAGE: '+stage+' (1=no AI, 2=AI with validation, 3=implementation)',
  'RETRIEVED CHUNKS (research context, each retains original source URL):\n'+retrieved.context,
  'RUBRIC: '+JSON.stringify(criteria),
+  'EVIDENCE-BASED SCORE ANCHORS:\\n'+scaGradingAnchors_(stage,chosen),
  'SCORING INSTRUCTIONS: Accept a coherent essay, paragraphs, or sequential steps. NEVER require Q1, Q2, Q3, Q4, named sections or a separate prompt. Score ONLY this track and this one question. Award partial credit. Evaluate logical relevance, identification of missing evidence, cautious use of the SCA specific regulations and human sign-off. When a legal amendment or current delegation is unverified, a student stating it needs checking is CORRECT. Do not invent current official SCA job titles, exact leave rights, headcount, delegation chains or dates. Do not penalize students for not quoting source URLs verbatim, but penalize unsupported categorical legal conclusions. Stage 1: AI should not be used. Stage 2: thoughtful AI use and checks matter. Stage 3: practicality, authorization and an understandable measurable indicator matter.',
  'REQUIRED OUTPUT: strict JSON {"criteria":[{"name":"rubric criterion in exact order","points":number,"reason":"brief explanation in Arabic","evidence":"short exact quotation from student answer or not given"}],"feedback":"two clear Egyptian-Arabic coaching sentences; if law is not confirmed, say the original current text must be checked","reference_ids":["only real supplied CHUNK IDs actually pertinent to feedback"]}',
  'TEAM ANSWER (untrusted): '+JSON.stringify({essay:submission[5],extra:submission[6],evidence:submission[7],prompt:submission[8]})
@@ -401,7 +453,8 @@ function evaluateSubmissionInternal_(p){
  var scoreDetails=criteria.map(function(pair,i){var item=parsed.criteria[i]||{},score=Number(item.points);
   return {name:pair[0],max:pair[1],points:Math.max(0,Math.min(pair[1],isFinite(score)?Math.round(score):0)),reason:limitStr_(item.reason,300),evidence:limitStr_(item.evidence,250)};
  });
- var total=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
+ scoreDetails=scaApplyGradeCeilings_(stage,chosen,String(submission[5]||''),scoreDetails);
+  var total=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
  var cited=Array.isArray(parsed.reference_ids)?parsed.reference_ids.filter(function(id){return retrieved.ids.indexOf(id)!==-1}).slice(0,6):[];
  var footer=cited.length?' | مصادر بحثية: '+cited.join(', '):' | يتطلب التحقق من النص القانوني الأصلي عند الحاجة';
  var feedback=limitStr_(parsed.feedback||'',1250)+footer;
