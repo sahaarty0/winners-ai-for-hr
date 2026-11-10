@@ -178,11 +178,17 @@ body.sca-readable .q-tag{background:#e7bd62;color:#19344e;font-size:14px}
 
 
 /* SCA + Winners dual-logo header — original images only, no regeneration.
-   Winners artwork has exactly a 3% visual scale increase. */
+   Winners rendered at approximately the same visible height as SCA. */
+body.sca-readable .logo-card,
+body.sca-readable .brand{width:175px;max-width:175px;padding:6px 5px;min-height:127px}
 body.sca-readable .logo-card img,
 body.sca-readable .brand img{
-  transform:scale(1.03);
-  transform-origin:center center;
+  display:block;
+  transform:none;
+  width:165px;
+  height:115px;
+  max-height:115px;
+  object-fit:contain;
 }
 body.sca-readable .sca-logo{
   display:flex;align-items:center;justify-content:center;
@@ -229,13 +235,17 @@ body.sca-readable .arena-header-title .tiny{font-size:14px!important}
   body.sca-readable .header>.arena-header-title{grid-column:1/-1;grid-row:2;justify-self:stretch;text-align:center}
   body.sca-readable .sca-logo{width:126px;min-height:83px;padding:4px}
   body.sca-readable .sca-logo img{width:116px;max-height:89px}
-  body.sca-readable .topbar>.logo-card{min-width:120px;max-width:146px}
-  body.sca-readable .header>.brand{width:125px}
+  body.sca-readable .topbar>.logo-card,
+  body.sca-readable .header>.brand{width:140px;min-width:140px;max-width:140px;min-height:97px;padding:4px 6px}
+  body.sca-readable .logo-card img,
+  body.sca-readable .brand img{width:128px;height:89px;max-height:89px}
   body.sca-readable .topbar .top-actions{flex-wrap:wrap;gap:6px}
 }
 @media(max-width:360px){
   body.sca-readable .sca-logo{width:110px;min-height:75px}
   body.sca-readable .sca-logo img{width:102px}
-  body.sca-readable .topbar>.logo-card{min-width:113px;max-width:126px}
-  body.sca-readable .header>.brand{width:115px}
+  body.sca-readable .topbar>.logo-card,
+  body.sca-readable .header>.brand{width:122px;min-width:122px;max-width:122px;min-height:84px;padding:4px 6px}
+  body.sca-readable .logo-card img,
+  body.sca-readable .brand img{width:110px;height:76px;max-height:76px}
 }
