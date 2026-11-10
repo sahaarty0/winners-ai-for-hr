@@ -29,6 +29,15 @@
 - No API connection, deployment, quotas or account permissions can be verified until the owner completes the Google Apps Script project setup.
 - Use only a private **Only myself** deployment and never insert API keys into HTML, GitHub or chat.
 
+## Diagnosing Gemini HTTP 503
+
+- 503 = Gemini service temporarily busy. It is **not** proof that an API key or billing is invalid (those are distinct errors).
+- Updated Code.gs retries 503/500/502/504 at most **twice** (3 attempts total), with short pauses; 429 is **not** retried automatically.
+- Test in this order: **اختبار Gemini API** (model/key listing), **اختبار توليد نص صغير** (real generation), and only then upload a test SCA JSON.
+- To try a less-loaded model, list models available to your own key and set `GEMINI_MODEL` to one of those IDs in Apps Script > Project Settings > Script Properties. E.g. `gemini-3.5-flash-lite` only **if listed** for your project.
+- Updating GitHub **does not update a live Apps Script deployment**: replace Code.gs and Index.html in the owner project, Save, then Deploy > Manage deployments > Edit > New version > Deploy.
+- If 503 persists on multiple available models, check Google's Gemini API status and Apps Script > Executions; no code-side fix can force an overloaded upstream model to accept a request.
+
 ## Official references
 - https://developers.google.com/apps-script/guides/web
 - https://developers.google.com/apps-script/guides/html/communication
