@@ -168,7 +168,7 @@ function callGemini_(prompt, maxTokens) {
   const generationConfig={maxOutputTokens:maxTokens};
   // Gemini 3.8 Flash does not support deprecated temperature parameter.
   // LOW thinking avoids needless latency for this advisory workflow.
-  if (/^gemini-3\\./.test(model)) generationConfig.thinkingConfig={thinkingLevel:'LOW'};
+  if (/^gemini-3\./.test(model)) generationConfig.thinkingConfig={thinkingLevel:'LOW'};
   const payload={
     contents:[{role:'user',parts:[{text:prompt}]}],
     generationConfig:generationConfig
