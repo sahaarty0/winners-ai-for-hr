@@ -38,6 +38,16 @@
 - Updating GitHub **does not update a live Apps Script deployment**: replace Code.gs and Index.html in the owner project, Save, then Deploy > Manage deployments > Edit > New version > Deploy.
 - If 503 persists on multiple available models, check Google's Gemini API status and Apps Script > Executions; no code-side fix can force an overloaded upstream model to accept a request.
 
+## Final resilient edition — 2026-11-10
+- The complete 100-question public SCA research metadata is embedded in Code.gs: no GitHub/network question-bank fetch during analysis.
+- The private Index.html console now has **عرض تقرير فوري بدون Gemini**. It produces a deterministic, explicitly non-AI provisional report immediately from the SCA assessment JSON. This remains available if Gemini fails.
+- The **إضافة تحليل Gemini (اختياري)** action creates the deterministic report first; Gemini text is appended only after a successful response. Errors leave the report intact and downloadable.
+- Gemini REST generation has a **14-second timeout per attempt**, with at most **two model calls** (primary configured GEMINI_MODEL then fallback GEMINI_FALLBACK_MODEL, default gemini-3.5-flash-lite). No unbounded retry.
+- Default primary is gemini-3.5-flash-lite unless Script Properties override it. A 429 usage limit is not automatically retried on another model.
+- The AI payload limits detailed questions to the first 20 reported NO and 8 YES responses, while preserving aggregated counts for all assessed cores. No names, free-text notes, or personnel records are sent.
+- **Only updating GitHub does not update the user's private Google Apps Script Web App.** Replace both Code.gs and Index.html in the script editor, Save, then Deploy > Manage deployments > Edit > New version > Deploy.
+- This edition was statically and locally mocked/tested, but live Gemini generation on the user's private key cannot be verified by ChatGPT. The offline report is the fail-safe; an external Gemini service can still return 503.
+
 ## Official references
 - https://developers.google.com/apps-script/guides/web
 - https://developers.google.com/apps-script/guides/html/communication
