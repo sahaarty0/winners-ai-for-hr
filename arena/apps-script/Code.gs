@@ -317,9 +317,15 @@ function scaRetrieveEvidence_(track) {
   var cache=CacheService.getScriptCache(), cacheKey='SCA_ESSAY_KB_V1_'+track;
   var hit=cache.get(cacheKey);if(hit)return hit;
   var keywords={
-    recruitment:'قناة السويس التعيين شغل وظيفة الوظائف المفاضلة التعيينات الأقدمية لجنة شئون العاملين إجراءات الاختيار',
-    experience:'قناة السويس تقييم الأداء العاملين الورديات العمل التدريب نقل الأداء واجبات الشكاوى التظلمات تنظيم الإدارة',
-    policy:'قناة السويس إجازات العاملين إجازة مرضية اعتيادية العمل الاعتماد الجزاءات طلبات شئون العاملين'
+    recruitment:'التعيين شغل الوظائف المفاضلة الاختبارات الأهلية إعلان وظائف',
+    experience:'العمل الأداء التقييم مواعيد العمل النقل التدريب التبعية التنظيم',
+    policy:'الإجازة الإجازات الانقطاع طلب الإجازة الرصيد مواعيد العمل'
+  };
+  // Curated entry IDs are indexes into the same Drive datasets, not independent legal findings.
+  var anchors={
+    recruitment:{HR:['SCA-P01','SCA-P02','SCA-P03','SCA-P04','SCA-O03'],LEGAL:['SCA-LEG-HR-P01','SCA-LEG-HR-P02','SCA-LEG-HR-P03','SCA-LEG-HR-P04','SCA-LEG-007']},
+    experience:{HR:['SCA-P20','SCA-P09','SCA-P16','SCA-P37','SCA-O05'],LEGAL:['SCA-LEG-HR-P20','SCA-LEG-HR-P09','SCA-LEG-HR-P16','SCA-LEG-006','SCA-LEG-003']},
+    policy:{HR:['SCA-P21','SCA-P20','SCA-P08','SCA-O07'],LEGAL:['SCA-LEG-HR-P21','SCA-LEG-006','SCA-LEG-003','SCA-LEG-007','SCA-LEG-002']}
   };
   var query=keywords[track];if(!query)throw Error('Unknown SCA HR training track');
   var props=PropertiesService.getScriptProperties();
@@ -339,7 +345,7 @@ function scaRetrieveEvidence_(track) {
       var obj;try{obj=JSON.parse(line)}catch(e){throw Error('Invalid SCA '+ref.kind+' JSONL');}
       var meta=obj.metadata||{},title=String(meta.title_ar||meta.doc_name||'');
       var titleNorm=norm_(title),bodyNorm=norm_(String(obj.text||'').slice(0,1800));
-      var score=0;
+      var score=(anchors[track][ref.kind].indexOf(obj.id)>=0?100:0);
       tokens.forEach(function(tok){if(titleNorm.indexOf(tok)>=0)score+=7;if(bodyNorm.indexOf(tok)>=0)score+=1;});
       if(ref.kind==='LEGAL'&&meta.doc_id==='SCA-LAW-1975-030')score+=5;
       if(ref.kind==='LEGAL'&&meta.doc_id==='SCA-REG-2017-243')score+=8;
