@@ -37,7 +37,7 @@ a{color:#a6dcff}
 <div class="stat">نموذج Gemini<b id="modelStatus">—</b></div>
 <div class="stat">سياق HR / Legal Research<b id="researchStatus">—</b></div>
 </div>
-<div class="actions"><button id="testBtn" type="button">اختبار Gemini API</button><button id="modelsBtn" class="secondary" type="button">عرض النماذج المتاحة للمفتاح</button></div>
+<div class="actions"><button id="testBtn" type="button">اختبار Gemini API</button><button id="modelsBtn" class="secondary" type="button">عرض النماذج المتاحة للمفتاح</button><button id="generationBtn" class="secondary" type="button">اختبار توليد نص صغير</button></div>
 <div id="message" role="status"></div>
 <p class="dim">إضافة المفتاح: Project Settings → Script Properties → GEMINI_API_KEY. ويمكن ضبط GEMINI_MODEL إذا لزم الأمر. لا تكتب مفتاحك داخل أي صفحة أو داخل GitHub.</p>
 </div>
@@ -56,7 +56,7 @@ a{color:#a6dcff}
 const el=id=>document.getElementById(id);
 let assessmentText='', lastReport='';
 function msg(s,error){el('message').textContent=s;el('message').classList.toggle('error',!!error);}
-function busy(v){el('testBtn').disabled=v;el('modelsBtn').disabled=v;el('analyzeBtn').disabled=v||!assessmentText||!el('approval').checked;}
+function busy(v){el('testBtn').disabled=v;el('modelsBtn').disabled=v;el('generationBtn').disabled=v;el('analyzeBtn').disabled=v||!assessmentText||!el('approval').checked;}
 function init(){google.script.run.withSuccessHandler(s=>{
   el('keyStatus').textContent=s.hasKey?'مضاف — جاهز للاختبار':'لم يُضف بعد';
   el('modelStatus').textContent=s.model;
@@ -93,9 +93,23 @@ el('modelsBtn').onclick=()=>{
  google.script.run.withSuccessHandler(r=>{busy(false);msg('النماذج المتاحة: '+r.map(x=>x.name).join('، '));})
  .withFailureHandler(e=>{busy(false);msg(e.message,true);}).listGeminiModels();
 };
+el('generationBtn').onclick=()=>{
+ busy(true);msg('جاري اختبار توليد نص صغير من Gemini، وقد يعيد المحرك المحاولة تلقائيًا عند 503...');
+ let waiting=true;
+ const warning=setTimeout(()=>{
+   if(waiting)msg('الطلب لم ينته بعد. يتم انتظار استجابة Gemini أو محاولات إعادة محدودة. راجع Apps Script > Executions إذا استمر التأخير.',true);
+ },20000);
+ google.script.run.withSuccessHandler(r=>{
+   waiting=false;clearTimeout(warning);busy(false);
+   msg(r.ok?'نجح اختبار توليد النص ('+r.model+'): '+r.result:'لم ينتج Gemini نصًا.',!r.ok);
+ }).withFailureHandler(e=>{
+   waiting=false;clearTimeout(warning);busy(false);
+   msg('تعذر اختبار التوليد: '+(e&&e.message?e.message:String(e)),true);
+ }).testGeminiGeneration();
+};
 el('analyzeBtn').onclick=()=>{
  if(!assessmentText||!el('approval').checked)return;
- busy(true);msg('جاري تحليل الإجابات — لا تغلق هذه الصفحة.');
+ busy(true);msg('جاري تحليل الإجابات. إذا كانت خدمة Gemini مشغولة، سيحاول المحرك مرتين إضافيتين قبل إظهار التشخيص.');
  google.script.run.withSuccessHandler(r=>{
   busy(false);lastReport='SCA Maturity Gemini Analysis\nModel: '+r.model+'\nAnswered: '+r.answeredQuestions+'/'+r.assessedQuestions+'\nReported gaps: '+r.reportedGaps+
   '\nResearch: '+r.researchStatus+'\n\n'+r.analysis+'\n\n'+r.note;
