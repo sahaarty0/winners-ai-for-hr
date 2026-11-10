@@ -21,7 +21,7 @@ export function renderCasePack(container,data) {
   container.dir="rtl";
   const make=(p,tag,text,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)bidiFill(e,text);p.append(e);return e};
   const head=make(container,"section",undefined,"case-brief");
-  make(head,"h3","الأسئلة المطلوبة • "+data.duration);
+  make(head,"h3","سؤال التحدي • "+data.duration);
   const qs=make(head,"ul",undefined,"case-questions");
   for(const item of data.questions){
     const li=make(qs,"li"),m=String(item).match(/^(Q\d+)\s*[:：—\-]\s*/);

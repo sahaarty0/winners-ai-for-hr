@@ -67,10 +67,10 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 <div class="field" id="codeField"><label for="teamCode">كود الفريق — Apps Script</label><input id="teamCode" maxlength="16" placeholder="Code from trainer"></div>
 </div>
 <div class="row-controls"><button id="joinTeam" class="btn">دخول الفريق بالكود</button><span id="teamIdentity" class="tag">Demo Teams</span></div>
-<div class="field"><label for="answerProblem" id="answerProblemLabel">1. فهم المشكلة والإجراءات</label><textarea id="answerProblem" maxlength="7000" placeholder="حدد المشكلة، الإجراءات المقترحة، وأسباب اختيارها..."></textarea></div>
-<div class="field"><label for="answerTools" id="answerToolsLabel">2. الأدوات ودور الـAI</label><textarea id="answerTools" maxlength="7000" placeholder="الأدوات التي ستستخدمها ولماذا، وما دور HR..."></textarea></div>
-<div class="field"><label for="answerEvidence" id="answerEvidenceLabel">3. الأدلة والتحقق والمخاطر</label><textarea id="answerEvidence" maxlength="7000" placeholder="مصادر البيانات، التحقق، القيود، والمراجعة البشرية..."></textarea></div>
-<div class="field" id="masterField"><label for="answerPrompt">4. Master Prompt / تنفيذ الحل (يظهر من المرحلة الثانية)</label><textarea id="answerPrompt" maxlength="7000" placeholder="النص النهائي للبرومبت، أو خطوات AI Research / Automation وخطة التنفيذ..."></textarea></div>
+<div class="field"><label for="answerProblem" id="answerProblemLabel">إجابة واحدة — مقالة أو خطوات متتابعة</label><textarea id="answerProblem" maxlength="7000" placeholder="اكتب إجابتك على السؤال الواحد في فقرة أو خطوات متتابعة. وضّح ما تعرفه وما يحتاج تحققًا..."></textarea></div>
+<div class="field" style="display:none"><label for="answerTools" id="answerToolsLabel">2. الأدوات ودور الـAI</label><textarea id="answerTools" maxlength="7000" placeholder="الأدوات التي ستستخدمها ولماذا، وما دور HR..."></textarea></div>
+<div class="field" style="display:none"><label for="answerEvidence" id="answerEvidenceLabel">3. الأدلة والتحقق والمخاطر</label><textarea id="answerEvidence" maxlength="7000" placeholder="مصادر البيانات، التحقق، القيود، والمراجعة البشرية..."></textarea></div>
+<div class="field" id="masterField" style="display:none"><label for="answerPrompt">4. Master Prompt / تنفيذ الحل (يظهر من المرحلة الثانية)</label><textarea id="answerPrompt" maxlength="7000" placeholder="النص النهائي للبرومبت، أو خطوات AI Research / Automation وخطة التنفيذ..."></textarea></div>
 <details class="panel" id="masterReference" style="background:#081c37;margin-top:13px">
 <summary style="cursor:pointer;color:#ffdb7f;font-weight:800">📚 Master Prompt الأصلي + Worksheet 01 / 02 (افتح المرجع)</summary>
 <p>Worksheet 01 — AI Task Definition: (1) HR Function (2) Process (3) Bottleneck (4) Available Inputs (5) Desired Outcome.</p>

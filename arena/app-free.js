@@ -1,6 +1,5 @@
-import {getTrackStage,TRACK_OPTIONS} from "./tracks.js";
+import {getTrackStage,TRACK_OPTIONS,STAGE_INFO} from "./tracks.js";
 import {renderCasePack,bidiFill} from "./case-view.js";
-import {DETAILED_CASES} from "./case-details.js";
 import {appsScriptWebAppUrl,defaultSessionId,pollSeconds} from "./apps-script-config.js";
 const qs=new URLSearchParams(location.search);
 if(appsScriptWebAppUrl && !qs.has("bridge") && !qs.has("offline") && !qs.has("demo") && window.top===window.self){
@@ -8,7 +7,7 @@ if(appsScriptWebAppUrl && !qs.has("bridge") && !qs.has("offline") && !qs.has("de
  for(const key of ["session","view"])if(qs.get(key))liveUrl.searchParams.set(key,qs.get(key));
  window.location.replace(liveUrl.href);
 }
-const STAGES=DETAILED_CASES;
+const STAGES=STAGE_INFO;
 const caseCss=document.createElement("link");caseCss.rel="stylesheet";caseCss.href="./case-style.css";document.head.appendChild(caseCss);
 const DEMO_SEED=[
 {id:"alpha",name:"Team Alpha",scores:{"1":42,"2":81,"3":91},feedback:{"1":"تحديد أولويات جيد؛ ناقش مصدر البيانات قبل اقتراح الأدوات.","2":"تحسن في صياغة الـPrompt وربط النتائج بالبيانات.","3":"حل متكامل مع خطة متابعة جيدة."}},
@@ -51,7 +50,7 @@ function renderCase(){
   source:"The Leader's track selection is saved in Teams. Gemini uses a track-specific rubric."
  };
  if(!s)return;el("stageHeading").textContent=s.name;el("challengeStage").textContent="STAGE "+String(s.id).padStart(2,"0");bidiFill(el("caseTitle"),s.title);bidiFill(el("caseDescription"),s.description);el("caseFacts").replaceChildren(...s.facts.map(x=>bidiFill(document.createElement("li"),x)));bidiFill(el("caseTask"),s.task);bidiFill(el("caseNote"),s.source);let pack=document.getElementById("caseEvidence");if(!pack){pack=document.createElement("section");pack.id="caseEvidence";el("caseNote").after(pack)}if(pack.dataset.stage!==String(s.id)+"_"+(chosen||"none")){renderCasePack(pack,s);pack.dataset.stage=String(s.id)+"_"+(chosen||"none")}el("rubricList").innerHTML=s.rubric.map(([name,w])=>'<div class="rubric-row"><span>'+escape(name)+'</span><span class="bar"><i style="width:'+w+'%"></i></span><b>'+w+'%</b></div>').join("");el("stageStatus").textContent=isOpen()?"التحدي مفتوح":"تم إغلاق التسليم";el("visibilityBadge").textContent=revealed()?"👁 Scores Revealed":"🙈 Scores Hidden";el("revealBtn").textContent=revealed()?"🙈 إخفاء الدرجات":"👁 إظهار الدرجات";el("freezeBtn").textContent=isOpen()?"⏸ إغلاق التحدي":"▶ فتح التحدي";el("connectionBadge").textContent=mode?(realSession?"● Google Sheets Live":bridgeReady?"● Apps Script Ready":"◉ Connecting to Apps Script"):(OFFLINE?"⚠ Emergency Local Scoreboard":"◉ Local Demo (Illustrative Scores)");el("sessionBadge").textContent="SESSION: "+(activeSessionId||"LOCAL");
-el("masterField").classList.toggle("hidden",s.id===1);el("masterReference").classList.toggle("hidden",s.id===1);el("answerProblemLabel").textContent=s.id===1?"1. تشخيص المشكلة والخطوات — بدون AI":s.id===2?"1. تحليل أولي — بدون AI":"1. تحليل المشكلة وتحديد الأولويات";el("answerToolsLabel").textContent=s.id===1?"2. أدوات AI المناسبة ولماذا — بدون استخدامها":s.id===2?"2. الخطوات والأدوات بعد التدريب":"2. AI Tools / Workflow وخطة التنفيذ";el("answerEvidenceLabel").textContent="3. Evidence / Verification / Human Judgment";el("submitTeam").disabled=!isOpen();el("prevStage").disabled=s.id===1;el("nextStage").disabled=s.id===3}
+el("masterField").classList.toggle("hidden",s.id===1);el("masterReference").classList.toggle("hidden",s.id===1);el("answerProblemLabel").textContent="إجابة واحدة — مقالة أو خطوات متتابعة";el("answerToolsLabel").textContent=s.id===1?"2. أدوات AI المناسبة ولماذا — بدون استخدامها":s.id===2?"2. الخطوات والأدوات بعد التدريب":"2. AI Tools / Workflow وخطة التنفيذ";el("answerEvidenceLabel").textContent="3. Evidence / Verification / Human Judgment";el("submitTeam").disabled=!isOpen();el("prevStage").disabled=s.id===1;el("nextStage").disabled=s.id===3}
 function renderFeedback(){
 const id=el("judgeTeam").value,stage=currentStage();
 const e=realEvals.find(x=>x.teamId===id&&x.stage===stage);

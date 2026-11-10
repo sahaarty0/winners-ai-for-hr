@@ -69,3 +69,15 @@ The stage rubric criteria and weights are **provisional design choices** pending
 - Gemini free-tier usage may be used by the provider to improve its products.
 - The old `backend/` Firebase code and `app.js` remain in the repo as **unused experimental alternatives**; `app-free.js` is the active script.
 - The original [AI for HR Practical Toolkit](https://sahaarty0.github.io/winners-ai-for-hr/) is preserved unchanged.
+
+
+## SCA Edition — Essay + Evidence Retrieval (staged, not deployed)
+
+- One simple open question for each of the three HR tracks at each of the three levels (9 prompts total). A single essay or sequential explanation is accepted; no Q1–Q4 parts are required.
+- Case facts are **synthetic examples**, not descriptions of established Suez Canal Authority job titles, current delegated decision powers, or policy entitlements.
+- The Apps Script grader reads the already indexed **SCA HR** and **SCA Legal** JSONL files stored in the user's SCA Google Drive knowledge-base folders, using a bounded keyword retrieval and cited chunk IDs. This is *not* vector embeddings or direct Gemini access to a folder.
+- Default HR file ID: `1ia85QIe6di6jnHvbPgrbE4gTl0m4z_v7`. Default Legal file ID: `1CDKAUiDeoqpfr2YEItsa6NE7t95hQwZo`. Override via Script Properties `SCA_HR_CHUNKS_FILE_ID` and `SCA_LEGAL_CHUNKS_FILE_ID`.
+- Legal chunks contain **research summaries**, not verified consolidated verbatim laws. Any statutory deadline, entitlement or official job title must be verified against the original currently-effective document before reliance.
+- If Drive is inaccessible or a source file is invalid, Gemini grading fails to the existing **MANUAL** scoring workflow, with no fabricated legal assessment.
+- **Activation requirements:** update `Code.gs` in the bound Apps Script project; ensure its executing identity has access to both Drive files; authorize Drive scopes; redeploy a **new Web App version**; test retrieval, evaluation, instructor approval, and Google Sheets save with a fresh session. GitHub changes alone do not update the deployed Apps Script backend.
+- The original `case-details.js` and legacy Firebase experimental files remain in the repository for historical reference only.
