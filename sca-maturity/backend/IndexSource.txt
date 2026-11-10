@@ -74,10 +74,19 @@ el('file').addEventListener('change',async e=>{
 });
 el('approval').onchange=()=>{el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;};
 el('testBtn').onclick=()=>{
- busy(true);msg('جاري اختبار الاتصال...');google.script.run.withSuccessHandler(r=>{
- busy(false);msg(r.ok?'تم الاتصال بـGemini بنجاح ('+r.model+'): '+r.response:'لم تصل استجابة.');
- init();
- }).withFailureHandler(e=>{busy(false);msg(e.message,true);}).testGeminiConnection();
+ busy(true);msg('جاري فحص صلاحية المفتاح وقائمة نماذج Gemini (بدون توليد نص)...');
+ let pending=true;
+ const warning=setTimeout(()=>{
+   if(pending)msg('اختبار الاتصال لم يرد خلال 20 ثانية. افتح Apps Script > Executions لمعرفة حالة testGeminiConnection، وراجع التفويض وصلاحية المفتاح.',true);
+ },20000);
+ google.script.run.withSuccessHandler(r=>{
+   pending=false;clearTimeout(warning);busy(false);
+   msg(r.ok?'نتيجة الاتصال ('+r.model+'): '+r.response:'تعذر التحقق من الاتصال.',!r.modelListed);
+   init();
+ }).withFailureHandler(e=>{
+   pending=false;clearTimeout(warning);busy(false);
+   msg('خطأ الاتصال: '+(e&&e.message?e.message:String(e)),true);
+ }).testGeminiConnection();
 };
 el('modelsBtn').onclick=()=>{
  busy(true);msg('جاري فحص النماذج المرتبطة بالمفتاح...');
