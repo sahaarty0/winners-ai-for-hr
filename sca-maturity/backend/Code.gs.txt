@@ -37,17 +37,21 @@ function getBackendStatus() {
 }
 
 function testGeminiConnection() {
-  const result = callGemini_('Write only the exact text: SCA GEMINI CONNECTED', 80);
+  // Connection-only test. Do not invoke generative inference for basic API readiness.
+  const model = selectedModel_();
+  const available = listGeminiModels();
+  const found = available.some(m => m.name === model);
   return {
-    ok: !!result,
-    model: selectedModel_(),
-    response: result.slice(0, 450)
+    ok: true, model: model, modelListed: found, listedCount: available.length,
+    response: found
+      ? 'تم قبول المفتاح من Gemini API والنموذج المحدد موجود ضمن النماذج المتاحة. اختبر توليد النص من ملف التقييم.'
+      : 'تم قبول المفتاح من Gemini API، لكن النموذج المحدد لم يظهر في القائمة. راجع GEMINI_MODEL والنماذج المتاحة.'
   };
 }
 
 function listGeminiModels() {
   const key = apiKey_();
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=100';
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=500';
   const resp = UrlFetchApp.fetch(url, {
     method: 'get',
     headers: {'x-goog-api-key': key},
@@ -161,9 +165,13 @@ function selectedModel_() {
 
 function callGemini_(prompt, maxTokens) {
   const model=selectedModel_();
+  const generationConfig={maxOutputTokens:maxTokens};
+  // Gemini 3.8 Flash does not support deprecated temperature parameter.
+  // LOW thinking avoids needless latency for this advisory workflow.
+  if (/^gemini-3\./.test(model)) generationConfig.thinkingConfig={thinkingLevel:'LOW'};
   const payload={
     contents:[{role:'user',parts:[{text:prompt}]}],
-    generationConfig:{temperature:0.15,maxOutputTokens:maxTokens}
+    generationConfig:generationConfig
   };
   const response=UrlFetchApp.fetch(SCA_CONFIG.GEMINI_BASE + encodeURIComponent(model) + ':generateContent', {
     method:'post', contentType:'application/json',
