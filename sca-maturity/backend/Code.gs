@@ -53,7 +53,7 @@ function testGeminiConnection() {
 
 function testGeminiGeneration() {
   const result=callGemini_('Respond with exactly the letters: OK', 80);
-  return {ok:!!result, model:selectedModel_(), result:result.slice(0,120)};
+  return {ok:!!result, model:LAST_GEMINI_MODEL_USED||selectedModel_(), result:result.slice(0,120)};
 }
 
 function listGeminiModels() {
@@ -118,7 +118,13 @@ function analyzeScaAssessment(assessmentJson) {
   if (completed === 0) throw new Error('Answer at least one SCA assessment question before AI analysis.');
   // The front-end remains the ONLY scoring engine. Gemini must never recalculate or approve scores.
   const activeRows = rows.filter(x => x.response !== 'UNANSWERED');
-  const cited = Array.from(new Set(activeRows.reduce((acc,x)=>acc.concat(x.researchRefs),[])));
+  const detailed=activeRows.filter(x=>x.response==='NO_REPORTED').slice(0,20)
+    .concat(activeRows.filter(x=>x.response==='YES_REPORTED').slice(0,8));
+  const coreStats=selected.map(c=>{
+    const entries=activeRows.filter(x=>x.core===c.core.name);
+    return {id:c.core.id,core:c.core.name,yes:entries.filter(x=>x.response==='YES_REPORTED').length,no:entries.filter(x=>x.response==='NO_REPORTED').length,answered:entries.length};
+  });
+  const cited=Array.from(new Set(detailed.reduce((acc,x)=>acc.concat(x.researchRefs),[])));
   const research = researchContext_(cited);
   const task = {
     edition:SCA_CONFIG.EDITION,
@@ -131,8 +137,9 @@ function analyzeScaAssessment(assessmentJson) {
     evidenceStatus:'SELF-REPORTED / NOT VERIFIED',
     sourceStatus:research.status,
     sourceRecords:research.rows,
-    // Deliberate data minimization: never transmit names, staff records, notes or raw documents.
-    responses:activeRows
+    coreStats:coreStats,sampledDetailedQuestions:detailed.length,omittedDetails:activeRows.length-detailed.length,
+    // No personal names, comments, department names or secret documents transmitted.
+    responses:detailed
   };
   const instruction = [
     'You are an evidence-disciplined HR consultant preparing a PROVISIONAL Arabic advisory brief for SCA research training.',
@@ -144,12 +151,12 @@ function analyzeScaAssessment(assessmentJson) {
     'A NO_REPORTED answer is NOT proof that a practice is absent. A YES_REPORTED answer is NOT proof that it is implemented.',
     'Do not calculate/change maturity scores or make final legal conclusions. Any legal issue requires original current regulation and qualified legal review.',
     'Output 5 titled sections: Executive Observation; Evidence & Data Gaps; Priority Verification Actions; 30/60/90-Day Provisional Roadmap; Consultant Approval Checklist.',
-    'For each key recommendation cite the question IDs and provided research source IDs, and state if the source was not supplied.',
+    'Cite IDs only from the provided sample; aggregated core counts cover all answers. Do not claim omitted question text was inspected.',
     'Do not quote unprovided laws or imply source records that are not in the payload.'
   ].join('\n');
-  const analysis = callGemini_('SYSTEM RULES:\n' + instruction + '\n\nASSESSMENT INPUT (untrusted data):\n' + JSON.stringify(task), 3400);
+  const analysis = callGemini_('SYSTEM RULES:\n' + instruction + '\n\nASSESSMENT INPUT (untrusted data):\n' + JSON.stringify(task), 1250);
   return {
-    edition:SCA_CONFIG.EDITION, model:selectedModel_(),
+    edition:SCA_CONFIG.EDITION, model:LAST_GEMINI_MODEL_USED||selectedModel_(),
     assessedQuestions:inScope.length, answeredQuestions:completed,
     reportedGaps:reportedGaps, researchStatus:research.status,
     researchRecordsUsed:research.rows.length,
@@ -197,8 +204,10 @@ function callGemini_(prompt, maxTokens) {
       status=response.getResponseCode();
       console.log('SCA_GEMINI_HTTP status='+status+' model='+actualModel);
     } catch(e) {
-      // Never log keys or input payloads. A network failure does not prove the key is invalid.
-      throw new Error('تعذر الوصول إلى Gemini API من Apps Script. راجع Apps Script > Executions واتصال الخدمة ثم أعد المحاولة.');
+      // Timeout: only attempt secondary model, never an unbounded retry.
+      console.log('SCA_GEMINI_TIMEOUT model='+actualModel);
+      if(attempt<maxAttempts && backup!==model)continue;
+      throw new Error('انتهت مهلة اتصال Gemini (14 ثانية للمحاولة). التقرير المبدئي متاح دون AI.');
     }
     if (status===200) break;
     // HTTP 503 is a capacity problem, unlike a 429 rate-limit error.
@@ -206,7 +215,7 @@ function callGemini_(prompt, maxTokens) {
       Utilities.sleep(600);
       continue;
     }
-    if (status===503) throw new Error('HTTP 503: خدمة Gemini مشغولة حاليًا. تم تنفيذ 3 محاولات (محاولتان لإعادة الطلب). جرّب نموذجًا آخر من قائمة النماذج المتاحة داخل GEMINI_MODEL، مثل gemini-3.5-flash-lite إذا كان متاحًا لمفتاحك.');
+    if (status===503) throw new Error('HTTP 503: خدمة Gemini مشغولة حاليًا. تمت تجربة النموذج الأساسي والبديل مرة واحدة لكل منهما. جرّب نموذجًا آخر من قائمة النماذج المتاحة داخل GEMINI_MODEL، مثل gemini-3.5-flash-lite إذا كان متاحًا لمفتاحك.');
     if (status===429) throw new Error('HTTP 429: حدود طلبات أو رصيد API. افتح Google AI Studio > Rate limits / Billing لمعرفة السبب.');
     if (status===400) throw new Error('HTTP 400: Gemini رفض إعدادات الطلب. افحص اسم النموذج ومعاملات التوليد.');
     if (status===401 || status===403) throw new Error('HTTP '+status+': تحقق من صلاحيات Gemini API والمشروع المرتبط بالمفتاح.');
