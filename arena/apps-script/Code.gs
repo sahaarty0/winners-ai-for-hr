@@ -453,11 +453,13 @@ function evaluateSubmissionInternal_(p){
  var scoreDetails=criteria.map(function(pair,i){var item=parsed.criteria[i]||{},score=Number(item.points);
   return {name:pair[0],max:pair[1],points:Math.max(0,Math.min(pair[1],isFinite(score)?Math.round(score):0)),reason:limitStr_(item.reason,300),evidence:limitStr_(item.evidence,250)};
  });
+ var modelRawTotal=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
  scoreDetails=scaApplyGradeCeilings_(stage,chosen,String(submission[5]||''),scoreDetails);
-  var total=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
+ var total=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
  var cited=Array.isArray(parsed.reference_ids)?parsed.reference_ids.filter(function(id){return retrieved.ids.indexOf(id)!==-1}).slice(0,6):[];
  var footer=cited.length?' | مصادر بحثية: '+cited.join(', '):' | يتطلب التحقق من النص القانوني الأصلي عند الحاجة';
- var feedback=limitStr_(parsed.feedback||'',1250)+footer;
+ var calibrationNotice=modelRawTotal>total?' | توضيح التقييم: تم ضبط '+(modelRawTotal-total)+' نقاط لأن الإجابة لم توضح مستندات الوظيفة أو التحقق من النص/التفويض الساري؛ راجع تفصيل المعايير.':'';
+ var feedback=limitStr_(parsed.feedback||'',1100)+calibrationNotice+footer;
  return saveEval_(sid,tid,stage,total,'pending',feedback,scoreDetails,model+' SCA-RAG');
 }
 function arenaRpc(req){
