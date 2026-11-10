@@ -225,7 +225,8 @@ function callGemini_(prompt, maxTokens) {
   const body=JSON.parse(response.getContentText());
   const result=(body.candidates||[]).reduce((a,c)=>a.concat((c.content&&c.content.parts||[])
     .map(p=>p.text||'').filter(Boolean)),[]).join('\n').trim();
-  if (!result) throw new Error('لم يرجع Gemini نصًا قابلًا للعرض. راجع النموذج ومرشحات الأمان وطول المخرجات.');
+  if (!result) throw new Error('لم يرجع Gemini نصًا قابلًا للعرض. التقرير الفوري غير متأثر.');
+  LAST_GEMINI_MODEL_USED=actualModel;
   return result;
 }
 
