@@ -175,3 +175,67 @@ body.sca-readable .q-tag{background:#e7bd62;color:#19344e;font-size:14px}
  body.sca-readable .stage-track .stage-pill{padding:10px}
  body.sca-readable :is(.hero h1,.brand-center h1){font-size:27px}
 }
+
+
+/* SCA + Winners dual-logo header — original images only, no regeneration.
+   Winners artwork has exactly a 3% visual scale increase. */
+body.sca-readable .logo-card img,
+body.sca-readable .brand img{
+  transform:scale(1.03);
+  transform-origin:center center;
+}
+body.sca-readable .sca-logo{
+  display:flex;align-items:center;justify-content:center;
+  justify-self:end;align-self:start;
+  width:175px;min-height:100px;padding:6px 10px;
+  background:#fff;border-radius:14px;
+  box-shadow:0 2px 12px #1129460e;
+}
+body.sca-readable .sca-logo img{
+  display:block;width:150px;height:auto;max-height:115px;object-fit:contain;
+}
+body.sca-readable .topbar{
+  display:grid;
+  grid-template-columns:minmax(155px,1fr) minmax(250px,2.6fr) minmax(155px,1fr);
+  align-items:start;column-gap:12px;row-gap:10px;
+}
+body.sca-readable .topbar>.logo-card{grid-column:1;grid-row:1;justify-self:start;align-self:start}
+body.sca-readable .topbar>.brand-center{grid-column:2;grid-row:1;min-width:0;order:0}
+body.sca-readable .topbar>.sca-logo{grid-column:3;grid-row:1;justify-self:end}
+body.sca-readable .topbar .top-actions{justify-content:center;margin:9px auto 0}
+body.sca-readable .header{
+  display:grid;
+  grid-template-columns:minmax(135px,1fr) minmax(140px,2fr) minmax(135px,1fr);
+  align-items:start;gap:12px;
+}
+body.sca-readable .header>.brand{grid-column:1;grid-row:1;justify-self:start}
+body.sca-readable .header>.arena-header-title{
+  grid-column:2;grid-row:1;align-self:center;text-align:center;min-width:0;
+}
+body.sca-readable .header>.sca-logo{grid-column:3;grid-row:1;justify-self:end}
+body.sca-readable .arena-header-title .tiny{font-size:14px!important}
+@media(max-width:700px){
+  body.sca-readable .topbar,
+  body.sca-readable .header{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-rows:auto auto;
+    column-gap:8px;row-gap:8px;
+  }
+  body.sca-readable .topbar>.logo-card,
+  body.sca-readable .header>.brand{grid-column:1;grid-row:1;justify-self:start}
+  body.sca-readable .topbar>.sca-logo,
+  body.sca-readable .header>.sca-logo{grid-column:2;grid-row:1;justify-self:end}
+  body.sca-readable .topbar>.brand-center,
+  body.sca-readable .header>.arena-header-title{grid-column:1/-1;grid-row:2;justify-self:stretch;text-align:center}
+  body.sca-readable .sca-logo{width:126px;min-height:83px;padding:4px}
+  body.sca-readable .sca-logo img{width:116px;max-height:89px}
+  body.sca-readable .topbar>.logo-card{min-width:120px;max-width:146px}
+  body.sca-readable .header>.brand{width:125px}
+  body.sca-readable .topbar .top-actions{flex-wrap:wrap;gap:6px}
+}
+@media(max-width:360px){
+  body.sca-readable .sca-logo{width:110px;min-height:75px}
+  body.sca-readable .sca-logo img{width:102px}
+  body.sca-readable .topbar>.logo-card{min-width:113px;max-width:126px}
+  body.sca-readable .header>.brand{width:115px}
+}
