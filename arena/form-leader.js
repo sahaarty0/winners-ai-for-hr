@@ -82,7 +82,7 @@ function render(){
    if(!sourcePanel){sourcePanel=document.createElement("div");sourcePanel.id="caseEvidence";el("questionTask").closest(".question").after(sourcePanel)}
    if(sourcePanel.dataset.stage!==String(stage)+"_"+group.track){renderCasePack(sourcePanel,c.details);sourcePanel.dataset.stage=String(stage)+"_"+group.track}
 
-   show("masterBlock",false); // المراحل كلها بقت إجابة بالخطوات، من غير Prompt منفصل
+   show("masterBlock",false); // إجابة واحدة: مقال مختصر أو خطوات متتابعة، دون Prompt منفصل
    el("submitBtn").disabled=!session.open||requestBusy;
    el("submitHint").textContent=session.open?"الإجابة هتتحفظ باسم الفريق كله. Gemini هيعالجها إن كان متاحًا، والنتيجة لازم يراجعها المدرب.":"الجولة الحالية مقفولة من المحاضر.";
  }else{
