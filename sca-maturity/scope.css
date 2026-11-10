@@ -1,0 +1,25 @@
+
+/* Scoped assessment — white / navy / dark yellow design */
+.scope-panel{margin:18px 0 18px;padding:18px;border:1px solid #d6e2ec;border-right:5px solid #b38331;background:#fff;border-radius:15px;box-shadow:0 5px 16px #1238550e;color:#0b2b47}
+.scope-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.scope-heading strong{color:#0c2c49;font-size:16px}
+.scope-heading p{color:#526b81;font-size:12px;line-height:1.8;margin:3px 0 0}
+.scope-heading #scopeProgress{border:1px solid #d4bb7b;background:#fff7e8;color:#815b16;padding:7px 11px;font:700 12px Cairo,Arial,sans-serif;border-radius:9px;white-space:nowrap}
+.scope-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px}
+.scope-option{display:flex;align-items:center;gap:10px;min-height:72px;background:#092e52;border:2px solid #214d73;border-radius:12px;color:#fff;padding:12px;cursor:pointer;font-weight:800;font-size:13px}
+.scope-option:nth-child(2){background:#b78835;border-color:#b78835;color:#0a2b49}
+.scope-option:has(input:checked){border-color:#e3bb60;box-shadow:0 0 0 2px #e3bb6040}
+.scope-option:nth-child(2):has(input:checked){border-color:#092e52;box-shadow:0 0 0 2px #092e523d}
+.scope-option input{accent-color:#d5a348;width:17px;height:17px;flex:none}
+.scope-option:nth-child(2) input{accent-color:#0a2e50}
+.scope-option small{display:block;font-size:10px;opacity:.85;margin-top:4px;line-height:1.7}
+.focused-list{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:13px}
+.focused-list[hidden]{display:none!important}
+.scope-fieldset{margin:0;border:1px solid #c4d7e3;border-radius:12px;padding:13px;display:grid;gap:8px;background:#f8fafc}
+.scope-fieldset legend{padding:0 6px;font-weight:800;font-size:12px;color:#a07020}
+.scope-core{display:flex;gap:9px;align-items:center;font-size:12px;line-height:1.7;color:#153a59;font-weight:700;cursor:pointer}
+.scope-core input{accent-color:#0b3357;width:15px;height:15px;flex:none}
+.scope-description,.scope-report-notice{font-size:12px;line-height:1.9;color:#835e1d;background:#fff9ee;border:1px solid #ead8ae;border-radius:10px;padding:9px 12px;margin:12px 0 0}
+@media(max-width:920px){.scope-options{grid-template-columns:1fr 1fr}.focused-list{grid-template-columns:1fr}}
+@media(max-width:650px){.scope-options,.focused-list{grid-template-columns:1fr}.scope-panel{padding:14px}}
+@media print{.scope-panel{display:none!important}.scope-report-notice{color:#725418!important;background:#fff!important;border:1px solid #bda96f!important}}
