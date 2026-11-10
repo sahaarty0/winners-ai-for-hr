@@ -21,7 +21,7 @@ export function renderCasePack(container,data) {
   container.dir="rtl";
   const make=(p,tag,text,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)bidiFill(e,text);p.append(e);return e};
   const head=make(container,"section",undefined,"case-brief");
-  make(head,"h3","الأسئلة المطلوبة • "+data.duration);
+  make(head,"h3","السؤال التطبيقي الواحد • "+data.duration);
   const qs=make(head,"ul",undefined,"case-questions");
   for(const item of data.questions){
     const li=make(qs,"li"),m=String(item).match(/^(Q\d+)\s*[:：—\-]\s*/);
@@ -30,7 +30,7 @@ export function renderCasePack(container,data) {
   }
   if(data.task)make(head,"p",data.task,"case-answer-format");
   make(head,"h3","البيانات المتاحة للحالة");
-  make(head,"p","كل البيانات دي افتراضية للتدريب. متعمّمش النتائج على سجلات مش متاحة.","case-disclaimer");
+  make(head,"p","الموقف التدريبي افتراضي. المصادقات القانونية لا تثبت إلا بالنص الأصلي الساري، والملخصات البحثية ليست فتوى.","case-disclaimer");
   for(const [i,part] of data.sections.entries()){
     const d=make(container,"details",undefined,"case-evidence-section");
     if(i===0)d.open=true;
@@ -48,4 +48,5 @@ export function renderCasePack(container,data) {
   make(limits,"h3","القواعد");
   const list=make(limits,"ul");for(const item of data.boundaries)make(list,"li",item);
   make(limits,"p",data.source,"case-source");
+  if(data.referenceUrl){const a=document.createElement("a");a.href=data.referenceUrl;a.target="_blank";a.rel="noopener noreferrer";a.textContent="📚 فتح المرجع البحثي لهيئة قناة السويس على Google Drive";a.className="case-source";limits.append(a)}
 }
