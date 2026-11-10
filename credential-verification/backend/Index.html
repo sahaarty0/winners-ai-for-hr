@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WINNERS | Document Verification</title>
+  <style>
+    :root{--navy:#12243d;--navy2:#1e3555;--gold:#bd9138;--gold2:#e7c87c;--paper:#f4f6fa;--white:#fff;--ink:#213047;--muted:#66748a;--line:#dfe5ef;--green:#1a8069;--red:#b14d4b;--violet:#63639b;--shadow:0 12px 32px rgba(18,36,61,.055)}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Segoe UI',Tahoma,Arial,sans-serif;line-height:1.6}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.47;cursor:not-allowed}.hidden{display:none!important}a{color:var(--navy2)}
+    .top{background:var(--navy);color:white;padding:18px max(22px,calc((100vw - 1160px)/2));display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:4px solid var(--gold)}.identity{display:flex;align-items:center;gap:14px}.mark{height:46px;width:46px;border:2px solid var(--gold2);border-radius:13px;display:grid;place-items:center;color:var(--gold2);font-size:27px;font-weight:850}.brand{font-size:15px;font-weight:800;letter-spacing:.5px}.brand small{display:block;color:#c8d1df;font-size:11px;font-weight:500;letter-spacing:0}.headmeta{font-size:12px;color:#c8d1df;white-space:nowrap}
+    main{max-width:1160px;margin:0 auto;padding:28px 22px 70px}.headline{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}.eyebrow{display:flex;gap:8px;color:#9a742c;align-items:center;font-weight:750;font-size:12px;letter-spacing:.4px}.headline h1{margin:3px 0 4px;font-size:clamp(24px,3vw,33px);line-height:1.3;color:var(--navy)}.headline p{margin:0;color:var(--muted);font-size:14px}.version{font-size:12px;padding:7px 12px;background:#e8eef5;border:1px solid var(--line);border-radius:16px;color:#4f627a}
+    .grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(285px,.9fr);gap:18px;align-items:start}.card{background:var(--white);border:1px solid var(--line);border-radius:17px;padding:23px;box-shadow:var(--shadow)}.card h2{color:var(--navy);font-size:18px;margin:0 0 6px}.card h3{margin:0 0 7px;color:var(--navy);font-size:15px}.sub{font-size:12px;color:var(--muted);margin:0 0 14px}.num{background:#f4ead3;color:#8d681d;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;height:27px;min-width:27px;font-size:13px;font-weight:800;margin-left:7px}.drop{border:2px dashed #c9d3e2;border-radius:13px;background:#fafbfd;min-height:184px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:23px 12px;transition:.18s;position:relative}.drop:hover,.drop.drag{border-color:var(--gold);background:#fffaf0}.drop svg{width:41px;height:41px;color:var(--gold);margin-bottom:7px}.drop strong{color:var(--navy);font-size:16px}.drop p{color:var(--muted);font-size:12px;margin:4px 0 12px}.drop input{display:none}.outline{background:white;border:1px solid #cfb77d;color:#88621f;border-radius:9px;padding:8px 17px;font-weight:750}.drop small{display:block;margin-top:9px;color:#78869b;font-size:11px}.files{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.file{background:#eef3f9;border:1px solid #d9e3ef;border-radius:9px;padding:6px 10px;color:#41536c;font-size:12px;max-width:100%;word-break:break-word}.file b{color:#8f6a26}
+    .formcols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:5px;margin-top:14px}.field label{font-weight:730;font-size:12px;color:#3c4c61}.field input,.field textarea,.field select{border:1px solid #ced8e5;background:white;color:var(--ink);border-radius:9px;padding:11px 12px;min-height:43px;width:100%;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px #bd91381a}.field textarea{resize:vertical;min-height:66px}.checkline{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#57667e;margin-top:13px;padding:11px;border-radius:11px;background:#f8f9fc}.checkline input{margin-top:5px;accent-color:var(--gold);min-width:16px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:17px}.primary{background:var(--navy);border:1px solid var(--navy);border-radius:10px;color:white;font-weight:750;padding:12px 22px}.primary:hover{background:#203b5e}.secondary{border:1px solid #c9d4e2;background:white;border-radius:10px;color:var(--navy);font-weight:750;padding:11px 17px}.primary:focus-visible,.secondary:focus-visible,.outline:focus-visible{outline:3px solid #d6ac48;outline-offset:2px}
+    .sidecard{margin-bottom:18px}.sidecard:nth-child(1){border-top:4px solid var(--gold)}.status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:7px 0}.dot{height:8px;width:8px;background:#9eabbc;border-radius:100%}.dot.good{background:var(--green)}.dot.warn{background:#c88d30}.steps{display:grid;grid-template-columns:1fr;gap:9px;margin-top:11px}.step{display:flex;align-items:center;gap:10px;font-size:12px;color:#55677f}.step i{font-style:normal;background:#e9eff6;color:var(--navy);width:23px;height:23px;display:grid;place-items:center;border-radius:7px;font-size:10px;font-weight:850}.hint{padding:12px 13px;font-size:12px;border:1px solid #ead9ae;background:#fffaf0;border-radius:10px;color:#735820}.hint p{margin:0}
+    .msg{font-size:12px;color:var(--navy);margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}.msg.error{color:var(--red)}.loader{height:5px;border-radius:5px;background:#e1e6ef;margin-top:14px;overflow:hidden}.loader:before{content:"";display:block;width:36%;height:100%;background:linear-gradient(90deg,var(--gold),#f3d591);animation:load 1.25s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(-185%)}}.section{margin-top:20px;scroll-margin-top:20px}.blockhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.blockhead h2{margin:0;color:var(--navy);font-size:19px}.tag{display:inline-flex;align-items:center;gap:5px;border-radius:100px;font-size:11px;border:1px solid var(--line);padding:4px 10px;background:#f0f3f8;color:#53637b}.tag.good{color:var(--green);background:#e8f5f0;border-color:#cce8df}.tag.warn{color:#8c671d;background:#fff6de;border-color:#ead8a3}.tag.bad{color:var(--red);background:#fff0ed;border-color:#f1d4cf}
+    .results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{border:1px solid var(--line);background:white;border-radius:12px;padding:16px}.metric .label{font-size:12px;color:var(--muted)}.metric strong{display:block;margin-top:5px;font-size:15px;color:var(--navy);line-height:1.4}.metric small{font-size:11px;color:#8490a0}
+    .fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.data{background:#f8fafc;padding:13px;border-radius:9px;border:1px solid #e3e9f1;min-height:75px;overflow-wrap:anywhere}.data small{color:var(--muted);font-size:11px}.data b{display:block;color:var(--navy);font-size:14px;white-space:pre-wrap;margin-top:3px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.finding{border:1px solid #e2e8f0;border-right:3px solid #cba34e;border-radius:9px;padding:12px 14px;margin:9px 0;background:#fcfdff}.finding strong{display:block;font-size:13px;color:var(--navy)}.finding p{font-size:12px;color:#57667c;margin:4px 0}.finding small{color:#8b98aa;font-size:11px}.bullet{margin:5px 0;color:#52627a;font-size:12px}.original{padding:10px;background:#f5f7fb;border:1px solid var(--line);margin:8px 0;border-radius:8px;font-size:12px}.original strong{font-size:12px}.original code{direction:ltr;display:block;text-align:left;white-space:normal;word-break:break-all;color:#516076;margin-top:2px;font-size:10px}
+    .decision{border:1px solid #e2d2a6;background:#fffcf5;border-radius:13px;padding:17px}.decision p{font-size:13px;color:#544d3d;margin:8px 0}.buttons{display:flex;flex-wrap:wrap;gap:8px}.buttons label{border:1px solid #ccdaeb;background:white;padding:8px 10px;border-radius:9px;font-size:12px;cursor:pointer}.buttons input{accent-color:var(--gold)}.footer{margin-top:30px;color:#8290a4;font-size:11px;text-align:center;border-top:1px solid var(--line);padding-top:20px}.audit{font-size:12px;color:var(--green);margin-top:8px}.empty{color:var(--muted);font-size:13px;margin:8px 0}
+    @media(max-width:850px){.grid,.two{grid-template-columns:1fr}.results{grid-template-columns:1fr 1fr}.top{padding:16px 19px}.headmeta{display:none}main{padding:22px 15px 45px}.card{padding:18px}}@media(max-width:500px){.results,.fields,.formcols{grid-template-columns:1fr}.brand{font-size:13px}.drop{min-height:170px}.primary,.secondary{width:100%}.actions{align-items:stretch}}
+    @media print{body{background:white}.top,.upload-zone,.sidebar,.actions,.noprint,.footer,.decision .field,.decision .buttons,.footer{display:none!important}main{padding:0;max-width:none}.grid{display:block}.card{border:1px solid #ddd;box-shadow:none;break-inside:avoid}.section{break-inside:avoid}.hidden{display:none!important}}
+  </style>
+</head>
+<body>
+<header class="top"><div class="identity"><div class="mark">W</div><div class="brand">WINNERS <small>BUSINESS CONSULTATION & TRAINING SERVICES</small></div></div><div class="headmeta">AI DOCUMENT FRAUD DETECTION · PRIVATE REVIEW CONSOLE</div></header>
+<main>
+  <section class="headline"><div><div class="eyebrow">WINNERS INTELLIGENCE · HR VERIFICATION</div><h1>فحص الشهادات والمستندات بالذكاء الاصطناعي</h1><p>ارفع الملف، راجع البيانات المستخرجة والمؤشرات، ثم اعتمد إجراء الموارد البشرية — في صفحة واحدة.</p></div><div class="version">v1.0 · Standalone</div></section>
+  <div class="grid">
+    <section class="card upload-zone" aria-labelledby="uploadTitle">
+      <h2 id="uploadTitle"><span class="num">1</span> رفع المستندات</h2><p class="sub">الشهادة الأساسية أولًا. يمكنك إضافة CV أو شهادة داعمة للمقارنة (اختياري).</p>
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 16V3m0 0-4.5 4.5M12 3l4.5 4.5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <strong>اسحب الشهادة هنا أو اختر ملفًا</strong><p>PDF / JPG / PNG / DOCX</p>
+        <button type="button" class="outline" id="pick">اختيار الملفات</button>
+        <input type="file" id="files" accept=".pdf,.jpg,.jpeg,.png,.docx,application/pdf,image/jpeg,image/png" multiple aria-label="رفع مستندات التحقق">
+        <small>حتى 3 ملفات · الحد الأقصى 1.9 MB لكل ملف، 4.5 MB للمجموعة</small>
+      </div>
+      <div id="fileList" class="files" aria-live="polite"></div>
+      <div class="field"><label for="context">معلومة مساعدة للاستخراج أو المقارنة (اختياري)</label><textarea id="context" maxlength="300" placeholder="مثل نوع الشهادة أو المؤهل المتوقع — تجنّب بيانات شخصية غير لازمة"></textarea></div>
+      <label class="checkline"><input type="checkbox" id="consent"><span>أوافق على إرسال محتوى الملفات المرفوعة إلى <strong>Google Gemini</strong> للتحليل. أفهم أن الملفات قد تحتوي بيانات شخصية، وأن استخدام ملفات حقيقية يتطلب تصريحًا وسياسة خصوصية معتمدة. دون الموافقة يُجرى الفحص الفني المحدود فقط.</span></label>
+      <div class="actions"><button class="primary" id="analyze" disabled>بدء الفحص واستخراج البيانات</button><button class="secondary" id="demo">معاينة تجريبية</button><button class="secondary" id="clear">إعادة تعيين</button></div>
+      <div class="loader hidden" id="loader"></div><div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </section>
+    <aside class="sidebar">
+      <section class="card sidecard"><h3>حالة الربط</h3><div class="status"><span class="dot" id="apiDot"></span><span id="apiText">جاري التحقق من إعدادات المحرك...</span></div><div class="actions"><button type="button" class="secondary" id="testApi">فحص الاتصال بالمفتاح</button></div><div class="msg" id="apiMsg"></div></section>
+      <section class="card sidecard"><h3>مراحل الفحص السبع</h3><div class="steps">
+        <div class="step"><i>01</i>سلامة نوع الملف والبصمة</div><div class="step"><i>02</i>استخراج بيانات المؤهل</div><div class="step"><i>03</i>الفحص البصري</div><div class="step"><i>04</i>فحص البنية الفنية</div><div class="step"><i>05</i>مؤشرات إعادة الرسم بالـAI</div><div class="step"><i>06</i>التحقق من جهة الإصدار</div><div class="step"><i>07</i>اعتماد إجراء HR</div>
+      </div></section>
+      <section class="hint"><p><strong>حدود إثبات التزوير:</strong> اختلاف الخطوط أو الألوان أو نتائج Gemini لا تثبت التزوير. لا يوجد في هذه النسخة تحقق آلي من سجلات الجامعات أو توقيعات C2PA/SynthID أو فحص مضاد للفيروسات. أي حالة غير متاحة ستُعرض بصراحة.</p></section>
+    </aside>
+  </div>
+
+  <div class="hidden" id="results" aria-live="polite">
+    <section class="section"><div class="blockhead"><h2><span class="num">2</span> نتائج الفحص</h2><span id="caseChip" class="tag"></span></div><div class="results" id="metrics"></div></section>
+    <section class="card section"><div class="blockhead"><h2>البيانات المستخرجة من الشهادة</h2><span class="tag" id="dataTag"></span></div><div class="fields" id="fields"></div><p class="sub" id="extractText"></p></section>
+    <section class="section two"><div class="card"><h2>مؤشرات الفحص البصري والفني</h2><p class="sub">نتائج مبدئية يجب مراجعة أدلتها، ولا تثبت التلاعب بمفردها.</p><div id="visual"></div></div><div class="card"><h2>AI Reconstruction & Synthetic Indicators</h2><p class="sub">بحث استدلالي عن إعادة الرسم أو تعديل الاسم والختم والتوقيع باستخدام AI.</p><div id="aiFlags"></div><p class="hint" style="margin:10px 0 0">لا يتم إثبات منشأ AI إلا بخدمة تحقق منشأ/علامات مائية صالحة؛ هذه الخدمة غير متكاملة في الإصدار الحالي.</p></div></section>
+    <section class="card section"><h2>الفحص الهيكلي وبصمات الملفات</h2><div id="technical"></div></section>
+    <section class="card section"><div class="blockhead"><h2><span class="num">3</span> إجراءات الموارد البشرية</h2><span class="tag warn">قرار بشري إلزامي</span></div>
+      <div class="decision"><strong>التوصية الإجرائية</strong><p id="recommendation"></p><p class="sub" style="margin-bottom:0">الموافقة هنا على إجراء التحقق المقترح، وليست تصديقًا بصحة الشهادة أو قرارًا بتعيين/رفض المرشح.</p></div>
+      <div class="formcols">
+        <div class="field"><label for="issuerStatus">نتيجة تحقق جهة الإصدار (توثيق يدوي)</label><select id="issuerStatus"><option value="unverified">لم يتم التحقق رسميًا</option><option value="confirmed_manual">مطابقة وفق دليل رسمي أرفق مرجعه أدناه</option><option value="discrepancy_manual">تعارض موثق مع مصدر رسمي</option></select></div>
+        <div class="field"><label for="issuerRef">مرجع دليل جهة الإصدار — إلزامي إن اخترت تحققًا رسميًا</label><input id="issuerRef" maxlength="300" placeholder="رقم مرجعي / قناة رسمية / تاريخ الاستجابة"></div>
+        <div class="field"><label for="reviewer">اسم مسؤول المراجعة</label><input id="reviewer" maxlength="110" placeholder="اسم المراجع المفوض"></div>
+        <div class="field"><label for="reason">سبب القرار والإجراء التالي</label><input id="reason" maxlength="1200" placeholder="مثال: طلب شهادة رقمية قابلة للتحقق من الجهة"></div>
+      </div>
+      <div class="field"><label>اختيار الإجراء</label><div class="buttons">
+        <label><input type="radio" name="decision" value="APPROVE_RECOMMENDATION" checked> الموافقة على التوصية</label>
+        <label><input type="radio" name="decision" value="REJECT_RECOMMENDATION"> رفض التوصية</label>
+        <label><input type="radio" name="decision" value="MORE_VERIFICATION"> طلب تحقق إضافي</label>
+      </div></div>
+      <div class="actions"><button id="save" class="primary">حفظ القرار في Audit Sheet</button><button id="json" class="secondary">تحميل تقرير JSON</button><button id="txt" class="secondary">تحميل تقرير TXT</button><button id="print" class="secondary">طباعة / حفظ PDF</button></div>
+      <div id="savedMsg" class="msg"></div>
+    </section>
+  </div>
+  <footer class="footer">WINNERS BUSINESS CONSULTATION & TRAINING SERVICES · Document analysis supports HR verification; it does not establish fraud, academic authenticity or candidate identity.</footer>
+</main>
+<script>
+(function(){'use strict';
+const $=id=>document.getElementById(id),MAX_FILES=3,MAX_FILE_BYTES=1900000,MAX_TOTAL=4500000;
+const state={selected:[],report:null,busy:false,demo:false};
+const isAppsScript=typeof google!=='undefined'&&google.script&&google.script.run;
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showMsg(s,error){$('msg').textContent=s;$('msg').classList.toggle('error',!!error);}
+function busy(v){state.busy=v;$('analyze').disabled=v||!state.selected.length;$('demo').disabled=v;$('clear').disabled=v;$('loader').classList.toggle('hidden',!v);}
+function fmtSize(n){return n<1000000?(n/1000).toFixed(0)+' KB':(n/1000000).toFixed(2)+' MB';}
+function fileCheck(files){if(!files.length)return 'اختر شهادة أو مستندًا واحدًا على الأقل.';if(files.length>MAX_FILES)return 'مسموح بـ3 ملفات بحد أقصى.';
+ const allow=['pdf','jpg','jpeg','png','docx'];let total=0;
+ for(const f of files){const ext=(f.name.split('.').pop()||'').toLowerCase();if(!allow.includes(ext))return 'صيغة غير مدعومة: '+f.name;if(f.size>MAX_FILE_BYTES)return 'حجم الملف أكبر من 1.9 MB: '+f.name;total+=f.size;}
+ if(total>MAX_TOTAL)return 'مجموع الملفات يتجاوز 4.5 MB.';return '';
+}
+function acceptFiles(incoming){if(state.busy)return;const a=Array.from(incoming||[]),err=fileCheck(a);if(err){state.selected=[];$('fileList').textContent='';busy(false);showMsg(err,true);return;}
+ state.selected=a;$('fileList').innerHTML=a.map((f,i)=>'<span class="file"><b>'+(i===0?'الشهادة الرئيسية':'ملف داعم')+'</b> · '+esc(f.name)+' ('+fmtSize(f.size)+')</span>').join('');busy(false);showMsg('الملفات جاهزة للفحص.');}
+$('pick').onclick=()=>$('files').click();$('files').onchange=e=>acceptFiles(e.target.files);
+const drop=$('drop');drop.ondragover=e=>{e.preventDefault();drop.classList.add('drag')};drop.ondragleave=()=>drop.classList.remove('drag');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('drag');acceptFiles(e.dataTransfer.files)};
+function read64(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onerror=()=>reject(Error('تعذر قراءة '+file.name));fr.onload=()=>resolve(String(fr.result).split(',')[1]||'');fr.readAsDataURL(file);});}
+function call(name,payload){return new Promise((resolve,reject)=>{if(!isAppsScript)return reject(Error('هذه معاينة HTML محلية. الصق الملفات في Apps Script لتفعيل الفحص الحقيقي.'));
+ let r=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(Error((e&&e.message)||'تعذر تنفيذ العملية')));
+ if(name==='getAppStatus')r.getAppStatus();else if(name==='analyzeCase')r.analyzeCase(payload);else if(name==='recordDecision')r.recordDecision(payload);else if(name==='checkGeminiConnection')r.checkGeminiConnection();else reject(Error('Unknown action'));});}
+function setupStatus(){if(!isAppsScript){$('apiText').textContent='معاينة محلية — الربط الفعلي بعد نشر Apps Script';return;}
+ call('getAppStatus').then(s=>{$('apiText').textContent=s.configured?'Gemini مهيأ — '+s.model:'مفتاح Gemini غير مضاف بعد';$('apiDot').classList.add(s.configured?'good':'warn');}).catch(e=>{$('apiText').textContent='تعذر قراءة حالة المحرك: '+e.message;});}
+$('testApi').onclick=()=>{if(!isAppsScript){$('apiMsg').textContent='اختبار API متاح من صفحة Google Apps Script فقط.';return;} $('apiMsg').textContent='جاري التحقق من صلاحية المفتاح وظهور النموذج...';
+ call('checkGeminiConnection').then(r=>{$('apiMsg').textContent=r.available?'المفتاح يعمل والنموذج موجود: '+r.model:'المفتاح يعمل، لكن النموذج الحالي غير ظاهر لمشروعك. راجع GEMINI_MODEL.';}).catch(e=>$('apiMsg').textContent=e.message);};
+$('analyze').onclick=async()=>{if(state.busy)return;const issue=fileCheck(state.selected);if(issue){showMsg(issue,true);return;}
+ busy(true);$('results').classList.add('hidden');$('savedMsg').textContent='';
+ try{
+  showMsg('جاري قراءة المستندات وتجهيز الفحص...');const files=[];
+  for(const f of state.selected)files.push({name:f.name,base64:await read64(f)});
+  showMsg($('consent').checked?'الملفات جاهزة. جاري تحليل Gemini وإعداد التقرير...':'جاري الفحص الفني المحدود بدون إرسال الملفات إلى Gemini...');
+  const input={files,context:$('context').value,consent:$('consent').checked};
+  const r=await call('analyzeCase',input);state.demo=false;state.report=r;render(r);
+  showMsg(r.ai.state==='completed'?'اكتمل الاستخراج وفحص المؤشرات. راجع النتائج قبل اتخاذ إجراء.':'اكتمل الفحص الفني المحدود. تحليل AI غير مكتمل: '+r.ai.reason, r.ai.state==='unavailable');
+ }catch(e){showMsg('تعذر الفحص: '+e.message,true);}finally{busy(false);}};
+function fields(r){const f=r.ai&&r.ai.data?r.ai.data.fields:{};const entries=[['اسم حامل الشهادة','holderName'],['الجهة المصدرة','issuer'],['المؤهل / الشهادة','qualification'],['تاريخ الإصدار','issueDate'],['الرقم المرجعي','referenceNumber'],['اللغة','language']];
+ $('fields').innerHTML=entries.map(([label,key])=>'<div class="data"><small>'+label+'</small><b>'+esc(f[key]||'غير مستخرج / غير ظاهر')+'</b></div>').join('');
+ $('dataTag').textContent=r.ai.state==='completed'?'Gemini Extraction':'استخراج AI غير متاح';
+ $('extractText').textContent=r.ai.state==='completed'?'البيانات من قراءة Gemini وتحتاج مطابقة مع الملف الأصلي.':'لا توجد بيانات مستخرجة آليًا؛ نتائج الفحص الفني متاحة أدناه.';}
+function findings(items,empty){if(!Array.isArray(items)||!items.length)return '<p class="empty">'+esc(empty)+'</p>';
+ return items.map(x=>'<div class="finding"><strong>'+esc(x.label||x.text)+'</strong><p>'+esc(x.observation||x.text||'')+'</p><small>'+esc(x.location||x.source||'')+' · '+esc(x.evidenceClass||'مؤشر وليس إثباتًا')+'</small></div>').join('');}
+function render(r){$('results').classList.remove('hidden');$('caseChip').textContent=r.caseId+(state.demo?' · DEMO':'');
+ const ai=r.ai||{state:'not_run'},hasAI=ai.state==='completed';
+ const meta=[['سلامة الملف','توقيع الصيغة مطابق','مراجعة فنية محدودة'],['منشأ AI','غير مثبت','مؤشرات استدلالية فقط'],['جهة الإصدار','لم يتم التحقق رسميًا','يستلزم قناة رسمية']];
+ $('metrics').innerHTML=meta.map(([label,val,detail])=>'<div class="metric"><div class="label">'+esc(label)+'</div><strong>'+esc(val)+'</strong><small>'+esc(detail)+'</small></div>').join('');
+ fields(r);const d=hasAI?ai.data:{};
+ const technicalFindings=r.files.flatMap(f=>f.technical&&f.technical.findings||[]);
+ $('visual').innerHTML=findings(d.visualFindings,'لا توجد نتائج بصرية مستخرجة؛ لا يعني ذلك عدم وجود تعديل.')+findings(technicalFindings.filter(f=>f.kind==='warning'),'');
+ $('aiFlags').innerHTML=findings(d.aiRedrawFindings,'لا توجد مؤشرات كافية على إعادة الرسم، أو أن تحليل AI لم يعمل. منشأ الملف غير حاسم.');
+ $('technical').innerHTML=r.files.map((f,i)=>'<div class="original"><strong>'+(i===0?'الشهادة الأساسية · ':'ملف مساعد · ')+esc(f.name)+' · '+fmtSize(f.bytes)+'</strong><code>SHA-256: '+esc(f.sha256)+'</code>'+
+   ((f.technical&&f.technical.summary)||[]).map(s=>'<p class="bullet">• '+esc(s)+'</p>').join('')+(f.scopeLimit?'<p class="bullet">• '+esc(f.scopeLimit)+'</p>':'')+'</div>').join('')+
+   '<p class="sub" style="margin-top:12px">تحذير: لا يوجد تحقق من سلامة PDF بالتوقيع المشفر، أو فحص Antivirus، أو تحقق C2PA / SynthID. النتائج المعروضة ليست شهادة سلامة أمنية.</p>';
+ $('recommendation').textContent=r.recommendation||'استكمل مراجعة المستند مع جهة الإصدار.';
+ $('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function serialize(){if(!state.report)return null;return {app:'WINNERS credential verifier',version:'1.0',report:state.report,
+  humanReview:{reviewer:$('reviewer').value.trim(),decision:document.querySelector('input[name="decision"]:checked').value,
+    reason:$('reason').value.trim(),issuerStatus:$('issuerStatus').value,issuerReference:$('issuerRef').value.trim()},
+  disclaimer:'AI and technical observations are not legal evidence of forgery; issuer authenticity remains unverified unless manually evidenced.'};}
+function download(name,text,type){const b=new Blob([text],{type:type||'text/plain;charset=utf-8'}),a=document.createElement('a'),u=URL.createObjectURL(b);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+$('json').onclick=()=>{const x=serialize();if(x)download(x.report.caseId+'.json',JSON.stringify(x,null,2),'application/json');};
+$('txt').onclick=()=>{const x=serialize();if(!x)return;const r=x.report,d=r.ai&&r.ai.data;const s=[
+  'WINNERS | Credential Verification',r.caseId,r.createdAt,'', '=== Extracted fields (AI, not verified) ===',
+  ...Object.entries(d?d.fields:{}).map(z=>z[0]+': '+z[1]),'','=== Summary ===',d?d.summary:'Gemini unavailable',
+  '','=== Visual indicators ===',...(d?d.visualFindings:[]).map(i=>i.label+': '+i.observation),
+  '','=== AI redraw indicators ===',...(d?d.aiRedrawFindings:[]).map(i=>i.label+': '+i.observation),
+  '','=== Source hashes ===',...r.files.map(f=>f.name+' = '+f.sha256),'','=== HR action ===',r.recommendation,
+  x.humanReview.decision,x.humanReview.reason,'','IMPORTANT: No conclusion of forgery or issuer validation.'].join('\n');download(r.caseId+'.txt',s);};
+$('print').onclick=()=>window.print();
+$('save').onclick=async()=>{if(!state.report){$('savedMsg').textContent='ابدأ الفحص أولًا.';return;}
+ const x=serialize(),d=x.humanReview;if(d.reviewer.length<3||d.reason.length<5){$('savedMsg').textContent='يرجى إدخال اسم المراجع وسبب القرار (5 أحرف على الأقل).';return;}
+ if(d.issuerStatus!=='unverified'&&d.issuerReference.length<8){$('savedMsg').textContent='لا يجوز اعتماد تحقق جهة الإصدار دون مرجع رسمي موثق.';return;}
+ if(state.demo){$('savedMsg').textContent='هذه معاينة تجريبية فقط؛ لم يتم حفظ أي قرار. استخدم Apps Script مع ملف فحص حقيقي.';return;}
+ $('save').disabled=true;$('savedMsg').textContent='جاري حفظ سجل القرار...';
+ try{const r=await call('recordDecision',{caseId:state.report.caseId,hash:state.report.files[0].sha256,
+   reviewer:d.reviewer,action:d.decision,reason:d.reason,issuerStatus:d.issuerStatus,issuerReference:d.issuerReference});
+   $('savedMsg').classList.add('audit');$('savedMsg').textContent='تم تسجيل إجراء HR في Audit Sheet الخاص. السجل لا يتضمن أصل الشهادة.';
+   if(r.auditSheetUrl){const a=document.createElement('a');a.href=r.auditSheetUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=' · فتح سجل المراجعة';$('savedMsg').appendChild(a);}
+ }catch(e){$('savedMsg').textContent='تعذر حفظ القرار: '+e.message;}finally{$('save').disabled=false;}};
+$('demo').onclick=()=>{if(state.busy)return;state.demo=true;state.report={caseId:'WF-20261110-000000-DEMO00',createdAt:new Date().toISOString(),
+  files:[{name:'Demo_Certificate.pdf',format:'pdf',bytes:155000,sha256:'0123456789abcdef'.repeat(4),technical:{findings:[{kind:'notice',text:'Signature-validation service not connected',source:'DEMO'}],summary:['PDF text metadata only — not cryptographic proof']}}],
+  ai:{state:'completed',model:'DEMO – no API call',data:{fields:{holderName:'أحمد (بيانات افتراضية)',issuer:'جامعة افتراضية',qualification:'شهادة تدريب توضيحية',issueDate:'2026-01-01',referenceNumber:'DEMO-001',language:'العربية'},
+    summary:'هذه شهادة تدريبية افتراضية للمعاينة فقط.',visualFindings:[{label:'اختلاف موضع النص (مثال)',observation:'مؤشر افتراضي يحتاج مقارنة مع أصل المستند.',location:'حقل الاسم',evidenceClass:'VISUAL_INDICATOR'}],aiRedrawFindings:[{label:'اشتباه غير مثبت (مثال)',observation:'نموذج توضيحي؛ لا يوجد تحليل فعلي لبكسلات أو صورة.',location:'منطقة الختم',evidenceClass:'AI_VISUAL_SUSPICION'}],comparisonNotes:[],clarifications:[],nextAction:'اطلب تأكيد المؤهل من جهة الإصدار عبر قناة رسمية.'}},recommendation:'طلب تأكيد المؤهل من جهة الإصدار عبر قناة رسمية.'};
+ render(state.report);showMsg('وضع المعاينة: كل البيانات خيالية، ولم يتم رفع ملف أو الاتصال بـGemini.');};
+$('clear').onclick=()=>{if(state.busy)return;state.selected=[];state.report=null;state.demo=false;$('files').value='';$('context').value='';$('consent').checked=false;$('fileList').textContent='';$('results').classList.add('hidden');$('savedMsg').textContent='';showMsg('');busy(false);};
+setupStatus();
+})();
+</script>
+</body>
+</html>
