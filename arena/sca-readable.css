@@ -250,7 +250,7 @@ body.sca-readable .arena-header-title .tiny{font-size:14px!important}
   body.sca-readable .brand img{width:110px;height:76px;max-height:76px}
 }
 
-/* Winners embedded PNG contains large internal whitespace; enlarge artwork visually without regenerating the logo. */
+/* Winners image has internal whitespace: double the *current* visual magnification (2.7 -> 5.4), without changing its source pixels. */
 body.sca-readable .logo-card,
 body.sca-readable .brand{
   overflow:hidden;
@@ -258,15 +258,15 @@ body.sca-readable .brand{
 }
 body.sca-readable .logo-card img,
 body.sca-readable .brand img{
-  transform:scale(2.7);
+  transform:scale(5.4);
   transform-origin:center center;
   object-fit:contain;
 }
 @media(max-width:700px){
   body.sca-readable .logo-card img,
-  body.sca-readable .brand img{transform:scale(2.5)}
+  body.sca-readable .brand img{transform:scale(5)}
 }
 @media(max-width:360px){
   body.sca-readable .logo-card img,
-  body.sca-readable .brand img{transform:scale(2.35)}
+  body.sca-readable .brand img{transform:scale(4.7)}
 }
