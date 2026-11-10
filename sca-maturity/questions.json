@@ -32,7 +32,7 @@
           "questions": [
             {
               "id": "SCA-F01-Q01",
-              "en": "At the Suez Canal Authority: Are HR policies formally documented, approved, and accessible to employees?",
+              "en": "Does SCA have a current approved set of HR and personnel policies, with documented review of amendments following the 2017 regulations?",
               "ar": "هل توجد نسخة معتمدة وحديثة من سياسات شئون العاملين والموارد البشرية بالهيئة، مع سجل يثبت مراجعة التعديلات اللاحقة للائحة 2017؟",
               "origin": "SCA-G06 · SCA-S02 · SCA-LEG-006",
               "sourceRefs": [
@@ -47,7 +47,7 @@
             },
             {
               "id": "SCA-F01-Q02",
-              "en": "At the Suez Canal Authority: Are roles, responsibilities, and approval authorities within HR clearly defined?",
+              "en": "Is there an up-to-date delegation-of-authority matrix distinguishing the preparer, reviewer, and authorized approver of personnel requests?",
               "ar": "هل توجد مصفوفة تفويضات حديثة تميّز بين مُعدّ طلب شؤون العاملين والمراجع وصاحب سلطة الاعتماد؟",
               "origin": "SCA-G05 · SCA-LEG-003",
               "sourceRefs": [
@@ -61,7 +61,7 @@
             },
             {
               "id": "SCA-F01-Q03",
-              "en": "At the Suez Canal Authority: Are HR policies reviewed and updated on a defined schedule?",
+              "en": "Is there an approved 2026 HR organization chart identifying divisions and reporting lines, rather than relying solely on published unit titles?",
               "ar": "هل يتوافر هيكل 2026 المعتمد لإدارة الموارد البشرية يحدد الأقسام والتبعية دون الاعتماد على المسميات المنشورة وحدها؟",
               "origin": "SCA-G01 · SCA-O01 · SCA-O02",
               "sourceRefs": [
@@ -76,7 +76,7 @@
             },
             {
               "id": "SCA-F01-Q04",
-              "en": "At the Suez Canal Authority: Are HR procedures applied consistently across departments and employee groups?",
+              "en": "Are recruitment, promotion, and probation-confirmation procedures documented, including the personnel committee and competent authority under current rules?",
               "ar": "هل إجراءات التعيين والترقية والتثبيت موثقة وتوضح دور لجنة شئون العاملين والسلطة المختصة وفق الوثائق السارية؟",
               "origin": "SCA-O07 · SCA-P04 · SCA-P05 · SCA-P12 · SCA-LEG-007",
               "sourceRefs": [
@@ -93,7 +93,7 @@
             },
             {
               "id": "SCA-F01-Q05",
-              "en": "At the Suez Canal Authority: Is there an effective control and escalation mechanism for policy exceptions?",
+              "en": "Is there a documented procedure to review policy exceptions and update policies following legal review and approval by the competent authority?",
               "ar": "هل توجد آلية موثقة لمراجعة الاستثناءات وتحديث السياسات بعد الرأي القانوني والاعتماد المختص؟",
               "origin": "SCA-G05 · SCA-G06 · SCA-O14",
               "sourceRefs": [
@@ -117,7 +117,7 @@
           "questions": [
             {
               "id": "SCA-F02-Q01",
-              "en": "At the Suez Canal Authority: Is there an approved annual manpower plan linked to business targets and budget?",
+              "en": "Is an approved authorized-establishment and actual-headcount dataset available for SCA employees, broken down by units and locations?",
               "ar": "هل يوجد بيان معتمد للملاك الوظيفي والأعداد الفعلية للعاملين بالهيئة، مفصول بحسب الوحدات والمواقع؟",
               "origin": "SCA-G09 · SCA-G04",
               "sourceRefs": [
@@ -131,7 +131,7 @@
             },
             {
               "id": "SCA-F02-Q02",
-              "en": "At the Suez Canal Authority: Are headcount needs based on workload, productivity, and future business demand?",
+              "en": "Are workforce requirements determined from documented operational workloads and actual sites, without presuming an unverified structure?",
               "ar": "هل يُربط تقدير الاحتياج الوظيفي بحجم العمل التشغيلي والمواقع الفعلية بدل افتراض هيكل غير معتمد؟",
               "origin": "SCA-G09 · SCA-G01",
               "sourceRefs": [
@@ -145,7 +145,7 @@
             },
             {
               "id": "SCA-F02-Q03",
-              "en": "At the Suez Canal Authority: Are vacancies, replacements, and new positions tracked against the manpower plan?",
+              "en": "Are vacancies and replacement needs monitored against an approved job catalogue and job descriptions?",
               "ar": "هل تُراجع الوظائف الشاغرة والبدائل المطلوبة على أساس دليل وظائف وبطاقات وصف معتمدة؟",
               "origin": "SCA-G03 · SCA-P01",
               "sourceRefs": [
@@ -159,7 +159,7 @@
             },
             {
               "id": "SCA-F02-Q04",
-              "en": "At the Suez Canal Authority: Are workforce gaps and surpluses identified by function, role, and location?",
+              "en": "Are workforce gaps across specializations and Canal-region locations assessed using verified operational data?",
               "ar": "هل تُقاس فجوات الكوادر بين التخصصات والوحدات في مدن القناة باستخدام بيانات تشغيلية موثقة؟",
               "origin": "SCA-G04 · SCA-G09",
               "sourceRefs": [
@@ -173,7 +173,7 @@
             },
             {
               "id": "SCA-F02-Q05",
-              "en": "At the Suez Canal Authority: Is actual headcount and workforce cost regularly compared with the approved plan?",
+              "en": "Are workforce costs and recruitment plans reviewed with the competent finance units against documented approvals?",
               "ar": "هل تُراجع تكلفة القوى العاملة وخطط التعيين مع الجهات المالية المختصة بمستندات اعتماد واضحة؟",
               "origin": "SCA-O16 · SCA-P04 · SCA-G05",
               "sourceRefs": [
@@ -197,7 +197,7 @@
           "questions": [
             {
               "id": "SCA-F03-Q01",
-              "en": "At the Suez Canal Authority: Are employee files complete, updated, and maintained under a standard filing process?",
+              "en": "Are the creation, updating, retention, and authorized access to employee service files governed by documented controls?",
               "ar": "هل توجد ضوابط موثقة لإنشاء وتحديث وحفظ ملفات خدمة العاملين وتحديد حق الاطلاع عليها؟",
               "origin": "SCA-P08 · SCA-LEG-008",
               "sourceRefs": [
@@ -211,7 +211,7 @@
             },
             {
               "id": "SCA-F03-Q02",
-              "en": "At the Suez Canal Authority: Are contracts, attendance, leave, and employee movements processed accurately and on time?",
+              "en": "Are currently approved procedures available for attendance, work schedules, leave, and absence that reflect operational shift requirements?",
               "ar": "هل توجد إجراءات حالية معتمدة للحضور ومواعيد العمل والإجازات والانقطاع تراعي اختلاف متطلبات التشغيل؟",
               "origin": "SCA-P20 · SCA-P21",
               "sourceRefs": [
@@ -225,7 +225,7 @@
             },
             {
               "id": "SCA-F03-Q03",
-              "en": "At the Suez Canal Authority: Are payroll inputs reviewed and approved before payroll processing?",
+              "en": "Do changes in marital status, address, and supporting documents follow a defined verification and records-management process?",
               "ar": "هل تتبع تغييرات الحالة الاجتماعية والعنوان ومستنداتها مسارًا واضحًا للمراجعة والحفظ؟",
               "origin": "SCA-P22 · SCA-P08",
               "sourceRefs": [
@@ -239,7 +239,7 @@
             },
             {
               "id": "SCA-F03-Q04",
-              "en": "At the Suez Canal Authority: Are joiners, transfers, promotions, and leavers handled through documented workflows?",
+              "en": "Are transfer, secondment, and loan procedures documented, distinguishing the requester, reviewer, and decision authority?",
               "ar": "هل توجد إجراءات موثقة للنقل والندب والإعارة تفصل بين الجهة الطالبة والمراجعة وصاحب القرار؟",
               "origin": "SCA-P16 · SCA-P17 · SCA-P18 · SCA-G05",
               "sourceRefs": [
@@ -255,7 +255,7 @@
             },
             {
               "id": "SCA-F03-Q05",
-              "en": "At the Suez Canal Authority: Are HR operational records traceable and easy to retrieve when needed?",
+              "en": "Are resignation, employment termination, service extensions, and end-of-service payments documented in traceable records?",
               "ar": "هل تُوثق الاستقالة وإنهاء الخدمة ومدّها ومستحقات نهايتها في ملفات قابلة للتتبع؟",
               "origin": "SCA-P25 · SCA-P27 · SCA-P29 · SCA-P31",
               "sourceRefs": [
@@ -280,7 +280,7 @@
           "questions": [
             {
               "id": "SCA-F04-Q01",
-              "en": "At the Suez Canal Authority: Are employment practices reviewed for compliance with applicable labor and social insurance requirements?",
+              "en": "Are original currently effective provisions of Law 30/1975, the personnel regulations, and subsequent amendments checked before HR decisions?",
               "ar": "هل تُراجع الأحكام الأصلية السارية للقانون 30 لسنة 1975 ولائحة العاملين والتعديلات قبل أي تطبيق HR؟",
               "origin": "SCA-LEG-001 · SCA-LEG-006 · SCA-G06",
               "sourceRefs": [
@@ -295,7 +295,7 @@
             },
             {
               "id": "SCA-F04-Q02",
-              "en": "At the Suez Canal Authority: Are statutory records, contracts, and employee documents complete and valid?",
+              "en": "Are SCA's own employees distinguished from subsidiary employees and Suez Canal Economic Zone staff when applying rules?",
               "ar": "هل يجري الفصل في التطبيق بين العاملين بالهيئة والعاملين بالشركات التابعة والمنطقة الاقتصادية؟",
               "origin": "SCA-G14 · SCA-LEG-011 · SCA-LEG-012",
               "sourceRefs": [
@@ -310,7 +310,7 @@
             },
             {
               "id": "SCA-F04-Q03",
-              "en": "At the Suez Canal Authority: Are compliance risks identified, documented, and assigned to responsible owners?",
+              "en": "Is there a documented legal review of disciplinary investigations and referrals that respects the competent decision-maker?",
               "ar": "هل توجد مراجعة قانونية موثقة لمسارات التأديب والتحقيق والإحالة مع مراعاة السلطة المختصة؟",
               "origin": "SCA-P23 · SCA-P24 · SCA-O14",
               "sourceRefs": [
@@ -325,7 +325,7 @@
             },
             {
               "id": "SCA-F04-Q04",
-              "en": "At the Suez Canal Authority: Are payroll, benefits, and employee deductions subject to regular compliance checks?",
+              "en": "Are secondment and overseas-duty decisions reviewed under SCA-specific rules and amendments without unsupported generalization?",
               "ar": "هل تُراجع قرارات الإعارة والمهام الخارجية وفق النصوص والتعديلات الخاصة بالهيئة دون تعميم غير متحقق؟",
               "origin": "SCA-P18 · SCA-P19 · SCA-LEG-010",
               "sourceRefs": [
@@ -340,7 +340,7 @@
             },
             {
               "id": "SCA-F04-Q05",
-              "en": "At the Suez Canal Authority: Is there a process to track regulatory changes and update HR practices accordingly?",
+              "en": "Is there a register of legal risks and discrepancies between operating templates and approved regulations, with an accountable reviewer for each correction?",
               "ar": "هل يوجد سجل للمخاطر القانونية ونقاط التعارض بين النماذج التشغيلية واللوائح المعتمدة مع مالك لكل إجراء تصحيحي؟",
               "origin": "SCA-G06 · SCA-G11 · SCA-LEG-009",
               "sourceRefs": [
@@ -364,7 +364,7 @@
           "questions": [
             {
               "id": "SCA-F05-Q01",
-              "en": "At the Suez Canal Authority: Are job requirements and selection criteria clearly defined before recruitment starts?",
+              "en": "Are vacancy announcements reviewed for workforce demand, role title, eligibility criteria, and approval workflow before publication?",
               "ar": "هل تُراجع إعلانات الوظائف من حيث الاحتياج والمسمى والمعايير ومسار الاعتماد قبل النشر؟",
               "origin": "SCA-P01 · SCA-O03 · SCA-G03",
               "sourceRefs": [
@@ -379,7 +379,7 @@
             },
             {
               "id": "SCA-F05-Q02",
-              "en": "At the Suez Canal Authority: Are sourcing channels measured for quality, speed, and cost effectiveness?",
+              "en": "Is there an approved eligibility and recruitment-condition checklist based on currently effective SCA personnel rules?",
               "ar": "هل توجد قائمة تحقق معتمدة لشروط التعيين والأهلية تستند إلى النسخة السارية من اللائحة؟",
               "origin": "SCA-P02 · SCA-LEG-HR-P02",
               "sourceRefs": [
@@ -393,7 +393,7 @@
             },
             {
               "id": "SCA-F05-Q03",
-              "en": "At the Suez Canal Authority: Is the selection process structured, documented, and consistently applied?",
+              "en": "Are selection tests, ranking, and final results documented against auditable criteria and procedures?",
               "ar": "هل تُوثق الاختبارات والمفاضلة ونتائجها وفق إجراءات ومعايير واضحة قابلة للتدقيق؟",
               "origin": "SCA-P03 · SCA-LEG-HR-P03",
               "sourceRefs": [
@@ -407,7 +407,7 @@
             },
             {
               "id": "SCA-F05-Q04",
-              "en": "At the Suez Canal Authority: Are recruitment KPIs such as time to hire and quality of hire regularly reviewed?",
+              "en": "Are recruitment-file preparation, eligibility verification, and issuance of the appointment decision clearly separated by authority?",
               "ar": "هل تُفصل أعمال إعداد ملف التعيين عن مراجعة الاستحقاق وإصدار القرار من السلطة المختصة؟",
               "origin": "SCA-P04 · SCA-G05",
               "sourceRefs": [
@@ -421,7 +421,7 @@
             },
             {
               "id": "SCA-F05-Q05",
-              "en": "At the Suez Canal Authority: Is onboarding structured with clear activities, owners, and early-stage follow-up?",
+              "en": "Are probation monitoring, confirmation recommendations, and final decisions documented against the committee's verified mandate?",
               "ar": "هل تُوثق متابعة فترة الاختبار والتثبيت وسجلات القرار مع مراجعة اختصاصات اللجنة المعنية؟",
               "origin": "SCA-P05 · SCA-O07",
               "sourceRefs": [
@@ -444,7 +444,7 @@
           "questions": [
             {
               "id": "SCA-F06-Q01",
-              "en": "At the Suez Canal Authority: Are individual objectives and KPIs clearly linked to business and departmental goals?",
+              "en": "Are the annual performance-report templates currently applied by SCA and their approval workflow available for inspection?",
               "ar": "هل تتوافر نماذج تقارير الأداء السنوية المطبقة فعليًا وآلية اعتمادها في الهيئة حاليًا؟",
               "origin": "SCA-P09 · SCA-G10",
               "sourceRefs": [
@@ -458,7 +458,7 @@
             },
             {
               "id": "SCA-F06-Q02",
-              "en": "At the Suez Canal Authority: Are performance expectations measurable, documented, and communicated at the start of the cycle?",
+              "en": "Do approved appraisal forms define transparent assessment criteria for the relevant roles and employee categories?",
               "ar": "هل تحدد نماذج الأداء المعتمدة معايير تقييم معروفة للوظائف والفئات المختلفة؟",
               "origin": "SCA-P09 · SCA-G03",
               "sourceRefs": [
@@ -472,7 +472,7 @@
             },
             {
               "id": "SCA-F06-Q03",
-              "en": "At the Suez Canal Authority: Are performance reviews conducted on schedule with documented feedback?",
+              "en": "Are annual appraisals completed on schedule, with evidence and review records retained in employees' files?",
               "ar": "هل تُنفذ دورة التقييم السنوي في المواعيد المحددة وتُحفظ الأدلة والمراجعات في ملف العامل؟",
               "origin": "SCA-P09 · SCA-P08",
               "sourceRefs": [
@@ -486,7 +486,7 @@
             },
             {
               "id": "SCA-F06-Q04",
-              "en": "At the Suez Canal Authority: Is there a calibration process to improve fairness and consistency of ratings?",
+              "en": "Are processes for addressing weak performance documented, including recommendation, review, and final decision authority?",
               "ar": "هل توجد إجراءات موثقة لمعالجة ضعف الأداء مع بيان أدوار التوصية والمراجعة وصاحب القرار؟",
               "origin": "SCA-P10 · SCA-G05",
               "sourceRefs": [
@@ -500,7 +500,7 @@
             },
             {
               "id": "SCA-F06-Q05",
-              "en": "At the Suez Canal Authority: Are performance results linked to development, recognition, reward, or corrective action?",
+              "en": "Are links between performance outcomes, promotion, and development reviewed against effective rules without assuming a separate KPI system?",
               "ar": "هل تُراجع العلاقة بين نتائج الأداء وقرارات الترقية أو التطوير وفق القواعد السارية دون افتراض نظام KPI مستقل؟",
               "origin": "SCA-P12 · SCA-P09 · SCA-G10",
               "sourceRefs": [
@@ -524,7 +524,7 @@
           "questions": [
             {
               "id": "SCA-F07-Q01",
-              "en": "At the Suez Canal Authority: Is training need analysis based on business priorities, performance gaps, and competency gaps?",
+              "en": "Are technical training needs gathered from the relevant departments and prioritization criteria documented?",
               "ar": "هل تُجمع الاحتياجات التدريبية الفنية من الجهات المعنية ويُوثق أساس ترتيب الأولويات؟",
               "origin": "SCA-P34 · SCA-O04",
               "sourceRefs": [
@@ -538,7 +538,7 @@
             },
             {
               "id": "SCA-F07-Q02",
-              "en": "At the Suez Canal Authority: Is there an approved annual learning plan with priorities, budget, and target groups?",
+              "en": "Is there a documented internal-training plan defining target groups, objectives, responsibilities, and costs?",
               "ar": "هل يوجد برنامج تدريب داخلي موثق يحدد الفئات والأهداف والمسؤوليات والتكلفة؟",
               "origin": "SCA-P32 · SCA-O09 · SCA-O10",
               "sourceRefs": [
@@ -553,7 +553,7 @@
             },
             {
               "id": "SCA-F07-Q03",
-              "en": "At the Suez Canal Authority: Are learning programs linked to defined skills or competencies required by the role?",
+              "en": "Are current rules for nomination and authorization of external training and scholarships documented?",
               "ar": "هل توجد قواعد حديثة وموثقة للترشيح والاعتماد للتدريب الخارجي والبعثات؟",
               "origin": "SCA-P33 · SCA-G07",
               "sourceRefs": [
@@ -567,7 +567,7 @@
             },
             {
               "id": "SCA-F07-Q04",
-              "en": "At the Suez Canal Authority: Is training effectiveness measured beyond attendance and participant satisfaction?",
+              "en": "Is training impact on job performance measured beyond participation and attendance?",
               "ar": "هل تُقاس نتائج التدريب وتأثيرها العملي على المهام المطلوبة بعيدًا عن الاكتفاء بالحضور؟",
               "origin": "SCA-P32 · SCA-P34",
               "sourceRefs": [
@@ -581,7 +581,7 @@
             },
             {
               "id": "SCA-F07-Q05",
-              "en": "At the Suez Canal Authority: Are development actions followed up to confirm application on the job?",
+              "en": "Where applicable, are post-training service commitments checked against currently effective rules for the relevant specializations?",
               "ar": "هل تُراجع حالات التزام الخدمة بعد التدريب عند انطباقها على التخصصات المعنية وبسند ساري؟",
               "origin": "SCA-P30 · SCA-LEG-HR-P30",
               "sourceRefs": [
@@ -604,7 +604,7 @@
           "questions": [
             {
               "id": "SCA-F08-Q01",
-              "en": "At the Suez Canal Authority: Are critical roles and key talent segments formally identified?",
+              "en": "Are critical posts identified from the approved SCA job catalogue rather than assumed role titles?",
               "ar": "هل تحدد الهيئة الوظائف الحرجة بناءً على دليل الوظائف المعتمد وليس على مسميات مفترضة؟",
               "origin": "SCA-G03 · SCA-J04 · SCA-J05",
               "sourceRefs": [
@@ -619,7 +619,7 @@
             },
             {
               "id": "SCA-F08-Q02",
-              "en": "At the Suez Canal Authority: Are high-potential employees identified through clear and consistent criteria?",
+              "en": "Are potential talent nominations supported by documented criteria and reviewed by the competent authority?",
               "ar": "هل توجد معايير موثقة لترشيح الكفاءات الواعدة تراجعها السلطة المختصة؟",
               "origin": "SCA-P09 · SCA-P12",
               "sourceRefs": [
@@ -633,7 +633,7 @@
             },
             {
               "id": "SCA-F08-Q03",
-              "en": "At the Suez Canal Authority: Are succession plans available for critical positions with identified readiness levels?",
+              "en": "Are successors and readiness plans documented for approved critical and leadership positions?",
               "ar": "هل تتوافر بدائل جاهزة وخطط إحلال للوظائف القيادية والحرجة مع أدلة للجاهزية؟",
               "origin": "SCA-G03 · SCA-P37",
               "sourceRefs": [
@@ -647,7 +647,7 @@
             },
             {
               "id": "SCA-F08-Q04",
-              "en": "At the Suez Canal Authority: Are career paths and development actions defined for priority talent groups?",
+              "en": "Are career paths aligned with effective seniority, promotion, and occupational-change rules?",
               "ar": "هل ترتبط المسارات الوظيفية بالأقدمية والترقيات وتغيير المهنة وفق قواعد الهيئة السارية؟",
               "origin": "SCA-P06 · SCA-P07 · SCA-P12",
               "sourceRefs": [
@@ -662,7 +662,7 @@
             },
             {
               "id": "SCA-F08-Q05",
-              "en": "At the Suez Canal Authority: Are retention risks for critical talent monitored and addressed proactively?",
+              "en": "Are rare-skill loss risks and retention measures reviewed using verified employee and capability data?",
               "ar": "هل تُراجع مخاطر فقد المهارات النادرة وخطط الاحتفاظ بها بناءً على بيانات موثقة؟",
               "origin": "SCA-G09 · SCA-P34",
               "sourceRefs": [
@@ -685,7 +685,7 @@
           "questions": [
             {
               "id": "SCA-F09-Q01",
-              "en": "At the Suez Canal Authority: Is there a documented salary structure based on job value and internal equity?",
+              "en": "Are approved rules for pay grades, salaries, and periodic increases based on the current SCA regulations and resolutions available?",
               "ar": "هل توجد قواعد معتمدة للأجور والدرجات والعلاوات وفق لائحة الهيئة وقراراتها السارية؟",
               "origin": "SCA-P11 · SCA-S02 · SCA-G06",
               "sourceRefs": [
@@ -700,7 +700,7 @@
             },
             {
               "id": "SCA-F09-Q02",
-              "en": "At the Suez Canal Authority: Are salaries and benefits periodically benchmarked against the relevant labor market?",
+              "en": "Are allowances and bonuses reviewed for eligibility before payment under documented delegations?",
               "ar": "هل تخضع البدلات والمكافآت إلى مراجعة استحقاق قبل الصرف وفق تفويضات معتمدة؟",
               "origin": "SCA-P15 · SCA-O16 · SCA-G05",
               "sourceRefs": [
@@ -715,7 +715,7 @@
             },
             {
               "id": "SCA-F09-Q03",
-              "en": "At the Suez Canal Authority: Are pay decisions governed by clear rules for hiring, increases, promotions, and adjustments?",
+              "en": "Do incentive and reward decisions follow documented recommendation, approval, and recordkeeping procedures?",
               "ar": "هل تتبع قرارات الحوافز والمكافآت إجراءات واضحة للتوصية والاعتماد والتوثيق؟",
               "origin": "SCA-P13 · SCA-LEG-HR-P13",
               "sourceRefs": [
@@ -729,7 +729,7 @@
             },
             {
               "id": "SCA-F09-Q04",
-              "en": "At the Suez Canal Authority: Are incentives and variable pay linked to measurable performance or business outcomes?",
+              "en": "Are academic merit-increase eligibility and documentation checked against any subsequent legal amendments?",
               "ar": "هل تُراجع شروط العلاوات التشجيعية العلمية ومستنداتها مع أي تعديلات قانونية لاحقة؟",
               "origin": "SCA-P14 · SCA-G06",
               "sourceRefs": [
@@ -743,7 +743,7 @@
             },
             {
               "id": "SCA-F09-Q05",
-              "en": "At the Suez Canal Authority: Are compensation costs and benefit utilization regularly monitored?",
+              "en": "Are end-of-service or death-related payments verified for supporting documents, calculations, and approval?",
               "ar": "هل تُراجع المستحقات المرتبطة بانتهاء الخدمة أو الوفاة من ناحية المستندات والحساب والاعتماد؟",
               "origin": "SCA-P31 · SCA-O16",
               "sourceRefs": [
@@ -766,7 +766,7 @@
           "questions": [
             {
               "id": "SCA-F10-Q01",
-              "en": "At the Suez Canal Authority: Is there a clear process for grievances, complaints, and disciplinary cases?",
+              "en": "Is there a documented channel for employee grievances and complaints, including escalation and case tracking?",
               "ar": "هل توجد قناة موثقة لاستقبال تظلمات وشكاوى العاملين وتحديد مسار إحالتها ومتابعتها؟",
               "origin": "SCA-P23 · SCA-P24 · SCA-G11",
               "sourceRefs": [
@@ -781,7 +781,7 @@
             },
             {
               "id": "SCA-F10-Q02",
-              "en": "At the Suez Canal Authority: Are employee relations cases documented, tracked, and resolved within defined timelines?",
+              "en": "Are disciplinary incidents and investigations recorded with due process and separation of legal-department responsibilities?",
               "ar": "هل تُوثق الوقائع التأديبية والتحقيقات مع الحفاظ على حقوق الأطراف وتمييز اختصاص الإدارة القانونية؟",
               "origin": "SCA-P23 · SCA-P24 · SCA-O14",
               "sourceRefs": [
@@ -796,7 +796,7 @@
             },
             {
               "id": "SCA-F10-Q03",
-              "en": "At the Suez Canal Authority: Is employee engagement or experience measured through a structured mechanism?",
+              "en": "Is there a consistent process for absence and irregular leave that avoids treating all absence as resignation?",
               "ar": "هل يوجد أسلوب موحد للتعامل مع الانقطاع والإجازات غير المنتظمة دون الخلط بينها وبين الاستقالة؟",
               "origin": "SCA-P21 · SCA-P29",
               "sourceRefs": [
@@ -810,7 +810,7 @@
             },
             {
               "id": "SCA-F10-Q04",
-              "en": "At the Suez Canal Authority: Are turnover, absenteeism, and employee concerns analyzed for root causes?",
+              "en": "Is employee experience with administrative services, including verified available digital services, assessed?",
               "ar": "هل تُقاس تجربة العاملين في الخدمات الإدارية، بما فيها الخدمات الرقمية المتاحة فعليًا؟",
               "origin": "SCA-P36 · SCA-G12",
               "sourceRefs": [
@@ -824,7 +824,7 @@
             },
             {
               "id": "SCA-F10-Q05",
-              "en": "At the Suez Canal Authority: Are employee communication channels active, trusted, and responsive?",
+              "en": "Is there a communication and tracking mechanism for grievances and personnel services across SCA units and sites?",
               "ar": "هل توجد آلية تواصل ومتابعة للتظلمات والخدمات بين الوحدات والمواقع المختلفة؟",
               "origin": "SCA-G04 · SCA-G11",
               "sourceRefs": [
@@ -847,7 +847,7 @@
           "questions": [
             {
               "id": "SCA-F11-Q01",
-              "en": "At the Suez Canal Authority: Is there a reliable single source of HR data with defined data ownership?",
+              "en": "Is there a reliable employee-record source defining responsibility for each data field and access to its original supporting document?",
               "ar": "هل يوجد مصدر موثوق لسجلات بيانات العاملين يحدد مسؤولية تحديث كل حقل والرجوع إلى المستند الأصلي؟",
               "origin": "SCA-P08 · SCA-P22",
               "sourceRefs": [
@@ -861,7 +861,7 @@
             },
             {
               "id": "SCA-F11-Q02",
-              "en": "At the Suez Canal Authority: Are employee data records accurate, complete, and regularly validated?",
+              "en": "Are seniority, leave, personnel-movement, and employee records checked periodically for quality and consistency?",
               "ar": "هل تُنفذ مراجعات دورية لجودة سجلات الأفراد والأقدمية والإجازات والحركات الوظيفية؟",
               "origin": "SCA-P06 · SCA-P08 · SCA-P21",
               "sourceRefs": [
@@ -876,7 +876,7 @@
             },
             {
               "id": "SCA-F11-Q03",
-              "en": "At the Suez Canal Authority: Are key HR processes automated or digitally supported where practical?",
+              "en": "Have the HR-related digital systems actually in use been inventoried without assuming an integrated HRIS?",
               "ar": "هل تم حصر الأنظمة الإلكترونية المستخدمة فعليًا في HR دون افتراض وجود HRIS متكامل؟",
               "origin": "SCA-G12 · SCA-P36",
               "sourceRefs": [
@@ -890,7 +890,7 @@
             },
             {
               "id": "SCA-F11-Q04",
-              "en": "At the Suez Canal Authority: Are HR dashboards and metrics produced consistently and used by management?",
+              "en": "Can verified operational indicators be produced from existing records to support management decisions?",
               "ar": "هل يمكن استخراج مؤشرات تشغيلية موثوقة من السجلات الفعلية لدعم القرار الإداري؟",
               "origin": "SCA-G09 · SCA-G10 · SCA-P09",
               "sourceRefs": [
@@ -905,7 +905,7 @@
             },
             {
               "id": "SCA-F11-Q05",
-              "en": "At the Suez Canal Authority: Are access rights, confidentiality, and HR data security adequately controlled?",
+              "en": "Are controls for employee-data confidentiality, user permissions, and backups documented?",
               "ar": "هل توجد ضوابط مكتوبة لسرية بيانات العاملين وصلاحيات المستخدمين والنسخ الاحتياطية؟",
               "origin": "SCA-P08 · SCA-G12",
               "sourceRefs": [
@@ -935,7 +935,7 @@
           "questions": [
             {
               "id": "SCA-S01-Q01",
-              "en": "At the Suez Canal Authority: Is the HR strategy explicitly derived from the organization’s business strategy and priorities?",
+              "en": "Are SCA HR priorities demonstrably linked to approved operational objectives and business-continuity requirements?",
               "ar": "هل ترتبط أولويات إدارة الموارد البشرية بأهداف هيئة قناة السويس التشغيلية واستمرارية الأعمال بمستند معتمد؟",
               "origin": "SCA-O01 · SCA-P37",
               "sourceRefs": [
@@ -949,7 +949,7 @@
             },
             {
               "id": "SCA-S01-Q02",
-              "en": "At the Suez Canal Authority: Are the workforce implications of growth, cost, digital, or market plans clearly defined?",
+              "en": "Are organizational HR needs translated into measurable objectives connected to operational outcomes?",
               "ar": "هل تُترجم الاحتياجات التنظيمية للهيئة إلى أهداف موارد بشرية محددة تقاس بنتائج تشغيلية؟",
               "origin": "SCA-G09 · SCA-P34",
               "sourceRefs": [
@@ -963,7 +963,7 @@
             },
             {
               "id": "SCA-S01-Q03",
-              "en": "At the Suez Canal Authority: Are HR priorities translated into measurable strategic objectives and initiatives?",
+              "en": "Are recruitment, training, and capability priorities updated in response to verified operating needs and changes?",
               "ar": "هل يجري تحديث أولويات التوظيف والتدريب والقدرات وفق المتغيرات والاحتياجات التشغيلية المثبتة؟",
               "origin": "SCA-P01 · SCA-P34 · SCA-P37",
               "sourceRefs": [
@@ -978,7 +978,7 @@
             },
             {
               "id": "SCA-S01-Q04",
-              "en": "At the Suez Canal Authority: Are HR leaders involved in strategic business planning and major business decisions?",
+              "en": "Do the responsible HR bodies participate in reviewing how organizational decisions affect personnel?",
               "ar": "هل تشارك الجهات المختصة بالموارد البشرية في مراجعة آثار القرارات التنظيمية على العاملين؟",
               "origin": "SCA-G01 · SCA-G05",
               "sourceRefs": [
@@ -992,7 +992,7 @@
             },
             {
               "id": "SCA-S01-Q05",
-              "en": "At the Suez Canal Authority: Is HR strategy progress reviewed using business-linked outcomes rather than activity measures only?",
+              "en": "Is progress on HR initiatives and operational impact reviewed periodically with authorized decision-makers?",
               "ar": "هل توجد مراجعة دورية موثقة لتقدم مبادرات HR ومؤشرات أثرها مع أصحاب القرارات؟",
               "origin": "SCA-G11 · SCA-P37",
               "sourceRefs": [
@@ -1015,7 +1015,7 @@
           "questions": [
             {
               "id": "SCA-S02-Q01",
-              "en": "At the Suez Canal Authority: Does the organization structure clearly support the current business model and strategic direction?",
+              "en": "Has the effective approved SCA organization chart and HR structure been obtained, with a verifiable effective date?",
               "ar": "هل تم الحصول على نسخة الهيكل التنظيمي المعتمد للهيئة وإدارة الموارد البشرية بتاريخ سريان واضح؟",
               "origin": "SCA-G01 · SCA-O01",
               "sourceRefs": [
@@ -1029,7 +1029,7 @@
             },
             {
               "id": "SCA-S02-Q02",
-              "en": "At the Suez Canal Authority: Are roles, accountabilities, reporting lines, and decision rights clearly defined?",
+              "en": "Has the relationship between the titles Human Resources and Personnel Affairs been verified from a formal organizational decision?",
               "ar": "هل جرى التحقق من العلاقة بين مسميي «إدارة الموارد البشرية» و«شئون العاملين» بقرار تنظيمي رسمي؟",
               "origin": "SCA-G02 · SCA-O01 · SCA-O02",
               "sourceRefs": [
@@ -1044,7 +1044,7 @@
             },
             {
               "id": "SCA-S02-Q03",
-              "en": "At the Suez Canal Authority: Are management layers and spans of control appropriate for the organization’s size and complexity?",
+              "en": "Are approved job descriptions available for current role titles, responsibilities, and reporting relationships?",
               "ar": "هل توجد بطاقات وصف وظائف معتمدة للمسميات والمسؤوليات وخطوط الإشراف؟",
               "origin": "SCA-G03 · SCA-J01 · SCA-J02",
               "sourceRefs": [
@@ -1059,7 +1059,7 @@
             },
             {
               "id": "SCA-S02-Q04",
-              "en": "At the Suez Canal Authority: Are overlaps, duplicated responsibilities, and structural gaps regularly identified and addressed?",
+              "en": "Are unit reporting lines across Canal cities, including organization/training and school-affairs units, verified?",
               "ar": "هل تم التحقق من تبعية الأقسام والوحدات في مدن القناة، بما فيها التنظيم والتدريب وشئون المدارس؟",
               "origin": "SCA-G04 · SCA-G07 · SCA-G08",
               "sourceRefs": [
@@ -1074,7 +1074,7 @@
             },
             {
               "id": "SCA-S02-Q05",
-              "en": "At the Suez Canal Authority: Is organization design reviewed when strategy, scale, technology, or operating model changes?",
+              "en": "Are overlapping responsibilities and approval paths assessed using a documented matrix reflecting SCA's actual structure?",
               "ar": "هل تُراجع ازدواجية الأدوار وخطوط الموافقة في الطبيعة المصفوفية للهيئة بمصفوفة موثقة؟",
               "origin": "SCA-G05 · SCA-G15",
               "sourceRefs": [
@@ -1097,7 +1097,7 @@
           "questions": [
             {
               "id": "SCA-S03-Q01",
-              "en": "At the Suez Canal Authority: Are the critical capabilities required to execute future business strategy clearly defined?",
+              "en": "Are the skills required in critical technical and operational roles defined in approved job references?",
               "ar": "هل حُددت الكفاءات المطلوبة للأدوار التشغيلية والفنية الحرجة بمراجع وظيفية معتمدة؟",
               "origin": "SCA-G03 · SCA-P34",
               "sourceRefs": [
@@ -1111,7 +1111,7 @@
             },
             {
               "id": "SCA-S03-Q02",
-              "en": "At the Suez Canal Authority: Is there a current view of skill and competency gaps across critical roles?",
+              "en": "Are capability gaps assessed using actual workforce, performance, and training-needs data?",
               "ar": "هل يجري تحليل فجوات المهارات بناءً على بيانات العاملين ونتائج الأداء واحتياجات التدريب؟",
               "origin": "SCA-G09 · SCA-G10 · SCA-P34",
               "sourceRefs": [
@@ -1126,7 +1126,7 @@
             },
             {
               "id": "SCA-S03-Q03",
-              "en": "At the Suez Canal Authority: Are build, buy, borrow, or automate decisions used to close capability gaps?",
+              "en": "Are training centers and associated schools assessed for their contribution to skills gaps only after their current reporting lines are verified?",
               "ar": "هل تُراجع مساهمة مراكز التدريب والمدارس ذات الصلة في سد الاحتياجات بعد إثبات تبعيتها الفعلية؟",
               "origin": "SCA-O09 · SCA-O10 · SCA-O11 · SCA-G07",
               "sourceRefs": [
@@ -1142,7 +1142,7 @@
             },
             {
               "id": "SCA-S03-Q04",
-              "en": "At the Suez Canal Authority: Are future workforce scenarios considered for technology, growth, restructuring, or market change?",
+              "en": "Are training, hiring, and workforce-redeployment options compared using documented needs plans?",
               "ar": "هل تُقارن بدائل التدريب والتعيين وإعادة التوزيع وفق خطط احتياجات موثقة؟",
               "origin": "SCA-P01 · SCA-P16 · SCA-P32",
               "sourceRefs": [
@@ -1157,7 +1157,7 @@
             },
             {
               "id": "SCA-S03-Q05",
-              "en": "At the Suez Canal Authority: Are capability investments prioritized based on strategic business value?",
+              "en": "Is workforce readiness for future technical and administrative changes assessed using verified data?",
               "ar": "هل تُقاس جاهزية القوى العاملة للتحولات التقنية والإدارية القادمة على أساس بيانات مثبتة؟",
               "origin": "SCA-P37 · SCA-G12",
               "sourceRefs": [
@@ -1180,7 +1180,7 @@
           "questions": [
             {
               "id": "SCA-S04-Q01",
-              "en": "At the Suez Canal Authority: Are leadership expectations and required leadership competencies clearly defined?",
+              "en": "Are documented leadership competencies available for approved supervisory and managerial roles in SCA?",
               "ar": "هل توجد معايير قيادية موثقة للأدوار الإشرافية والإدارية المعتمدة بالهيئة؟",
               "origin": "SCA-J04 · SCA-J05 · SCA-J06 · SCA-G03",
               "sourceRefs": [
@@ -1196,7 +1196,7 @@
             },
             {
               "id": "SCA-S04-Q02",
-              "en": "At the Suez Canal Authority: Is leadership effectiveness assessed using consistent evidence and business outcomes?",
+              "en": "Is leadership effectiveness assessed against verified outcomes rather than personal impressions alone?",
               "ar": "هل يُقاس أداء القيادات بنتائج موثقة ومراجعة بدلاً من الانطباعات وحدها؟",
               "origin": "SCA-P09 · SCA-G10",
               "sourceRefs": [
@@ -1210,7 +1210,7 @@
             },
             {
               "id": "SCA-S04-Q03",
-              "en": "At the Suez Canal Authority: Is there a visible leadership pipeline for critical management roles?",
+              "en": "Is there a documented mechanism to identify leadership successors and readiness for critical positions?",
               "ar": "هل توجد آلية موثقة لتحديد البدائل القيادية وتقدير الجاهزية للوظائف الحرجة؟",
               "origin": "SCA-P37 · SCA-G03",
               "sourceRefs": [
@@ -1224,7 +1224,7 @@
             },
             {
               "id": "SCA-S04-Q04",
-              "en": "At the Suez Canal Authority: Are succession and leadership development decisions discussed at senior management level?",
+              "en": "Are leadership-development and administrative-improvement initiatives translated into measurable implementation plans?",
               "ar": "هل تترجم مبادرات تطوير القيادات والإصلاح الإداري إلى خطط تنفيذ وقياس أثر قابلة للمراجعة؟",
               "origin": "SCA-P37 · SCA-S07",
               "sourceRefs": [
@@ -1238,7 +1238,7 @@
             },
             {
               "id": "SCA-S04-Q05",
-              "en": "At the Suez Canal Authority: Are leadership risks such as dependency on individuals or weak successors actively managed?",
+              "en": "Are key-person dependencies and insufficient backup coverage assessed for critical sites and positions?",
               "ar": "هل توجد مراجعة مخاطر الاعتماد على أفراد محددين ونقص البدائل في المواقع والأدوار الحرجة؟",
               "origin": "SCA-G09 · SCA-G04",
               "sourceRefs": [
@@ -1261,7 +1261,7 @@
           "questions": [
             {
               "id": "SCA-S05-Q01",
-              "en": "At the Suez Canal Authority: Are the desired organizational values and behaviors clearly defined and understood?",
+              "en": "Are approved staff-conduct rules available and supported by evidence of fair implementation?",
               "ar": "هل توجد قواعد سلوك وظيفي معتمدة ومتاحة للعاملين ويُثبت تطبيقها بإنصاف؟",
               "origin": "SCA-P23 · SCA-S02",
               "sourceRefs": [
@@ -1275,7 +1275,7 @@
             },
             {
               "id": "SCA-S05-Q02",
-              "en": "At the Suez Canal Authority: Do leadership behaviors consistently reinforce the desired culture?",
+              "en": "Is employee sentiment and experience measured in a structured way without assuming an unverified survey exists?",
               "ar": "هل يوجد قياس منظم لاتجاهات العاملين وتجربتهم دون الادعاء بوجود مسح لم يثبت تنفيذه؟",
               "origin": "SCA-P36 · SCA-G11",
               "sourceRefs": [
@@ -1289,7 +1289,7 @@
             },
             {
               "id": "SCA-S05-Q03",
-              "en": "At the Suez Canal Authority: Are accountability, collaboration, and decision-making effectiveness regularly assessed?",
+              "en": "Is collaboration across departments and locations assessed using specific cases and operating indicators?",
               "ar": "هل تُراجع فعالية التعاون بين الوحدات والأماكن المختلفة من خلال وقائع ومؤشرات عملية؟",
               "origin": "SCA-G04 · SCA-G15",
               "sourceRefs": [
@@ -1303,7 +1303,7 @@
             },
             {
               "id": "SCA-S05-Q04",
-              "en": "At the Suez Canal Authority: Are culture or organizational health issues identified through reliable employee and business data?",
+              "en": "Do investigation and disciplinary procedures follow a fair, documented workflow and approved decision authority?",
               "ar": "هل تتبع إجراءات التحقيق والجزاءات مسارًا عادلًا وموثقًا وتفويضًا معتمدًا؟",
               "origin": "SCA-P24 · SCA-O14 · SCA-G05",
               "sourceRefs": [
@@ -1318,7 +1318,7 @@
             },
             {
               "id": "SCA-S05-Q05",
-              "en": "At the Suez Canal Authority: Are cultural gaps addressed through specific leadership, process, or people interventions?",
+              "en": "Are findings on culture and accountability converted into corrective actions with owners and performance measures?",
               "ar": "هل تُترجم نتائج قياس الثقافة والمساءلة إلى إجراءات تصحيحية لها مسؤول ومؤشر متابعة؟",
               "origin": "SCA-G11 · SCA-P23",
               "sourceRefs": [
@@ -1341,7 +1341,7 @@
           "questions": [
             {
               "id": "SCA-S06-Q01",
-              "en": "At the Suez Canal Authority: Is the HR operating model clearly defined with appropriate roles for HR leadership, HRBPs, COEs, and operations?",
+              "en": "Has the actual working arrangement among HR, Personnel Affairs, and local personnel units been verified without presuming they are merged?",
               "ar": "هل تم تحديد نموذج التشغيل الفعلي بين الموارد البشرية وشئون العاملين ووحدات الأفراد دون افتراض اندماجها؟",
               "origin": "SCA-O01 · SCA-O02 · SCA-O08 · SCA-G02",
               "sourceRefs": [
@@ -1357,7 +1357,7 @@
             },
             {
               "id": "SCA-S06-Q02",
-              "en": "At the Suez Canal Authority: Are HR services designed around clear service ownership, standards, and escalation paths?",
+              "en": "Are stakeholder roles documented across HR processes, locations, and departments?",
               "ar": "هل جرى توثيق أدوار أصحاب المصلحة في إجراءات HR المختلفة عبر المدن والإدارات؟",
               "origin": "SCA-G04 · SCA-G15",
               "sourceRefs": [
@@ -1371,7 +1371,7 @@
             },
             {
               "id": "SCA-S06-Q03",
-              "en": "At the Suez Canal Authority: Are HR resources allocated according to business priorities and service demand?",
+              "en": "Is there an HR service catalogue specifying requests, required documentation, and follow-up ownership?",
               "ar": "هل يوجد دليل خدمات HR يحدد الخدمة ومتطلبات الطلب والجهة المسؤولة عن متابعتها؟",
               "origin": "SCA-G11 · SCA-P08 · SCA-P21",
               "sourceRefs": [
@@ -1386,7 +1386,7 @@
             },
             {
               "id": "SCA-S06-Q04",
-              "en": "At the Suez Canal Authority: Are transactional activities standardized and separated from strategic or advisory work where appropriate?",
+              "en": "Are approved RACI responsibilities, escalation paths, and approval workflows available for cross-unit procedures?",
               "ar": "هل تتوافر مصفوفة RACI ومسارات تصعيد وموافقة معتمدة للإجراءات المرتبطة بأكثر من جهة؟",
               "origin": "SCA-G05 · SCA-G15",
               "sourceRefs": [
@@ -1400,7 +1400,7 @@
             },
             {
               "id": "SCA-S06-Q05",
-              "en": "At the Suez Canal Authority: Is HR operating model effectiveness measured through service, cost, quality, and business impact indicators?",
+              "en": "Are HR service quality and turnaround measured using operating evidence without imposing unapproved SLAs?",
               "ar": "هل تقاس جودة وسرعة خدمات الموارد البشرية بأدلة تشغيلية دون فرض SLAs غير معتمدة؟",
               "origin": "SCA-G11 · SCA-P36",
               "sourceRefs": [
@@ -1423,7 +1423,7 @@
           "questions": [
             {
               "id": "SCA-S07-Q01",
-              "en": "At the Suez Canal Authority: Is there a defined HR technology roadmap aligned with business and HR priorities?",
+              "en": "Is an HR digital roadmap linked to verified SCA priorities, projects, and systems?",
               "ar": "هل توجد خارطة رقمية للموارد البشرية تربط أولويات الهيئة بالمشروعات والأنظمة المثبتة؟",
               "origin": "SCA-G12 · SCA-P36",
               "sourceRefs": [
@@ -1437,7 +1437,7 @@
             },
             {
               "id": "SCA-S07-Q02",
-              "en": "At the Suez Canal Authority: Are core HR systems integrated sufficiently to avoid duplicate work and fragmented data?",
+              "en": "Have current HR systems and data integrations been inventoried in the field without assuming a unified HRIS platform?",
               "ar": "هل أُجري حصر ميداني للأنظمة الحالية وتكاملات البيانات بدلاً من افتراض منصة HRIS موحدة؟",
               "origin": "SCA-G12 · SCA-O17",
               "sourceRefs": [
@@ -1451,7 +1451,7 @@
             },
             {
               "id": "SCA-S07-Q03",
-              "en": "At the Suez Canal Authority: Do employees and managers have practical self-service access for relevant HR processes?",
+              "en": "Have digital services currently available to employees and retirees been verified against historic public statements?",
               "ar": "هل تم التحقق من الخدمات الرقمية المتاحة الآن للعاملين والمتقاعدين مقارنة بما نُشر سابقًا؟",
               "origin": "SCA-P36 · SCA-S09",
               "sourceRefs": [
@@ -1465,7 +1465,7 @@
             },
             {
               "id": "SCA-S07-Q04",
-              "en": "At the Suez Canal Authority: Are automation and AI opportunities prioritized based on value, risk, and process readiness?",
+              "en": "Are automation opportunities selected based on process readiness, data protection, and operational approval?",
               "ar": "هل جرى اختيار فرص الأتمتة على أساس جاهزية الإجراء، وحماية البيانات، واعتمادات التشغيل؟",
               "origin": "SCA-G11 · SCA-G12",
               "sourceRefs": [
@@ -1479,7 +1479,7 @@
             },
             {
               "id": "SCA-S07-Q05",
-              "en": "At the Suez Canal Authority: Are digital adoption, user experience, system reliability, and data quality regularly monitored?",
+              "en": "Are there controls for human review of AI output and prohibiting personal-data transfer to unauthorized AI services?",
               "ar": "هل توجد ضوابط لمراجعة مخرجات أدوات AI ومنع تمرير بيانات شخصية إلى خدمات غير مصرح بها؟",
               "origin": "SCA-G12 · SCA-P08",
               "sourceRefs": [
@@ -1502,7 +1502,7 @@
           "questions": [
             {
               "id": "SCA-S08-Q01",
-              "en": "At the Suez Canal Authority: Are HR metrics selected based on business questions and decision needs?",
+              "en": "Are HR indicators based on verified establishment and actual-headcount data, not estimates?",
               "ar": "هل تُبنى مؤشرات HR على بيانات أعداد العاملين والملاك الوظيفي الموثقة وليس أرقامًا تقديرية؟",
               "origin": "SCA-G09",
               "sourceRefs": [
@@ -1515,7 +1515,7 @@
             },
             {
               "id": "SCA-S08-Q02",
-              "en": "At the Suez Canal Authority: Are workforce trends analyzed to explain causes and predict business or people risks?",
+              "en": "Are performance-appraisal measures derived from verified current forms and procedures?",
               "ar": "هل تُستخرج مؤشرات تقييم الأداء السنوي من النماذج والإجراءات الفعلية بعد التحقق منها؟",
               "origin": "SCA-G10 · SCA-P09",
               "sourceRefs": [
@@ -1529,7 +1529,7 @@
             },
             {
               "id": "SCA-S08-Q03",
-              "en": "At the Suez Canal Authority: Are key people metrics connected to productivity, cost, customer, quality, or revenue outcomes?",
+              "en": "Are hiring, selection, and confirmation stages measured with traceable time and quality indicators?",
               "ar": "هل تُقاس مراحل التعيين والمفاضلة والتثبيت بمؤشرات وقت وجودة يمكن تدقيقها؟",
               "origin": "SCA-P01 · SCA-P03 · SCA-P05",
               "sourceRefs": [
@@ -1544,7 +1544,7 @@
             },
             {
               "id": "SCA-S08-Q04",
-              "en": "At the Suez Canal Authority: Are HR insights regularly discussed with business leaders and converted into decisions or actions?",
+              "en": "Is the real effect of training on operational competence measured using documented methods?",
               "ar": "هل يُقاس أثر التدريب الفعلي على كفاءة العمل باستخدام أساليب موثقة؟",
               "origin": "SCA-P32 · SCA-P34",
               "sourceRefs": [
@@ -1558,7 +1558,7 @@
             },
             {
               "id": "SCA-S08-Q05",
-              "en": "At the Suez Canal Authority: Can HR demonstrate measurable value or ROI from major people initiatives?",
+              "en": "Do HR reports result in traceable decisions documenting the evidence and legally authorized decision-maker?",
               "ar": "هل تقود تقارير HR إلى قرارات قابلة للتتبع مع توثيق الأساس والجهة صاحبة الاختصاص؟",
               "origin": "SCA-G05 · SCA-G11",
               "sourceRefs": [
@@ -1581,7 +1581,7 @@
           "questions": [
             {
               "id": "SCA-S09-Q01",
-              "en": "At the Suez Canal Authority: Is change readiness assessed before major organizational or HR transformation initiatives?",
+              "en": "Is readiness assessed before changing the HR structure or redistributing responsibilities across units?",
               "ar": "هل تُجرى دراسة جاهزية قبل تعديل هيكل الموارد البشرية أو تغيير توزيع المهام بين الوحدات؟",
               "origin": "SCA-G01 · SCA-G02 · SCA-G15",
               "sourceRefs": [
@@ -1596,7 +1596,7 @@
             },
             {
               "id": "SCA-S09-Q02",
-              "en": "At the Suez Canal Authority: Are stakeholders, sponsors, resistance risks, and change impacts clearly mapped?",
+              "en": "Are stakeholders, authorization steps, and process impacts documented when regulations or decision rights change?",
               "ar": "هل تُوثق الأطراف المعنية والموافقات والآثار على الإجراءات عند تعديل اللوائح أو صلاحيات القرار؟",
               "origin": "SCA-G05 · SCA-G06",
               "sourceRefs": [
@@ -1610,7 +1610,7 @@
             },
             {
               "id": "SCA-S09-Q03",
-              "en": "At the Suez Canal Authority: Is there a structured communication and engagement plan for major change initiatives?",
+              "en": "Is there an employee and department communication plan when new HR services or procedures are introduced?",
               "ar": "هل توجد خطة تواصل مع العاملين والإدارات عند إطلاق خدمة أو إجراء HR جديد؟",
               "origin": "SCA-P36 · SCA-G11",
               "sourceRefs": [
@@ -1624,7 +1624,7 @@
             },
             {
               "id": "SCA-S09-Q04",
-              "en": "At the Suez Canal Authority: Are managers and employees provided with the capabilities and support needed to adopt the change?",
+              "en": "Are training and enablement needs reviewed before administrative or digital changes go live?",
               "ar": "هل تُراجع احتياجات التدريب والتأهيل المرتبطة بالتحول الإداري أو الرقمي قبل التفعيل؟",
               "origin": "SCA-P34 · SCA-P37 · SCA-G12",
               "sourceRefs": [
@@ -1639,7 +1639,7 @@
             },
             {
               "id": "SCA-S09-Q05",
-              "en": "At the Suez Canal Authority: Are adoption, behavior change, and business outcomes measured after implementation?",
+              "en": "Is adoption and service improvement measured after implementation, with documented corrective follow-up?",
               "ar": "هل يوجد قياس بعد التنفيذ للتحقق من تبني التغيير وتحسن الخدمة وتصحيح الانحرافات؟",
               "origin": "SCA-P37 · SCA-G11",
               "sourceRefs": [
