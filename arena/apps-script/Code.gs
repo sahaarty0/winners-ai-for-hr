@@ -296,7 +296,10 @@ function evaluateSubmissionInternal_(p){var sid=sid_(p.sessionId),tid=tid_(p.tea
  if(!Array.isArray(parsed.criteria))return {ok:false,fallback:'MANUAL',message:'Missing criterion scores; score manually.'};
  var scoreDetails=criteria.map(function(pair,i){var p=parsed.criteria[i]||{},score=Number(p.points);return {name:pair[0],max:pair[1],points:Math.max(0,Math.min(pair[1],isFinite(score)?Math.round(score):0)),reason:limitStr_(p.reason,300),evidence:limitStr_(p.evidence,250)}});
  var total=scoreDetails.reduce(function(sum,c){return sum+c.points},0);
- return saveEval_(sid,tid,stage,total,'pending',parsed.feedback||'',scoreDetails,model);
+ var usedIds=Array.isArray(parsed.references)?parsed.references.map(function(ref){return String(ref&&ref.id||'')}).filter(function(id){return /^SCA-(?:LEG-|[A-Z])[\w-]+$/.test(id)&&kb.indexOf('['+id+']')>=0}).slice(0,4):[];
+ var feedback=limitStr_(parsed.feedback||'',1300);
+ if(usedIds.length)feedback+='\nمراجع Chunks للاسترشاد (ليست نصوصًا قانونية أصلية): '+usedIds.join('، ');
+ return saveEval_(sid,tid,stage,total,'pending',feedback,scoreDetails,model);
 }
 
 /**
