@@ -44,3 +44,12 @@
 - Arena GitHub source: https://github.com/sahaarty0/winners-ai-for-hr/tree/main/arena/
 - Google Sheets database: https://docs.google.com/spreadsheets/d/19zwo9t-NXAWZJla5eL5TrGgagR55v1KeIRJ_DRHFxu0/edit
 - Original AI Prompt Toolkit (unchanged): https://sahaarty0.github.io/winners-ai-for-hr/
+
+
+---
+
+## SCA Edition — mandatory 2026-11-10 override
+
+The earlier Horizon/Nova case descriptions and mandatory multiple-question formats in this legacy guide are superseded by [SCA Edition README](../README.md). The current source uses **one free-form question** per track and stage, with 93 HR and 45 legal research chunks from the [SCA reference folder](https://drive.google.com/drive/folders/1-NWFxKX6auKtezNxe321AHa4Jl98M_Bs).
+
+**Crucial:** a GitHub update alone does not publish the new Apps Script backend. Paste the current `Code.gs` into the bound script, authorize `DriveApp` access by running `scaKnowledgeHealthCheck()`, and redeploy the existing Web App as a new version. Verify Gemini draft → instructor approval → Sheets write; otherwise score manually. Do not confuse legal research summaries with certified current legislation.
