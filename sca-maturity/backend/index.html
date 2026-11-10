@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Winners SCA | Gemini Backend Setup</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#06182c;color:#e7eff7;font-family:Tahoma,Arial,sans-serif;line-height:1.9}
+main{max-width:940px;margin:30px auto;padding:18px}h1{font-size:27px;color:#f8d082}h2{font-size:19px}
+.card{background:#102d4b;padding:20px;border:1px solid #38617f;border-radius:13px;margin:18px 0}
+p,li{font-size:14px}code{direction:ltr;display:inline-block;color:#fbd28f;background:#07192d;padding:1px 6px;border-radius:4px}
+button,a.action{display:inline-block;padding:12px 15px;border-radius:9px;border:0;background:#e7bd68;color:#07182c;text-decoration:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;margin:5px}
+a.action.secondary,button.secondary{background:#275b80;color:#fff}small,.muted{color:#c6d4e3}
+textarea{width:100%;height:215px;background:#061629;color:#e9f6ff;border:1px solid #496b89;border-radius:10px;font-family:monospace;direction:ltr;padding:12px;font-size:12px;white-space:pre}
+.status{padding:9px;color:#b4ead2;min-height:35px}a{color:#9ed4fa}
+</style></head><body><main><p class="muted">WINNERS BUSINESS CONSULTATION & TRAINING · SCA RESEARCH EDITION</p>
+<h1>تهيئة SCA Gemini Backend</h1><p>دي <strong>صفحة ملفات التثبيت فقط</strong> وليست Backend منشورًا. المفتاح بيتحط داخل Google Apps Script في حسابك، مش هنا.</p>
+<section class="card"><h2>1 — افتح Google Apps Script</h2><a class="action" href="https://script.new" target="_blank" rel="noopener">إنشاء مشروع جديد</a><p>سمِّ المشروع <strong>Winners SCA Maturity Gemini Backend</strong>، واحذف الكود الافتراضي في Code.gs.</p></section>
+<section class="card"><h2>2 — انسخ محرك Code.gs</h2><button id="codeShow">عرض المحرك للنسخ</button><button id="codeCopy" class="secondary">نسخ Code.gs</button><a class="action secondary" href="./Code.gs" target="_blank" download="Code.gs">تنزيل الملف</a><textarea id="codeBox" readonly placeholder="اضغط عرض المحرك للنسخ"></textarea></section>
+<section class="card"><h2>3 — انسخ واجهة Index.html</h2><p>داخل Apps Script اختر + → HTML وسمّ الملف <code>Index</code>، ثم الصق محتوى الملف التالي.</p><button id="htmlShow">عرض واجهة Index</button><button id="htmlCopy" class="secondary">نسخ Index.html</button><a class="action secondary" href="./Index.html" target="_blank" download="Index.html">تنزيل الملف</a><textarea id="htmlBox" readonly placeholder="اضغط عرض الواجهة للنسخ"></textarea></section>
+<section class="card"><h2>4 — ضع المفتاح في المكان الآمن</h2><p><strong>Project Settings → Script Properties → Add script property</strong></p><p>الاسم: <code>GEMINI_API_KEY</code> — القيمة: مفتاحك من Google AI Studio.</p><p>يمكن إضافة <code>GEMINI_MODEL</code> بعد اختبار النماذج المتاحة. لا تكتب المفتاح داخل الكود أو في صفحة عامة.</p></section>
+<section class="card"><h2>5 — انشر بأمان واختبر</h2><p><strong>Deploy → New deployment → Web app</strong></p><p>Execute as: <code>Me</code> — Who has access: <code>Only myself</code>. افتح رابط <code>/exec</code> الناتج واختبر اتصال Gemini.</p><p><strong>مهم:</strong> لا تختار Anyone أو Anyone anonymous؛ وإلا قد تعرض مفتاحك لاستهلاك غير مصرح به.</p></section>
+<div id="status" class="status" role="status"></div>
+<p class="muted">الملفات الأصلية محفوظة في <a href="https://github.com/sahaarty0/winners-ai-for-hr/tree/main/sca-maturity/backend">مستودع Winners GitHub</a>. لا يوجد API Key مخزن هنا.</p>
+</main>
+<script>
+'use strict';
+const status=document.getElementById('status');
+async function load(path,target) {
+ status.textContent='جاري تحميل '+path+'...';
+ try{
+  const r=await fetch(path+'?v=20261110',{cache:'no-store'});
+  if(!r.ok)throw Error('HTTP '+r.status);
+  const text=await r.text();
+  if(text.length<500)throw Error('الملف غير مكتمل');
+  document.getElementById(target).value=text;
+  status.textContent='تم تحميل '+path+' ('+text.length+' حرفًا).';
+  return text;
+ }catch(e){status.textContent='تعذر تحميل '+path+': '+e.message+' — استخدم رابط تنزيل الملف.';return null;}
+}
+async function copy(path,target){
+ const t=document.getElementById(target);
+ const s=t.value||(await load(path,target));if(!s)return;
+ try{await navigator.clipboard.writeText(s);status.textContent='تم نسخ '+path+' بنجاح.';}
+ catch(e){t.focus();t.select();document.execCommand('copy');status.textContent='تم تحديد المحتوى. اضغط Ctrl+C إذا لم يُنسخ تلقائيًا.';}
+}
+document.getElementById('codeShow').onclick=()=>load('./Code.gs','codeBox');
+document.getElementById('htmlShow').onclick=()=>load('./Index.html','htmlBox');
+document.getElementById('codeCopy').onclick=()=>copy('./Code.gs','codeBox');
+document.getElementById('htmlCopy').onclick=()=>copy('./Index.html','htmlBox');
+</script></body></html>
