@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WINNERS × SCA | Gemini Backend</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#f4f7ff;background:#061629;font-size:14px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#123a64,#061629 55%);min-height:100vh}
+main{width:min(920px,94vw);margin:30px auto 60px}
+header{border-bottom:2px solid #d8a952;padding:10px 0 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+h1{font-size:27px;margin:0 0 8px}h2{color:#efd197;font-size:19px;margin:0 0 15px}
+p{line-height:1.9}small,.dim{color:#adc4dc}.brand{color:#f5cc78;font-size:12px;letter-spacing:1px}
+.card{background:#0d2948;border:1px solid #315473;border-radius:17px;padding:23px;margin-top:19px;box-shadow:0 15px 38px #0002}
+.tip{padding:13px;background:#1a3550;border-right:4px solid #e1b25b;border-radius:8px;line-height:1.9}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#0a203b;border:1px solid #355a7a;border-radius:10px;padding:16px}.stat b{display:block;font-size:17px;margin-top:6px}
+button{background:#e8bf6f;color:#081a2d;border:0;padding:12px 19px;border-radius:9px;font:700 13px Tahoma;cursor:pointer}
+button.secondary{background:#1d5277;color:#fff;border:1px solid #4f83a5}button:disabled{opacity:.5;cursor:wait}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
+input[type=file]{display:block;background:#122d4c;color:#fff;border:1px solid #497194;padding:15px;width:100%;border-radius:8px}
+label{display:block;line-height:2;margin:12px 0}
+#result{white-space:pre-wrap;line-height:2;background:#061c34;border:1px solid #45667e;padding:18px;border-radius:10px;min-height:90px;max-height:550px;overflow:auto}
+#message{font-weight:700;min-height:24px;color:#a6f1d4}#message.error{color:#ffabaf}
+a{color:#a6dcff}
+@media(max-width:640px){.stats{grid-template-columns:1fr}header{display:block}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<main>
+<header><div><div class="brand">WINNERS BUSINESS CONSULTATION & TRAINING</div>
+<h1>هيئة قناة السويس | Gemini Analysis Backend</h1>
+<div class="dim">SCA HR Maturity · Research / Training Edition · Private Consultant Console</div></div>
+<div style="color:#efd197;font-weight:bold">AI CONTROL CENTER</div></header>
+
+<div class="card"><h2>حالة الاتصال</h2>
+<div class="stats">
+<div class="stat">مفتاح Gemini<b id="keyStatus">جاري الفحص...</b></div>
+<div class="stat">نموذج Gemini<b id="modelStatus">—</b></div>
+<div class="stat">سياق HR / Legal Research<b id="researchStatus">—</b></div>
+</div>
+<div class="actions"><button id="testBtn" type="button">اختبار Gemini API</button><button id="modelsBtn" class="secondary" type="button">عرض النماذج المتاحة للمفتاح</button></div>
+<div id="message" role="status"></div>
+<p class="dim">إضافة المفتاح: Project Settings → Script Properties → GEMINI_API_KEY. ويمكن ضبط GEMINI_MODEL إذا لزم الأمر. لا تكتب مفتاحك داخل أي صفحة أو داخل GitHub.</p>
+</div>
+
+<div class="card"><h2>تحليل تقييم SCA</h2>
+<p>من <a href="https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/" target="_blank" rel="noopener noreferrer">أداة SCA Maturity Assessment</a> اختر «نسخة احتياطية»، ثم حمّل ملف JSON هنا. يُرسل إلى Gemini فقط نطاق الأسئلة وإجابات Yes/No وأرقام مراجع البحث؛ <strong>لا تُرسل الأسماء أو التعليقات أو بيانات العاملين</strong>.</p>
+<input id="file" type="file" accept="application/json,.json" aria-label="SCA Assessment backup JSON">
+<label><input id="approval" type="checkbox"> أؤكد أن الملف يحتوي على تقييم بحثي غير سري وأوافق على معالجة الإجابات بواسطة Gemini؛ لا يحتوي على بيانات شخصية أو مستندات داخلية.</label>
+<div class="actions"><button id="analyzeBtn" type="button" disabled>تحليل الإجابات باستخدام Gemini</button><button id="saveBtn" class="secondary" type="button" disabled>حفظ التحليل TXT</button></div>
+<div class="tip">التحليل استرشادي ويخضع لمراجعة الاستشاري والإدارة القانونية عند الحاجة. لا يغيّر درجات النضج الأصلية. استرجاع نصوص الأبحاث من Drive <strong>معطّل افتراضيًا</strong> حتى السماح به صراحة في Script Properties.</div>
+<h2 style="margin-top:25px">نتيجة التحليل</h2><pre id="result">لم يُجرَ تحليل بعد.</pre>
+</div>
+</main>
+<script>
+'use strict';
+const el=id=>document.getElementById(id);
+let assessmentText='', lastReport='';
+function msg(s,error){el('message').textContent=s;el('message').classList.toggle('error',!!error);}
+function busy(v){el('testBtn').disabled=v;el('modelsBtn').disabled=v;el('analyzeBtn').disabled=v||!assessmentText||!el('approval').checked;}
+function init(){google.script.run.withSuccessHandler(s=>{
+  el('keyStatus').textContent=s.hasKey?'مضاف — جاهز للاختبار':'لم يُضف بعد';
+  el('modelStatus').textContent=s.model;
+  el('researchStatus').textContent=s.researchContextEnabled?'مفعّل بإذن المالك':'مُعطّل (آمن)';
+}).withFailureHandler(e=>msg(e.message,true)).getBackendStatus();}
+el('file').addEventListener('change',async e=>{
+ const f=e.target.files[0];assessmentText='';el('analyzeBtn').disabled=true;
+ if(!f)return;
+ if(f.size>120000){msg('الملف أكبر من الحد المسموح (120 KB).',true);return;}
+ assessmentText=await f.text();
+ try{const obj=JSON.parse(assessmentText);if(obj.assessmentEdition!=='SCA-2026-11-10')throw Error('not SCA');
+ msg('تم تحميل ملف SCA. لم يتم إرسال بيانات إلى Gemini بعد.');
+ }catch(err){assessmentText='';msg('الملف ليس نسخة احتياطية صحيحة من SCA Maturity.',true);}
+ el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;
+});
+el('approval').onchange=()=>{el('analyzeBtn').disabled=!assessmentText||!el('approval').checked;};
+el('testBtn').onclick=()=>{
+ busy(true);msg('جاري اختبار الاتصال...');google.script.run.withSuccessHandler(r=>{
+ busy(false);msg(r.ok?'تم الاتصال بـGemini بنجاح ('+r.model+'): '+r.response:'لم تصل استجابة.');
+ init();
+ }).withFailureHandler(e=>{busy(false);msg(e.message,true);}).testGeminiConnection();
+};
+el('modelsBtn').onclick=()=>{
+ busy(true);msg('جاري فحص النماذج المرتبطة بالمفتاح...');
+ google.script.run.withSuccessHandler(r=>{busy(false);msg('النماذج المتاحة: '+r.map(x=>x.name).join('، '));})
+ .withFailureHandler(e=>{busy(false);msg(e.message,true);}).listGeminiModels();
+};
+el('analyzeBtn').onclick=()=>{
+ if(!assessmentText||!el('approval').checked)return;
+ busy(true);msg('جاري تحليل الإجابات — لا تغلق هذه الصفحة.');
+ google.script.run.withSuccessHandler(r=>{
+  busy(false);lastReport='SCA Maturity Gemini Analysis\nModel: '+r.model+'\nAnswered: '+r.answeredQuestions+'/'+r.assessedQuestions+'\nReported gaps: '+r.reportedGaps+
+  '\nResearch: '+r.researchStatus+'\n\n'+r.analysis+'\n\n'+r.note;
+  el('result').textContent=lastReport;el('saveBtn').disabled=false;
+  msg('تم التحليل. النتائج استرشادية ولم تتغير درجات التقييم.');
+ }).withFailureHandler(e=>{busy(false);msg(e.message,true);}).analyzeScaAssessment(assessmentText);
+};
+el('saveBtn').onclick=()=>{
+ const blob=new Blob(['\uFEFF'+lastReport],{type:'text/plain;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='SCA_Gemini_Advisory_Brief.txt';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+init();
+</script>
+</body></html>
