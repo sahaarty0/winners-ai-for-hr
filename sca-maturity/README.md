@@ -23,10 +23,16 @@ This research/training edition measures HR maturity as a **documented practice o
 - Levels **0–5**, with descriptions and indicative evidence requirements taken from the training methodology:
   0 = absence established by examination, not merely no file; 1 = ad hoc; 2 = recurring but inconsistent; 3 = approved/documented/applied; 4 = measured and managed; 5 = continuous improvement supported by results.
 - "Not assessed" is used when there is insufficient evidence.
-- A score is counted only if BOTH evidence reference and explanation are entered. Score 0 additionally requires explicit confirmation that absence was established by examination.
+- A score is counted only if BOTH evidence reference and explanation are entered. A score of 0 must be justified by actual examination proving absence of practice; no separate checkbox is required. Mere absence of a document is insufficient.
 - Maturity average = sum of eligible scores / number of assessed domains. Coverage = assessed / 10 × 100. Neither is an official SCA score.
 - Draft/partial entries and unassessed domains must not silently count as zero.
 - No automatic equivalence, percent conversion, or score migration from v1 binary scoring.
+
+## Simplified learner journey (v2.1)
+1. **Assessment page:** exactly three inputs per domain: maturity score (0–5 or Not assessed), evidence/document reference, and short justification. The 0–5 rubric is collapsed unless the learner requests help.
+2. **Results page:** shows maturity summary, domain coverage, evidence register, and a separate optional, expandable analysis editor for missing evidence, gap, root-cause hypothesis, proposed action, priority, 30/60/90 wave, suggested owner and optional confidence.
+3. **Outputs:** gap register and roadmap update from the editable results analysis and persist locally. JSON, CSV and browser Print/PDF cover the full case.
+4. **Workflow:** on domain 10, the Next button becomes Show Results. Previous v2 localStorage records remain usable; v1 yes/no records are still accessed through the legacy-v1 page.
 
 ## Training and practitioner use
 Two display modes: **Consultant Assessment** and **Training Case Simulation**. The simulation exposes only summarized hypothetical evidence E01–E12 from the *unsolved* case in the Maturity SCA materials. **The solved model answer is not in the public site or its JavaScript.** Both modes are local browser tools, not authenticated access roles.
