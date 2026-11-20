@@ -1,48 +1,68 @@
-# Winners × SCA — HR Maturity Assessment (Research/Training Edition)
+# WINNERS × SCA | Evidence-Based HR Maturity Assessment (v2)
 
-## Production URLs
-- New SCA edition: https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/
-- Code: https://github.com/sahaarty0/winners-ai-for-hr/tree/main/sca-maturity
-- Original Winners tool, intentionally unchanged: https://sahaarty0.github.io/winners-ai-for-hr/maturity/
-- SCA research knowledge base (Google Drive): https://drive.google.com/drive/folders/1-NWFxKX6auKtezNxe321AHa4Jl98M_Bs
+**Production:** https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/
 
-## Clone and parity
-This is a **separate copy** of the existing Winners HR Maturity engine, sharing its interface, assessment modes, scoring, stages and reports, but using an **SCA-specific bilingual question bank** and isolated localStorage namespaces.
-- 20 cores (11 Functional / 9 Strategic), 5 questions per core, 100 tailored questions.
-- Full, Functional (55 questions), or Focused (5 × selected cores) assessment.
-- Binary 0/1 scoring with GREEN >= 80%, YELLOW >= 60%, RED < 60%.
-- Unanswered questions stay unscored; cores outside the assessment scope show NOT ASSESSED.
-- The selected-scope overall index is derived by the app, **not a legal compliance score and not a measure of the whole Authority in a limited assessment**.
-- 30/60/90 exploratory verification/improvement roadmap; gap backlog; consultant review gate; separate client/consultant display modes; CSV, JSON and browser Print/PDF.
-- Both original Winners logo (embedded source PNG) and SCA logo (`../arena/assets/sca-logo.png`) are reused, not redrawn.
-- Saves only in the current browser localStorage; nothing is written to Sheets, Drive or Apps Script. The modes are **not** user authentication or role-based access.
-- No Gemini evaluation/RAG is attached to this assessment; the question bank is a static source-controlled snapshot.
+**Repository:** https://github.com/sahaarty0/winners-ai-for-hr/tree/main/sca-maturity
 
-## Source methodology
-SCA HR Knowledge: 93 indexed chunks, SCA Legal Knowledge: 45 indexed chunks, and Reality Mapping: 37 process research checks (snapshot dated 2026-11-10). The 100 question items refer to **81 unique research chunk IDs** in the combined repositories. A single question can cite multiple chunks.
+## Purpose
+This research/training edition measures HR maturity as a **documented practice on a 0–5 scale**, rather than a yes/no presence checklist. This change responds to the WINNERS Maturity SCA training materials and replaces the 100-question interface with **10 assessments (one per domain)**. It is not an official evaluation of SCA and does not establish organizational, legal, or audit findings.
 
-Source references are *research pointers*, not proof that a process is performed, absent, authorized or legally current. In particular:
-- **Do not** conflate the Suez Canal Authority with the Suez Canal Economic Zone, or Authority personnel with subsidiaries.
-- **Do not** assume an unverified 2026 org chart, responsibilities, committee powers, digital systems or current working practices.
-- **Do not** treat legal summaries as original statutory/regulatory text or assume the 2017 rules are the latest amendment.
-- Verify current signed original rules, amendment history, authorized delegations, and actual operational records with the competent SCA body before any final conclusion.
-- A “No / Not evidenced” answer is an **evidence-verification flag**, not proof that SCA lacks the process. The 30/60/90 improvement roadmap is illustrative and subject to validation.
-- **Do not enter real staff personal information, secrets or internal confidential documents into this publicly hosted frontend.**
+## Ten assessment domains
+1. HR Strategy
+2. Organization Structure & Governance
+3. Objectives & KPIs
+4. Workforce Planning
+5. Job Description & Evaluation
+6. Competency Framework
+7. Performance Management
+8. Compensation & Benefits
+9. Policies & Procedures
+10. HR Data & Reporting
+
+## Scoring
+- Levels **0–5**, with descriptions and indicative evidence requirements taken from the training methodology:
+  0 = absence established by examination, not merely no file; 1 = ad hoc; 2 = recurring but inconsistent; 3 = approved/documented/applied; 4 = measured and managed; 5 = continuous improvement supported by results.
+- "Not assessed" is used when there is insufficient evidence.
+- A score is counted only if BOTH evidence reference and explanation are entered. Score 0 additionally requires explicit confirmation that absence was established by examination.
+- Maturity average = sum of eligible scores / number of assessed domains. Coverage = assessed / 10 × 100. Neither is an official SCA score.
+- Draft/partial entries and unassessed domains must not silently count as zero.
+- No automatic equivalence, percent conversion, or score migration from v1 binary scoring.
+
+## Training and practitioner use
+Two display modes: **Consultant Assessment** and **Training Case Simulation**. The simulation exposes only summarized hypothetical evidence E01–E12 from the *unsolved* case in the Maturity SCA materials. **The solved model answer is not in the public site or its JavaScript.** Both modes are local browser tools, not authenticated access roles.
+
+Evidence register, justification, confidence, missing evidence, gap, hypothetical root cause, proposed action, priority, suggested 30/60/90 wave and prospective owner are captured for each domain.
+
+## Exports and reports
+- Browser localStorage persists v2 inputs only on the same device/browser.
+- JSON export/import for v2 backups.
+- UTF-8 CSV export for spreadsheet analysis; leading formula characters are escaped.
+- Printable report / browser Save as PDF with coverage, evaluated domain scores, references, explanations, verification gaps and user-entered roadmap.
+- No backend, no Google Sheets write, no Gemini, and no institutional authentication or secure personnel data collection.
+- Do not enter personal data, confidential employee details or internal proprietary documents in a publicly hosted frontend.
+- Approval of recommendations and DoA must be validated with the authorized organization independently.
+
+## Original edition
+The original 100-question interface and its source files remain available at:
+https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/legacy-v1.html
+
+The original localStorage keys are **left untouched**. Users with pre-existing v1 browser data can open the legacy page and export their original records. V1 JSON is NOT compatible with v2 scoring, and the v2 import intentionally rejects it.
 
 ## Files
-- `index.html`: cloned interface, SCA source disclaimer and original brand logos.
-- `app.js`: original 0/1 assessment, CSV/JSON backup, SCA-specific advice and local browser state.
-- `phase2.js`: consultant/client review, decision gate, handoff; SCA-specific localStorage keys.
-- `questions.json`: 20 cores × 5 bilingual items; `sourceRefs`, `origin`, and `evidenceHintAr`.
-- `phase2.css`, `scope.css`: original visual styles.
+- index.html — v2 homepage, preserves original embedded WINNERS logo and linked SCA logo.
+- maturity-v2.js — 10 domains, evidence-required maturity model, reports/export/import.
+- maturity-v2.css — responsive white/navy/gold UI and print styles.
+- legacy-v1.html — preserved v1 interface (100 binary questions).
+- app.js, phase2.js, phase2.css, scope.css, questions.json, backend/ — retained as v1 legacy references, not loaded by v2 homepage.
 
-## Deployment
-This is a GitHub Pages static site; committing to the `main` branch (Pages source workflow) deploys the frontend. **No Apps Script deployment is involved.** Always distinguish GitHub commit existence from the live Pages version and verify the actual URL after updates.
+## Reference and limitations
+Sources: Maturity SCA training set (trainee guide, solved and unsolved hypothetical cases); SCA HR & Legal Knowledge Base (research reference snapshot dated 2026-11-10). Neither the training case nor the evidence pointers confirm actual SCA practices or current approval authority. Validate signed active regulations, amendments, structure and operational evidence with competent authorities before organizational recommendations.
 
-## QA record
-- Structural checks: 100 unique IDs, exactly 5 questions per core, 20 cores, 81 research IDs, original thresholds.
-- Live browser workflow (2026-11-10): Focused F01, 3 Yes + 2 No, score **60% / Yellow**, **2** flagged items, **19** cores NOT ASSESSED; both logos, roadmap, consultant review and report shown, no observed JavaScript errors.
-- All answers in QA were fabricated for functional testing; **none** constitutes a finding about SCA.
-- Follow-up regression checks for exports/import, printing, all 100 responses, mobile layout and any future changes should be performed before institutional rollout.
+## Release checklist
+1. Validate script syntax and HTML element references.
+2. Test all 10 domains, drafts, 0-level confirmation, save/restore, reports and CSV/JSON export.
+3. Test browser Save as PDF, responsive layout, and legacy-v1 access.
+4. Verify GitHub Pages live deployment and that both original logos render.
+5. Test with fictitious data only before instructional rollout.
 
-Created for Winners Business Consultation & Training Services, SCA research/training edition.
+Developed for WINNERS Business Consultation & Training Services.
