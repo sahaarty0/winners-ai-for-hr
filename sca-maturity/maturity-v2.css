@@ -191,3 +191,12 @@ th{background:var(--navy);color:#fff}
   .metric strong{font-size:20px}
 }
 @media screen and (min-width:791px){.mobile-scroll-tip{display:none!important}}
+
+/* Mobile affordances are hidden on desktop and in printed reports. */
+.mobile-start,.mobile-swipe-hint{display:none}
+@media screen and (max-width:790px){
+  .mobile-start{display:flex;align-items:center;justify-content:center;min-height:46px;margin:12px 0 4px;border-radius:9px;background:var(--navy);color:#fff;font-weight:800;font-size:14px;text-decoration:none}
+  .mobile-start:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .mobile-swipe-hint{display:block;margin:0 0 8px;font-size:11px;color:var(--muted)}
+  #axisTitle{scroll-margin-top:15px}
+}
