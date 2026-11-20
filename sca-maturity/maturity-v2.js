@@ -102,7 +102,7 @@
       '</div>';
     $("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":a.score===""?"غير مقيم":"الدرجة لا تُحتسب قبل إضافة الدليل والمبرر";
     $("axisStatus").className="status-chip "+(complete(a)?"complete":"pending");
-    $("backAxis").disabled=i===0;$("nextAxis").disabled=i===9;
+    $("backAxis").disabled=i===0;$("nextAxis").disabled=false;$("nextAxis").textContent=i===9?"عرض النتائج":"التالي";
   }
   function renderFormMeta(){
     $("workMode").value=state.mode;
@@ -174,6 +174,7 @@
     $("reportGaps").innerHTML=gaps.length?gaps.map(r=>'<article><strong>'+esc(r.x.title)+'</strong><p><b>ملاحظة / فجوة:</b> '+esc(r.a.gap||"غير محددة")+'</p><p><b>تحتاج تحققًا:</b> '+esc(r.a.missing||"غير محدد")+'</p><p><b>سبب محتمل:</b> '+esc(r.a.cause||"غير محدد")+'</p></article>').join(""):'<p class="hint">لم تسجل فجوات بعد. افتح نموذج التحليل بأعلى الصفحة لإضافتها.</p>';
     const proposals=AXES.map((x,i)=>({x,a:get(i)})).filter(r=>r.a.action);
     const priorityLabel={high:"مرتفعة",medium:"متوسطة",low:"منخفضة"};
+    $("reportTable").innerHTML=AXES.map((x,i)=>{const a=get(i);return '<tr><td>'+esc(x.title)+'</td><td>'+(complete(a)?esc(a.score)+"/5":"غير مقيم")+'</td><td>'+esc(a.evidence||"—")+'</td><td>'+esc(a.reason||"—")+'</td><td>'+esc(a.confidence||"—")+'</td></tr>';}).join("");
     $("reportPlan").innerHTML=proposals.length?proposals.map(r=>'<tr><td>'+esc(r.x.title)+'</td><td>'+esc(r.a.action)+'</td><td>'+esc(priorityLabel[r.a.priority]||"غير محددة")+'</td><td>'+esc(r.a.wave?r.a.wave+" يوم":"غير محددة")+'</td><td>'+esc(r.a.owner||"لم يحدد")+'</td></tr>').join(""):'<tr><td colspan="5">لا توجد مبادرات مسجلة. أدخلها في نموذج التحليل أعلى الصفحة.</td></tr>';
   }
   function renderReport(){
@@ -219,7 +220,7 @@
       if(key&&Number.isInteger(index)&&index>=0&&index<AXES.length)refreshAdvisoryOutputs();
     });
     $("backAxis").addEventListener("click",()=>{if(state.current>0){state.current--;store();nav();renderAxis();}});
-    $("nextAxis").addEventListener("click",()=>{if(state.current<9){state.current++;store();nav();renderAxis();}});
+    $("nextAxis").addEventListener("click",()=>{if(state.current<9){state.current++;store();nav();renderAxis();}else show("report");});
     $("workMode").addEventListener("change",e=>{state.mode=e.target.value;store();renderCase();});
     [["organization","organization"],["assessor","assessor"],["scopeName","scope"]].forEach(pair=>$(pair[0]).addEventListener("input",e=>{state[pair[1]]=e.target.value.slice(0,200);store();}));
     $("assessmentButton").addEventListener("click",()=>show("assessment"));
