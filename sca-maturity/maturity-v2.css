@@ -104,3 +104,90 @@ th{background:var(--navy);color:#fff}
 .advisory-item>.hint{padding:0 15px 10px;margin:0}
 @media(max-width:760px){.advisory-fields{grid-template-columns:1fr}.simple-assessment{gap:13px}}
 @media print{.advisory-panel{display:none!important}}
+
+/* Mobile-first usability: readable tap targets, horizontal axis rail, no page-wide overflow. */
+@media screen and (max-width:790px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .shell{width:100%;max-width:100%;padding:8px 10px calc(40px + env(safe-area-inset-bottom,0px))}
+  .header{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:10px 8px;padding:12px;justify-content:stretch;align-items:center;text-align:right;border-radius:12px}
+  .header>.brand{grid-column:1;grid-row:1;min-width:0;justify-content:flex-start}
+  .official-winners-logo{width:min(100%,225px);max-height:78px;padding:5px}
+  .header>.sca-brand{grid-column:2;grid-row:1;justify-self:end}
+  .header .sca-brand img{display:block;width:60px;height:60px;object-fit:contain}
+  .header>div:nth-child(2){grid-column:1/-1;grid-row:2;text-align:right;min-width:0}
+  .header .eyebrow{font-size:11px;line-height:1.4;letter-spacing:0}
+  .header>.head-btns{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%}
+  .header .head-btns>.btn{display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;line-height:1.35;min-height:45px;padding:8px 5px;font-size:11px;overflow-wrap:anywhere}
+  .prelude{margin:10px 0 11px;padding:14px}
+  .prelude h1{font-size:clamp(18px,4.7vw,22px);line-height:1.5}
+  .prelude>p{font-size:12px;line-height:1.8}
+  .danger-notice{padding:10px 12px;line-height:1.7;font-size:11.5px}
+  .quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px}
+  .quick-actions .action{min-height:47px;font-size:12px;line-height:1.4;padding:8px 6px;text-align:center;overflow-wrap:anywhere}
+  .quick-actions #resetState{grid-column:1/-1;min-height:42px}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+  .metric{padding:10px 12px;min-width:0}
+  .metric strong{font-size:22px;line-height:1.25}
+  .metric span{display:block;font-size:11px;line-height:1.5}
+  .workspace{display:flex;flex-direction:column;gap:10px;margin-top:10px;min-width:0}
+  .sidebar{position:static;width:100%;min-width:0;padding:12px 10px 8px}
+  .side-label{margin:0 0 8px;font-size:13px}
+  #axisNav{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:10px;scrollbar-width:thin}
+  .axis-nav{flex:0 0 min(54vw,205px);display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:79px;padding:9px 10px;border:1px solid #dce4ed;border-radius:9px;background:#fff;text-align:right;scroll-snap-align:start;white-space:normal}
+  .axis-nav .num{display:inline-flex;align-items:center;justify-content:center;width:23px;min-height:23px;font-size:12px}
+  .axis-nav>span:nth-child(2){line-height:1.5;font-size:12px;font-weight:700}
+  .axis-nav small{font-size:10px;line-height:1.4;white-space:normal}
+  .side-foot{display:none}
+  .side-foot#saveState{display:block;margin:0 2px 2px;font-size:10px;text-align:left}
+  .main{width:100%;min-width:0}
+  .card,.report-card{padding:14px;border-radius:11px}
+  .card h2,.report-card h2{font-size:17px;line-height:1.6}
+  .meta-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .title-row{flex-wrap:wrap;align-items:flex-start;gap:8px}
+  .title-row h2{flex:1 1 100%;margin:0}
+  .status-chip{font-size:11px;max-width:100%;white-space:normal}
+  .guide{padding:11px;font-size:13px;line-height:1.8}
+  .hint{font-size:11.5px;line-height:1.75}
+  .simple-assessment{gap:15px;margin-top:14px;width:100%;max-width:100%}
+  .simple-assessment .field>span{font-size:14px}
+  .field input,.field textarea,.field select,.simple-assessment .field select,.simple-assessment .field textarea{font-size:16px;line-height:1.6;padding:10px 12px;border-radius:9px;min-height:46px}
+  .simple-assessment .field textarea{min-height:88px}
+  .scale-toggle>summary{min-height:45px;display:flex;align-items:center;font-size:12px;line-height:1.6}
+  .scale{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .scale strong{font-size:12px}
+  .scale small{font-size:11px}
+  .axis-actions{position:sticky;bottom:env(safe-area-inset-bottom,0px);z-index:5;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.96);padding:10px 0;box-shadow:0 -5px 14px rgba(12,40,72,.07);border-top:1px solid #e7edf3;margin-top:15px}
+  .axis-actions button{flex:1 1 0;min-height:48px;font-size:15px;border-radius:9px}
+  .case-panel details{margin:7px 0;padding:9px 10px}
+  .case-panel summary{min-height:30px;line-height:1.7;font-size:12px}
+  .report-head{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .report-head>div{padding:9px}
+  .report-head b{font-size:17px}
+  .barrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:4px 8px;margin:7px 0;padding:9px;background:#f7f9fb;border-radius:8px;font-size:12px}
+  .barrow strong{grid-column:1;grid-row:1;line-height:1.5;overflow-wrap:anywhere}
+  .barrow em{grid-column:2;grid-row:1;align-self:start;text-align:left;white-space:nowrap}
+  .barrow .bar-track{grid-column:1/-1;grid-row:2;height:11px}
+  .control-grid,.control-grid.three,.gaps-grid,.advisory-fields{grid-template-columns:1fr}
+  .advisory-item>summary{min-height:47px;align-items:flex-start;gap:5px;padding:11px 12px}
+  .advisory-item>summary span{font-size:11px;line-height:1.6}
+  .advisory-fields{gap:13px;padding:10px 12px}
+  .table-wrap{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;border-radius:8px}
+  .table-wrap table{min-width:700px}
+  .mobile-scroll-tip{display:block!important;font-size:11px;color:var(--muted);margin:4px 0 7px}
+  .footer{line-height:1.7;font-size:10px}
+}
+@media screen and (max-width:520px){
+  .meta-grid{grid-template-columns:1fr}
+  .axis-nav{flex-basis:min(68vw,215px)}
+  .scale{grid-template-columns:1fr}
+}
+@media screen and (max-width:360px){
+  .shell{padding-right:7px;padding-left:7px}
+  .header{grid-template-columns:minmax(0,1fr) 52px}
+  .header .sca-brand img{width:50px;height:50px}
+  .official-winners-logo{max-height:65px}
+  .header .head-btns>.btn{font-size:10px}
+  .prelude,.card,.report-card{padding:11px}
+  .metric strong{font-size:20px}
+}
+@media screen and (min-width:791px){.mobile-scroll-tip{display:none!important}}
