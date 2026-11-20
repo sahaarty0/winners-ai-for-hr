@@ -45,7 +45,7 @@
     if(!state.items[id]||typeof state.items[id]!=="object")state.items[id]={score:"",evidence:"",reason:"",confidence:"",missing:"",gap:"",cause:"",action:"",priority:"",wave:"",owner:"",zeroConfirmed:false};
     return state.items[id];
   }
-  function complete(a){return /^[0-5]$/.test(String(a.score))&&String(a.evidence||"").trim().length>0&&String(a.reason||"").trim().length>0&&(String(a.score)!=="0"||a.zeroConfirmed===true);}
+  function complete(a){return /^[0-5]$/.test(String(a.score))&&String(a.evidence||"").trim().length>0&&String(a.reason||"").trim().length>0;}
   function totals(){
     const accepted=[];let draft=0;
     AXES.forEach((axis,i)=>{const a=get(i);if(complete(a))accepted.push({axis,a,score:Number(a.score)});else if(a.score!==""||a.evidence||a.reason)draft++;});
@@ -91,31 +91,18 @@
     $("axisTitle").textContent=(i+1)+" / 10 — "+x.title;
     $("axisQuestions").textContent=x.checks;
     $("axisEvidenceHint").textContent=x.examples;
-    $("axisMapping").textContent="مطابقة استرشادية مع المحاور القديمة: "+x.from;
     const scoreOpts=[["","غير مقيم — الأدلة غير كافية"]].concat(LEVELS.map(l=>[l[0],l[0]+" — "+l[1]]));
     $("axisFields").innerHTML=
-      '<div class="control-grid">'+
-      selectField("درجة النضج من 0 إلى 5","score",a.score,scoreOpts)+
-      selectField("درجة الثقة","confidence",a.confidence,[["","غير محدد"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
-      '</div>'+
-      '<div class="scale">'+LEVELS.map(l=>'<div><strong>'+l[0]+' — '+esc(l[1])+'</strong><small>'+esc(l[2])+'</small></div>').join("")+'</div>'+
-      (String(a.score)==="0"?'<label class="zero-check"><input type="checkbox" data-field="zeroConfirmed"'+(a.zeroConfirmed?' checked':'')+'> أؤكد وجود دليل تحقّق يثبت عدم وجود الممارسة، وليس مجرد نقص مستند.</label>':"")+
-      '<div class="control-grid">'+
-      field("مرجع الدليل / رقم المستند *","evidence",a.evidence,"مثال تدريبي: E02 أو اسم المستند وإصداره",2)+
-      field("مبرر الدرجة *","reason",a.reason,"كيف يثبت الدليل هذه الدرجة تحديدًا؟",3)+
-      field("الأدلة الناقصة / التحفظات","missing",a.missing,"ماذا يلزم التحقق منه قبل استنتاج نهائي؟",2)+
-      field("الفجوة أو الملاحظة","gap",a.gap,"فجوة مثبتة أو ملاحظة أولية؛ لا تفترض وجودها",2)+
-      field("السبب الجذري المحتمل (فرضية)","cause",a.cause,"سبب يحتاج إلى تحقق مستقل",2)+
-      field("الإجراء أو المبادرة المقترحة","action",a.action,"مخرج قابل للقياس والتنفيذ",2)+
-      '</div><div class="control-grid three">'+
-      selectField("الأولوية","priority",a.priority,[["","غير محددة"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
-      selectField("الموجة المقترحة","wave",a.wave,[["","غير محددة"],["30","أيام 1–30"],["60","أيام 31–60"],["90","أيام 61–90"]])+
-      field("المالك المقترح","owner",a.owner,"يُحسم وفق الصلاحيات",0)+
-      '</div>'+
-      '<p class="hint">لا تدخل بيانات موظفين حقيقية أو مستندات سرية؛ التطبيق عام ويحفظ البيانات محليًا في المتصفح. لا تُحتسب الدرجة دون مرجع دليل ومبرر، وتحتاج الدرجة صفر تأكيدًا خاصًا.</p>';
-    $("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":"غير مقيم أو ينقصه مبرر / دليل";
+      '<div class="simple-assessment">'+
+      selectField("1. درجة النضج (0–5)","score",a.score,scoreOpts)+
+      '<details class="scale-toggle"><summary>شرح مستويات النضج 0–5 (اختياري)</summary><div class="scale">'+LEVELS.map(l=>'<div><strong>'+l[0]+' — '+esc(l[1])+'</strong><small>'+esc(l[2])+'</small></div>').join("")+'</div></details>'+
+      field("2. مرجع الدليل أو رقم المستند","evidence",a.evidence,"مثال: E02 أو رقم/إصدار المستند",2)+
+      field("3. مبرر اختيار الدرجة","reason",a.reason,"اشرح السبب في جملة أو جملتين",3)+
+      '<p class="hint">لا تُحتسب أي درجة دون دليل ومبرر. إذا كانت الأدلة غير كافية اختر «غير مقيم»، فالدرجة صفر لا تعني غياب المستند بل غياب الممارسة المثبت بالفحص. تحليل الفجوات وخطة التحسين في صفحة النتائج.</p>'+
+      '</div>';
+    $("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":a.score===""?"غير مقيم":"الدرجة لا تُحتسب قبل إضافة الدليل والمبرر";
     $("axisStatus").className="status-chip "+(complete(a)?"complete":"pending");
-    $("backAxis").disabled=i===0;$("nextAxis").disabled=i===9;
+    $("backAxis").disabled=i===0;$("nextAxis").disabled=false;$("nextAxis").textContent=i===9?"عرض النتائج":"التالي";
   }
   function renderFormMeta(){
     $("workMode").value=state.mode;
@@ -158,6 +145,38 @@
       state=sanitized;store();renderAll();show("assessment");$("statusMessage").textContent="تم استيراد ملف الإصدار الثاني بنجاح.";
     }catch(e){$("statusMessage").textContent="لم يُستورد الملف: "+e.message;}};reader.readAsText(file);
   }
+  function renderAdvisoryEditor(){
+    const container=$("reportAdviceEditor");
+    if(!container)return;
+    container.innerHTML=AXES.map((axis,i)=>{
+      const a=get(i),status=complete(a)?a.score+"/5":"غير مقيم";
+      function advisoryField(name,key,value,placeholder,rows){
+        return field(name,key,value,placeholder,rows).replace('data-field="'+key+'"','data-advisory="'+key+'" data-index="'+i+'"');
+      }
+      function advisorySelect(name,key,value,opts){
+        return selectField(name,key,value,opts).replace('data-field="'+key+'"','data-advisory="'+key+'" data-index="'+i+'"');
+      }
+      return '<details class="advisory-item"><summary><strong>'+(i+1)+'. '+esc(axis.title)+'</strong><span>'+esc(status)+' · فتح التحليل والتوصيات</span></summary>'+
+        '<div class="advisory-fields">'+
+          advisoryField("الأدلة الناقصة / ما يحتاج تحققًا","missing",a.missing,"اذكر ما يجب التحقق منه قبل إصدار حكم",2)+
+          advisoryField("الفجوة المثبتة أو الملاحظة","gap",a.gap,"ما الذي يثبته الدليل، وما الذي لا يثبته؟",2)+
+          advisoryField("السبب الجذري المحتمل (فرضية)","cause",a.cause,"فرضية تحتاج للتحقق",2)+
+          advisoryField("المبادرة أو الإجراء المقترح","action",a.action,"إجراء عملي ومخرج قابل للقياس",2)+
+          advisorySelect("الأولوية","priority",a.priority,[["","غير محددة"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
+          advisorySelect("مرحلة التنفيذ","wave",a.wave,[["","غير محددة"],["30","الأيام 1–30"],["60","الأيام 31–60"],["90","الأيام 61–90"]])+
+          advisoryField("مالك التنفيذ المقترح","owner",a.owner,"يُحسم وفق RACI / DoA",0)+
+          advisorySelect("درجة الثقة في التقييم","confidence",a.confidence,[["","غير محددة"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
+        '</div><p class="hint">هذه توصيات مدخلَة من المقيّم وليست قرارات معتمدة أو نتائج مؤكدة تلقائيًا.</p></details>';
+    }).join("");
+  }
+  function refreshAdvisoryOutputs(){
+    const gaps=AXES.map((x,i)=>({x,a:get(i)})).filter(r=>r.a.gap||r.a.missing);
+    $("reportGaps").innerHTML=gaps.length?gaps.map(r=>'<article><strong>'+esc(r.x.title)+'</strong><p><b>ملاحظة / فجوة:</b> '+esc(r.a.gap||"غير محددة")+'</p><p><b>تحتاج تحققًا:</b> '+esc(r.a.missing||"غير محدد")+'</p><p><b>سبب محتمل:</b> '+esc(r.a.cause||"غير محدد")+'</p></article>').join(""):'<p class="hint">لم تسجل فجوات بعد. افتح نموذج التحليل بأعلى الصفحة لإضافتها.</p>';
+    const proposals=AXES.map((x,i)=>({x,a:get(i)})).filter(r=>r.a.action);
+    const priorityLabel={high:"مرتفعة",medium:"متوسطة",low:"منخفضة"};
+    $("reportTable").innerHTML=AXES.map((x,i)=>{const a=get(i);return '<tr><td>'+esc(x.title)+'</td><td>'+(complete(a)?esc(a.score)+"/5":"غير مقيم")+'</td><td>'+esc(a.evidence||"—")+'</td><td>'+esc(a.reason||"—")+'</td><td>'+esc(a.confidence||"—")+'</td></tr>';}).join("");
+    $("reportPlan").innerHTML=proposals.length?proposals.map(r=>'<tr><td>'+esc(r.x.title)+'</td><td>'+esc(r.a.action)+'</td><td>'+esc(priorityLabel[r.a.priority]||"غير محددة")+'</td><td>'+esc(r.a.wave?r.a.wave+" يوم":"غير محددة")+'</td><td>'+esc(r.a.owner||"لم يحدد")+'</td></tr>').join(""):'<tr><td colspan="5">لا توجد مبادرات مسجلة. أدخلها في نموذج التحليل أعلى الصفحة.</td></tr>';
+  }
   function renderReport(){
     const t=totals();
     $("reportMean").textContent=t.mean===null?"غير متاح":t.mean.toFixed(2)+" / 5";
@@ -169,29 +188,39 @@
     $("reportDisclaimer").textContent=t.n<10?"تقييم جزئي: لا يعكس متوسط المحاور المُقيمة درجة نضج المنظومة بالكامل، والدرجة مشروطة بكفاية الأدلة والتثبت منها.":"متوسط استرشادي قائم على إدخالات المقيّم؛ لا يُعد تدقيقًا مؤسسيًا أو إثباتًا قانونيًا دون تحقق مستقل.";
     $("reportBars").innerHTML=AXES.map((x,i)=>{const a=get(i),ready=complete(a),v=ready?Number(a.score):0;return '<div class="barrow"><strong>'+esc(x.title)+'</strong><div class="bar-track"><span style="width:'+(v*20)+'%"></span></div><em>'+ (ready?esc(a.score)+"/5":"غير مقيم")+'</em></div>';}).join("");
     $("reportTable").innerHTML=AXES.map((x,i)=>{const a=get(i);return '<tr><td>'+esc(x.title)+'</td><td>'+(complete(a)?esc(a.score)+"/5":"غير مقيم")+'</td><td>'+esc(a.evidence||"—")+'</td><td>'+esc(a.reason||"—")+'</td><td>'+esc(a.confidence||"—")+'</td></tr>';}).join("");
-    const gaps=AXES.map((x,i)=>({x,a:get(i)})).filter(r=>r.a.gap||r.a.missing);
-    $("reportGaps").innerHTML=gaps.length?gaps.map(r=>'<article><strong>'+esc(r.x.title)+'</strong><p><b>ملاحظة / فجوة:</b> '+esc(r.a.gap||"غير محددة")+'</p><p><b>تحتاج تحققًا:</b> '+esc(r.a.missing||"غير محدد")+'</p><p><b>سبب محتمل:</b> '+esc(r.a.cause||"غير محدد")+'</p></article>').join(""):'<p class="hint">لم تُسجل فجوات أو أدلة ناقصة بعد.</p>';
-    const proposals=AXES.map((x,i)=>({x,a:get(i)})).filter(r=>r.a.action);
-    const priorityLabel={high:"مرتفعة",medium:"متوسطة",low:"منخفضة"};
-    $("reportPlan").innerHTML=proposals.length?proposals.map(r=>'<tr><td>'+esc(r.x.title)+'</td><td>'+esc(r.a.action)+'</td><td>'+esc(priorityLabel[r.a.priority]||"غير محددة")+'</td><td>'+esc(r.a.wave?r.a.wave+" يوم":"غير محددة")+'</td><td>'+esc(r.a.owner||"لم يحدد")+'</td></tr>').join(""):'<tr><td colspan="5">لا توجد مبادرات مسجلة.</td></tr>';
+    renderAdvisoryEditor();
+    refreshAdvisoryOutputs();
     $("reportExecutive").textContent=t.mean===null?"لا توجد محاور مؤهلة للتقييم حتى الآن. ابدأ بتوثيق مرجع دليل ومبرر لكل درجة.":"تم تقييم "+t.n+" من 10 محاور، بمتوسط استرشادي "+t.mean.toFixed(2)+" من 5 وتغطية "+t.coverage+"%. عدد المحاور غير المقيمة "+t.unrated+". يجب استكمال مراجعة الأدلة، والتحقق من أسباب الفجوات والصلاحيات، قبل اعتماد التوصيات أو ترتيب التنفيذ.";
   }
   function hook(){
     $("axisNav").addEventListener("click",e=>{const b=e.target.closest("[data-axis]");if(b){state.current=Number(b.dataset.axis);store();nav();renderAxis();}});
     $("axisFields").addEventListener("input",e=>{
       const field=e.target.dataset.field;if(!field)return;
-      const a=get(state.current);a[field]=field==="zeroConfirmed"?e.target.checked:e.target.value;
+      const a=get(state.current);a[field]=e.target.value;
       store();refresh();nav();$("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":"غير مقيم أو ينقصه مبرر / دليل";
       $("axisStatus").className="status-chip "+(complete(a)?"complete":"pending");
     });
     $("axisFields").addEventListener("change",e=>{
       const field=e.target.dataset.field;if(!field)return;
-      const a=get(state.current);a[field]=field==="zeroConfirmed"?e.target.checked:e.target.value;
-      if(field==="score") {if(a.score!=="0")a.zeroConfirmed=false;store();renderAxis();}
+      const a=get(state.current);a[field]=e.target.value;
+      if(field==="score") {store();renderAxis();}
       else {store();refresh();nav();}
     });
+    $("reportAdviceEditor").addEventListener("input",e=>{
+      const key=e.target.dataset.advisory,index=Number(e.target.dataset.index);
+      if(!key||!Number.isInteger(index)||index<0||index>=AXES.length)return;
+      const allowed=["missing","gap","cause","action","priority","wave","owner","confidence"];
+      if(!allowed.includes(key))return;
+      get(index)[key]=String(e.target.value).slice(0,3000);
+      store();
+      refreshAdvisoryOutputs();
+    });
+    $("reportAdviceEditor").addEventListener("change",e=>{
+      const key=e.target.dataset.advisory,index=Number(e.target.dataset.index);
+      if(key&&Number.isInteger(index)&&index>=0&&index<AXES.length){get(index)[key]=String(e.target.value).slice(0,3000);store();refreshAdvisoryOutputs();}
+    });
     $("backAxis").addEventListener("click",()=>{if(state.current>0){state.current--;store();nav();renderAxis();}});
-    $("nextAxis").addEventListener("click",()=>{if(state.current<9){state.current++;store();nav();renderAxis();}});
+    $("nextAxis").addEventListener("click",()=>{if(state.current<9){state.current++;store();nav();renderAxis();}else show("report");});
     $("workMode").addEventListener("change",e=>{state.mode=e.target.value;store();renderCase();});
     [["organization","organization"],["assessor","assessor"],["scopeName","scope"]].forEach(pair=>$(pair[0]).addEventListener("input",e=>{state[pair[1]]=e.target.value.slice(0,200);store();}));
     $("assessmentButton").addEventListener("click",()=>show("assessment"));
