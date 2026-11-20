@@ -217,7 +217,7 @@
     });
     $("reportAdviceEditor").addEventListener("change",e=>{
       const key=e.target.dataset.advisory,index=Number(e.target.dataset.index);
-      if(key&&Number.isInteger(index)&&index>=0&&index<AXES.length)refreshAdvisoryOutputs();
+      if(key&&Number.isInteger(index)&&index>=0&&index<AXES.length){get(index)[key]=String(e.target.value).slice(0,3000);store();refreshAdvisoryOutputs();}
     });
     $("backAxis").addEventListener("click",()=>{if(state.current>0){state.current--;store();nav();renderAxis();}});
     $("nextAxis").addEventListener("click",()=>{if(state.current<9){state.current++;store();nav();renderAxis();}else show("report");});
