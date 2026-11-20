@@ -54,6 +54,15 @@ https://sahaarty0.github.io/winners-ai-for-hr/sca-maturity/legacy-v1.html
 
 The original localStorage keys are **left untouched**. Users with pre-existing v1 browser data can open the legacy page and export their original records. V1 JSON is NOT compatible with v2 scoring, and the v2 import intentionally rejects it.
 
+## Mobile experience
+- Responsive layout at 790px / 520px / 360px; no page-wide horizontal scrolling.
+- Original WINNERS and SCA logos remain visible on compact screens.
+- Assessment actions are touch-sized; text/select inputs use 16px mobile font size to prevent iOS auto-zoom.
+- Ten domains appear in a swipeable horizontal rail; the “ابدأ التقييم” link jumps to the form.
+- Hypothetical-case evidence E01–E12 collapses into an expandable section.
+- Report tables scroll independently with an Arabic swipe hint; reports remain printable.
+- Assessment data is saved to localStorage on each browser/device, not synchronized between desktop and mobile.
+
 ## Files
 - index.html — v2 homepage, preserves original embedded WINNERS logo and linked SCA logo.
 - maturity-v2.js — 10 domains, evidence-required maturity model, reports/export/import.

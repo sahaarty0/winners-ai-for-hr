@@ -17,6 +17,7 @@
 <section class="prelude">
   <h1>تقييم نضج الموارد البشرية | 10 محاور في خطوات بسيطة</h1>
   <p><strong>المرحلة الأولى:</strong> اختر درجة النضج، واكتب رقم الدليل وسبب الدرجة. <strong>المرحلة الثانية:</strong> انتقل للنتائج لتحليل الفجوات وإعداد خطة التحسين.</p>
+  <a class="mobile-start" href="#axisTitle">ابدأ التقييم ↓</a>
   <div class="danger-notice"><strong>تنبيه:</strong> هذه أداة تدريبية واستشارية استرشادية، وليست تقييمًا رسميًا أو نتيجة تخص هيئة قناة السويس. يجب التحقق من المستندات السارية والصلاحيات والممارسة الفعلية. لا تدخل بيانات شخصية أو مستندات سرية داخل موقع عام؛ البيانات تحفظ محليًا في هذا المتصفح.</div>
   <div class="quick-actions">
     <button type="button" class="action primary selected" id="assessmentButton">التقييم</button>
@@ -37,6 +38,7 @@
 <div class="workspace">
   <aside class="sidebar">
     <p class="side-label">المحاور العشرة</p>
+    <p class="mobile-swipe-hint">اسحب لليمين أو اليسار لاختيار أي محور</p>
     <nav id="axisNav" aria-label="محاور التقييم"></nav>
     <p class="side-foot">الدرجة لا تُحتسب إلا مع مرجع دليل ومبرر واضح. «غير مقيم» لا يساوي صفرًا.</p>
     <p class="side-foot" id="saveState">محفوظ محليًا</p>
@@ -56,7 +58,7 @@
       <section class="card case-panel" id="casePanel" hidden>
         <h2>حالة تدريبية افتراضية — بيئة فنية وبحرية</h2>
         <p>البيانات التالية مأخوذة بتلخيص من الحالة التدريبية غير المحلولة ضمن حزمة Maturity SCA. لا تمثل وقائع مؤكدة تخص الهيئة. راجع الأدلة قبل اختيار أي درجة.</p>
-        <div id="caseEvidence"></div>
+        <details class="case-collection"><summary>عرض المستندات التدريبية (E01–E12)</summary><div id="caseEvidence"></div></details>
       </section>
       <section class="card">
         <div class="title-row"><h2 id="axisTitle">المحور الأول</h2><span id="axisStatus" class="status-chip pending">غير مقيم</span></div>
@@ -83,7 +85,7 @@
       <section class="report-card"><h2>مستوى كل محور</h2><div id="reportBars"></div></section>
       <section class="report-card">
         <h2>Evidence Register — سجل الأدلة</h2>
-        <div class="table-wrap"><table><thead><tr><th>المحور</th><th>الدرجة</th><th>مرجع الدليل</th><th>مبرر الدرجة</th><th>الثقة</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+        <p class="mobile-scroll-tip">اسحب الجدول يمينًا أو يسارًا لعرض باقي الأعمدة.</p><div class="table-wrap"><table><thead><tr><th>المحور</th><th>الدرجة</th><th>مرجع الدليل</th><th>مبرر الدرجة</th><th>الثقة</th></tr></thead><tbody id="reportTable"></tbody></table></div>
       </section>
       <section class="report-card advisory-panel">
         <h2>تحليل الفجوات وخطة التحسين (اختياري بعد التقييم)</h2>
@@ -94,7 +96,7 @@
       <section class="report-card">
         <h2>Improvement Roadmap — خطة 30 / 60 / 90 يومًا</h2>
         <p class="hint">الخطة مبنية على مدخلات المقيّم، وليست توصيات معتمدة تلقائيًا. يجب مراجعة الصلاحيات والاعتماديات قبل التنفيذ.</p>
-        <div class="table-wrap"><table><thead><tr><th>المحور</th><th>المبادرة المقترحة</th><th>الأولوية</th><th>الموجة</th><th>المالك</th></tr></thead><tbody id="reportPlan"></tbody></table></div>
+        <p class="mobile-scroll-tip">اسحب الجدول يمينًا أو يسارًا لعرض باقي الأعمدة.</p><div class="table-wrap"><table><thead><tr><th>المحور</th><th>المبادرة المقترحة</th><th>الأولوية</th><th>الموجة</th><th>المالك</th></tr></thead><tbody id="reportPlan"></tbody></table></div>
       </section>
     </div>
   </main>
