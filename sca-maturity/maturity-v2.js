@@ -45,7 +45,7 @@
     if(!state.items[id]||typeof state.items[id]!=="object")state.items[id]={score:"",evidence:"",reason:"",confidence:"",missing:"",gap:"",cause:"",action:"",priority:"",wave:"",owner:"",zeroConfirmed:false};
     return state.items[id];
   }
-  function complete(a){return /^[0-5]$/.test(String(a.score))&&String(a.evidence||"").trim().length>0&&String(a.reason||"").trim().length>0&&(String(a.score)!=="0"||a.zeroConfirmed===true);}
+  function complete(a){return /^[0-5]$/.test(String(a.score))&&String(a.evidence||"").trim().length>0&&String(a.reason||"").trim().length>0;}
   function totals(){
     const accepted=[];let draft=0;
     AXES.forEach((axis,i)=>{const a=get(i);if(complete(a))accepted.push({axis,a,score:Number(a.score)});else if(a.score!==""||a.evidence||a.reason)draft++;});
@@ -91,29 +91,16 @@
     $("axisTitle").textContent=(i+1)+" / 10 — "+x.title;
     $("axisQuestions").textContent=x.checks;
     $("axisEvidenceHint").textContent=x.examples;
-    $("axisMapping").textContent="مطابقة استرشادية مع المحاور القديمة: "+x.from;
     const scoreOpts=[["","غير مقيم — الأدلة غير كافية"]].concat(LEVELS.map(l=>[l[0],l[0]+" — "+l[1]]));
     $("axisFields").innerHTML=
-      '<div class="control-grid">'+
-      selectField("درجة النضج من 0 إلى 5","score",a.score,scoreOpts)+
-      selectField("درجة الثقة","confidence",a.confidence,[["","غير محدد"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
-      '</div>'+
-      '<div class="scale">'+LEVELS.map(l=>'<div><strong>'+l[0]+' — '+esc(l[1])+'</strong><small>'+esc(l[2])+'</small></div>').join("")+'</div>'+
-      (String(a.score)==="0"?'<label class="zero-check"><input type="checkbox" data-field="zeroConfirmed"'+(a.zeroConfirmed?' checked':'')+'> أؤكد وجود دليل تحقّق يثبت عدم وجود الممارسة، وليس مجرد نقص مستند.</label>':"")+
-      '<div class="control-grid">'+
-      field("مرجع الدليل / رقم المستند *","evidence",a.evidence,"مثال تدريبي: E02 أو اسم المستند وإصداره",2)+
-      field("مبرر الدرجة *","reason",a.reason,"كيف يثبت الدليل هذه الدرجة تحديدًا؟",3)+
-      field("الأدلة الناقصة / التحفظات","missing",a.missing,"ماذا يلزم التحقق منه قبل استنتاج نهائي؟",2)+
-      field("الفجوة أو الملاحظة","gap",a.gap,"فجوة مثبتة أو ملاحظة أولية؛ لا تفترض وجودها",2)+
-      field("السبب الجذري المحتمل (فرضية)","cause",a.cause,"سبب يحتاج إلى تحقق مستقل",2)+
-      field("الإجراء أو المبادرة المقترحة","action",a.action,"مخرج قابل للقياس والتنفيذ",2)+
-      '</div><div class="control-grid three">'+
-      selectField("الأولوية","priority",a.priority,[["","غير محددة"],["high","مرتفعة"],["medium","متوسطة"],["low","منخفضة"]])+
-      selectField("الموجة المقترحة","wave",a.wave,[["","غير محددة"],["30","أيام 1–30"],["60","أيام 31–60"],["90","أيام 61–90"]])+
-      field("المالك المقترح","owner",a.owner,"يُحسم وفق الصلاحيات",0)+
-      '</div>'+
-      '<p class="hint">لا تدخل بيانات موظفين حقيقية أو مستندات سرية؛ التطبيق عام ويحفظ البيانات محليًا في المتصفح. لا تُحتسب الدرجة دون مرجع دليل ومبرر، وتحتاج الدرجة صفر تأكيدًا خاصًا.</p>';
-    $("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":"غير مقيم أو ينقصه مبرر / دليل";
+      '<div class="simple-assessment">'+
+      selectField("1. درجة النضج (0–5)","score",a.score,scoreOpts)+
+      '<details class="scale-toggle"><summary>شرح مستويات النضج 0–5 (اختياري)</summary><div class="scale">'+LEVELS.map(l=>'<div><strong>'+l[0]+' — '+esc(l[1])+'</strong><small>'+esc(l[2])+'</small></div>').join("")+'</div></details>'+
+      field("2. مرجع الدليل أو رقم المستند","evidence",a.evidence,"مثال: E02 أو رقم/إصدار المستند",2)+
+      field("3. مبرر اختيار الدرجة","reason",a.reason,"اشرح السبب في جملة أو جملتين",3)+
+      '<p class="hint">لا تُحتسب أي درجة دون دليل ومبرر. إذا كانت الأدلة غير كافية اختر «غير مقيم»، فالدرجة صفر لا تعني غياب المستند بل غياب الممارسة المثبت بالفحص. تحليل الفجوات وخطة التحسين في صفحة النتائج.</p>'+
+      '</div>';
+    $("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":a.score===""?"غير مقيم":"الدرجة لا تُحتسب قبل إضافة الدليل والمبرر";
     $("axisStatus").className="status-chip "+(complete(a)?"complete":"pending");
     $("backAxis").disabled=i===0;$("nextAxis").disabled=i===9;
   }
@@ -180,14 +167,14 @@
     $("axisNav").addEventListener("click",e=>{const b=e.target.closest("[data-axis]");if(b){state.current=Number(b.dataset.axis);store();nav();renderAxis();}});
     $("axisFields").addEventListener("input",e=>{
       const field=e.target.dataset.field;if(!field)return;
-      const a=get(state.current);a[field]=field==="zeroConfirmed"?e.target.checked:e.target.value;
+      const a=get(state.current);a[field]=e.target.value;
       store();refresh();nav();$("axisStatus").textContent=complete(a)?"مُقيّم — الدرجة "+a.score+"/5":"غير مقيم أو ينقصه مبرر / دليل";
       $("axisStatus").className="status-chip "+(complete(a)?"complete":"pending");
     });
     $("axisFields").addEventListener("change",e=>{
       const field=e.target.dataset.field;if(!field)return;
-      const a=get(state.current);a[field]=field==="zeroConfirmed"?e.target.checked:e.target.value;
-      if(field==="score") {if(a.score!=="0")a.zeroConfirmed=false;store();renderAxis();}
+      const a=get(state.current);a[field]=e.target.value;
+      if(field==="score") {store();renderAxis();}
       else {store();refresh();nav();}
     });
     $("backAxis").addEventListener("click",()=>{if(state.current>0){state.current--;store();nav();renderAxis();}});
